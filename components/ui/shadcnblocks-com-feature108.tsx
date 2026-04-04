@@ -1,6 +1,7 @@
 import * as React from "react"
 import * as Tabs from "@radix-ui/react-tabs"
 import { Layout, Pointer, Wallet } from "lucide-react"
+import { motion } from "motion/react"
 import Image from "next/image"
 import dashboardImage from "@/public/dashboard.avif"
 import socialImage from "@/public/share.avif"
@@ -114,35 +115,48 @@ export function Feature108({
         </div>
 
         <Tabs.Root defaultValue={tabs[0]?.value} className="mt-10">
-          <Tabs.List className="grid gap-4 md:grid-cols-3">
-            {tabs.map((tab, index) => (
-              <Tabs.Trigger
-                key={tab.value}
-                value={tab.value}
-                className={cn(
-                  "group rounded-2xl border border-muted-foreground p-5 text-left transition-all outline-none",
-                  "data-[state=active]:border-chart-1 data-[state=active]:bg-primary/10"
-                )}
-              >
-                <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-foreground">
-                  <span className="grid size-8 place-items-center text-gray-400 group-data-[state=active]/trigger:text-chart-1">
-                    {tab.icon}
-                  </span>
-                  <span className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
-                    Step {index + 1}
-                  </span>
-                </div>
-                <p className="font-heading text-lg font-semibold text-background group-data-[state=active]/trigger:text-chart-1">
-                  {tab.label}
-                </p>
-                <p className="mt-2 font-sans text-sm leading-relaxed text-background/70 group-data-[state=active]/trigger:text-background">
-                  {tab.shortDescription}
-                </p>
-              </Tabs.Trigger>
-            ))}
-          </Tabs.List>
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.35 }}
+            transition={{ duration: 0.45, ease: "easeOut" }}
+          >
+            <Tabs.List className="grid gap-4 md:grid-cols-3">
+              {tabs.map((tab, index) => (
+                <Tabs.Trigger
+                  key={tab.value}
+                  value={tab.value}
+                  className={cn(
+                    "group rounded-2xl border border-muted-foreground p-5 text-left transition-all outline-none",
+                    "data-[state=active]:border-chart-1 data-[state=active]:bg-primary/10"
+                  )}
+                >
+                  <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-foreground">
+                    <span className="grid size-8 place-items-center text-gray-400 group-data-[state=active]/trigger:text-chart-1">
+                      {tab.icon}
+                    </span>
+                    <span className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
+                      Step {index + 1}
+                    </span>
+                  </div>
+                  <p className="font-heading text-lg font-semibold text-background group-data-[state=active]/trigger:text-chart-1">
+                    {tab.label}
+                  </p>
+                  <p className="mt-2 font-sans text-sm leading-relaxed text-background/70 group-data-[state=active]/trigger:text-background">
+                    {tab.shortDescription}
+                  </p>
+                </Tabs.Trigger>
+              ))}
+            </Tabs.List>
+          </motion.div>
 
-          <div className="mt-8 p-6 lg:p-10">
+          <motion.div
+            className="mt-8 p-6 lg:p-10"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.35 }}
+            transition={{ duration: 0.5, ease: "easeOut", delay: 0.08 }}
+          >
             {tabs.map((tab) => (
               <Tabs.Content
                 key={tab.value}
@@ -178,7 +192,7 @@ export function Feature108({
                 </div>
               </Tabs.Content>
             ))}
-          </div>
+          </motion.div>
         </Tabs.Root>
       </div>
     </section>

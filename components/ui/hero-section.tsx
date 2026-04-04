@@ -4,6 +4,7 @@ import { HeroCopyBlock } from "@/components/landing/hero-copy"
 import { HeroAnimation } from "@/components/landing/hero-animation"
 import { HeroNav } from "@/components/landing/hero-nav"
 import { HowItWorks } from "@/components/landing/how-it-works"
+import { ModesSection } from "@/components/landing/modes"
 import { heroNavItems } from "@/lib/landing/hero-content"
 
 export default function HeroSection() {
@@ -24,6 +25,7 @@ export default function HeroSection() {
         <HeroAnimation />
       </div>
       <HowItWorks />
+      <ModesSection />
     </section>
   )
 }
