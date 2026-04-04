@@ -8,6 +8,7 @@ import paymentImage from "@/public/payment.jpg"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { AsteriskRevealHeading } from "@/components/ui/asterisk-reveal-heading"
 import { cn } from "@/lib/utils"
 
 export interface TabContent {
@@ -101,9 +102,12 @@ export function Feature108({
           >
             {badge}
           </Badge>
-          <h2 className="max-w-2xl font-heading text-3xl font-bold tracking-tight text-background md:text-5xl">
-            {heading}
-          </h2>
+          <AsteriskRevealHeading
+            as="h2"
+            delayMs={760}
+            text={heading}
+            className="max-w-2xl font-heading text-3xl font-bold tracking-tight text-background md:text-5xl"
+          />
           <p className="max-w-2xl font-sans text-background/70">
             {description}
           </p>
@@ -149,9 +153,12 @@ export function Feature108({
                   <Badge variant="outline" className="w-fit bg-background/70">
                     {tab.content.badge}
                   </Badge>
-                  <h3 className="font-heading text-3xl font-semibold tracking-tight text-background md:text-4xl">
-                    {tab.content.title}
-                  </h3>
+                  <AsteriskRevealHeading
+                    as="h3"
+                    delayMs={900}
+                    text={tab.content.title}
+                    className="font-heading text-3xl font-semibold tracking-tight text-background md:text-4xl"
+                  />
                   <p className="font-sans text-background/70 lg:text-lg">
                     {tab.content.description}
                   </p>

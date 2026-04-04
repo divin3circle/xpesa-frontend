@@ -1,6 +1,7 @@
 import { Play } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { AsteriskRevealHeading } from "@/components/ui/asterisk-reveal-heading"
 import { heroCopy, heroStats } from "@/lib/landing/hero-content"
 
 export function HeroCopyBlock() {
@@ -10,11 +11,12 @@ export function HeroCopyBlock() {
         {heroCopy.eyebrow}
       </p>
 
-      <h1 className="text-center font-heading text-3xl leading-[0.95] font-extrabold tracking-tight text-background md:text-6xl">
-        {heroCopy.headingLead}
-        <span className="mx-2 text-chart-1">{heroCopy.headingAccent}</span>
-        {heroCopy.headingTail}
-      </h1>
+      <AsteriskRevealHeading
+        as="h1"
+        delayMs={540}
+        text={`${heroCopy.headingLead} ${heroCopy.headingAccent} ${heroCopy.headingTail}`}
+        className="text-center font-heading text-3xl leading-[0.95] font-extrabold tracking-tight text-background md:text-6xl"
+      />
 
       <p className="mt-6 max-w-3xl text-center text-base leading-relaxed text-background/70 md:text-lg">
         {heroCopy.description}

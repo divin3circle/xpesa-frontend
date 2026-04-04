@@ -10,8 +10,8 @@ export function HeroAnimation() {
         className="pointer-events-none absolute inset-0"
       />
       <StackedPanels />
-      <p className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 font-sans text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase">
-        all your creator economy needs
+      <p className="pointer-events-none absolute bottom-0 font-sans text-[10px] font-medium tracking-[0.2em] text-muted-foreground uppercase md:bottom-3 md:left-1/2 md:-translate-x-1/2">
+        what your creator economy needs
       </p>
     </div>
   )
