@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import * as Tooltip from "@radix-ui/react-tooltip"
-import { ArrowUpRight, Landmark, Smartphone } from "lucide-react"
+import { ArrowUpRight } from "lucide-react"
 import { motion } from "motion/react"
 
 import { Badge } from "@/components/ui/badge"
