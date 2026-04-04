@@ -8,6 +8,7 @@ import { ModesSection } from "@/components/landing/modes"
 import { CtaSection } from "@/components/landing/cta"
 import { WhoIsThisForSection } from "@/components/landing/who-is-this-for"
 import { PricingSection } from "@/components/landing/pricing"
+import { FooterSection } from "@/components/landing/footer"
 import { heroNavItems } from "@/lib/landing/hero-content"
 
 export default function HeroSection() {
@@ -32,6 +33,7 @@ export default function HeroSection() {
       <CtaSection />
       <WhoIsThisForSection />
       <PricingSection />
+      <FooterSection />
     </section>
   )
 }
