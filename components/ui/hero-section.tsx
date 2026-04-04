@@ -3,6 +3,7 @@
 import { HeroCopyBlock } from "@/components/landing/hero-copy"
 import { HeroAnimation } from "@/components/landing/hero-animation"
 import { HeroNav } from "@/components/landing/hero-nav"
+import { HowItWorks } from "@/components/landing/how-it-works"
 import { heroNavItems } from "@/lib/landing/hero-content"
 
 export default function HeroSection() {
@@ -22,6 +23,7 @@ export default function HeroSection() {
       <div className="mx-auto w-full max-w-6xl px-6 pb-16 lg:px-10">
         <HeroAnimation />
       </div>
+      <HowItWorks />
     </section>
   )
 }

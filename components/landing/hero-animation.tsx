@@ -4,7 +4,7 @@ import StackedPanels from "@/components/ui/stacked-panels-cursor-intereactive-co
 
 export function HeroAnimation() {
   return (
-    <div className="relative h-105 w-full overflow-hidden md:h-125">
+    <div className="relative h-115 w-full overflow-hidden md:h-135">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"

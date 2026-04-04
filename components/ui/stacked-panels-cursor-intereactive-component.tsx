@@ -194,9 +194,7 @@ export default function StackedPanels({
   const center = (panelCount - 1) / 2
   const resolvedImages = images.length > 0 ? images : DEFAULT_PANEL_IMAGES
 
-  const [frontImageIndex, setFrontImageIndex] = React.useState(() =>
-    Math.floor(Math.random() * resolvedImages.length)
-  )
+  const [frontImageIndex, setFrontImageIndex] = React.useState(0)
 
   const cursorIndex = useSpring(center, CURSOR_SPRING)
   const rotY = useSpring(-42, SCENE_SPRING)
@@ -227,6 +225,15 @@ export default function StackedPanels({
   }, [center, cursorIndex, rotX, rotY])
 
   React.useEffect(() => {
+    setFrontImageIndex((prev) => {
+      if (resolvedImages.length <= 1) return 0
+      let next = prev
+      while (next === prev) {
+        next = Math.floor(Math.random() * resolvedImages.length)
+      }
+      return next
+    })
+
     const intervalId = window.setInterval(() => {
       setFrontImageIndex((prev) => {
         if (resolvedImages.length <= 1) return prev

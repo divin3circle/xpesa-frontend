@@ -10,7 +10,7 @@ export function HeroCopyBlock() {
         {heroCopy.eyebrow}
       </p>
 
-      <h1 className="text-center font-heading text-4xl leading-[0.95] font-extrabold tracking-tight text-background md:text-6xl">
+      <h1 className="text-center font-heading text-3xl leading-[0.95] font-extrabold tracking-tight text-background md:text-6xl">
         {heroCopy.headingLead}
         <span className="mx-2 text-chart-1">{heroCopy.headingAccent}</span>
         {heroCopy.headingTail}
