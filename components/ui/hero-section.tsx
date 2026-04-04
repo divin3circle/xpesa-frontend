@@ -5,6 +5,7 @@ import { HeroAnimation } from "@/components/landing/hero-animation"
 import { HeroNav } from "@/components/landing/hero-nav"
 import { HowItWorks } from "@/components/landing/how-it-works"
 import { ModesSection } from "@/components/landing/modes"
+import { CtaSection } from "@/components/landing/cta"
 import { heroNavItems } from "@/lib/landing/hero-content"
 
 export default function HeroSection() {
@@ -26,6 +27,7 @@ export default function HeroSection() {
       </div>
       <HowItWorks />
       <ModesSection />
+      <CtaSection />
     </section>
   )
 }
