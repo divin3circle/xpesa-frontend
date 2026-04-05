@@ -42,23 +42,22 @@ export function OnboardingProvider({
 }: {
   children: React.ReactNode
 }) {
-  const [state, setState] = useState<OnboardingState>(() => {
-    if (typeof window === "undefined") {
-      return INITIAL_ONBOARDING_STATE
-    }
+  const [state, setState] = useState<OnboardingState>(INITIAL_ONBOARDING_STATE)
+  const [isHydrated, setIsHydrated] = useState(false)
 
+  useEffect(() => {
     const raw = window.sessionStorage.getItem(ONBOARDING_STORAGE_KEY)
-    if (!raw) {
-      return INITIAL_ONBOARDING_STATE
+    if (raw) {
+      try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setState(JSON.parse(raw) as OnboardingState)
+      } catch {
+        // Ignore bad serialized data and continue with defaults.
+      }
     }
 
-    try {
-      return JSON.parse(raw) as OnboardingState
-    } catch {
-      return INITIAL_ONBOARDING_STATE
-    }
-  })
-  const isHydrated = typeof window !== "undefined"
+    setIsHydrated(true)
+  }, [])
 
   useEffect(() => {
     if (!isHydrated) return
