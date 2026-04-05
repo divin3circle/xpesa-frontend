@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { OnboardingStepHeader } from "@/components/onboarding/step-header"
 import { useOnboardingStepGuard } from "@/components/onboarding/onboarding-step-guard"
 import { useOnboarding } from "@/components/onboarding/onboarding-provider"
+import { IconInfoCircleFilled } from "@tabler/icons-react"
 
 function createMockWalletAddress() {
   return `0x${Math.random().toString(16).slice(2, 42).padEnd(40, "0")}`
@@ -57,14 +58,13 @@ export function WalletStep() {
       <OnboardingStepHeader step="wallet" />
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card className="rounded-3xl border-border/70">
+        <Card className="rounded-3xl border-border/70 shadow-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl">
-              <Wallet className="size-5 text-primary" />
               Connect existing wallet
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              Use Thirdweb ConnectButton to connect your current wallet.
+              Use the ConnectButton to connect your current wallet.
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -73,7 +73,7 @@ export function WalletStep() {
               className="w-full"
               onClick={handleConnectExistingWallet}
             >
-              Connect wallet (Thirdweb)
+              Connect wallet
             </Button>
 
             {connectedAddress ? (
@@ -93,10 +93,9 @@ export function WalletStep() {
           </CardContent>
         </Card>
 
-        <Card className="rounded-3xl border-border/70">
+        <Card className="rounded-3xl border-border/70 shadow-none">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl">
-              <Mail className="size-5 text-primary" />
               Create a wallet
             </CardTitle>
             <p className="text-sm text-muted-foreground">
@@ -138,20 +137,16 @@ export function WalletStep() {
         </Card>
       </div>
 
-      <div className="mt-8 rounded-3xl border border-border/70 bg-muted/30 p-4">
-        <p className="text-sm text-muted-foreground">
-          xpesa never holds your funds. Payments go directly to your wallet.
-        </p>
-      </div>
-
       <div className="mt-8 flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           {selectedWallet ? (
             <Check className="size-4 text-primary" />
           ) : (
-            <Copy className="size-4" />
+            <IconInfoCircleFilled className="size-4" />
           )}
-          {selectedWallet ? "Wallet selected" : "Select a wallet to continue"}
+          {selectedWallet
+            ? "Wallet selected"
+            : "Select a wallet to continue. We never holds your funds. Payments go directly to your wallet."}
         </div>
         <Button
           type="button"

@@ -114,10 +114,10 @@ export function ProfileStep() {
               <img
                 src={avatarDataUrl}
                 alt="Avatar preview"
-                className="size-14 rounded-full object-cover"
+                className="h-14 w-16 rounded-full object-cover"
               />
             ) : (
-              <div className="flex size-14 items-center justify-center rounded-full bg-primary/15 font-heading text-lg font-semibold text-primary">
+              <div className="flex h-14 w-16 items-center justify-center rounded-full bg-primary/15 font-heading text-lg font-semibold text-primary">
                 {initials}
               </div>
             )}
@@ -143,7 +143,7 @@ export function ProfileStep() {
           />
           <p className="text-sm text-muted-foreground">
             Required to withdraw earnings. You can change this later in
-            settings.
+            settings. We never share this with anyone.
           </p>
           {mpesaNumber && !isMpesaFieldValid ? (
             <p className="text-sm text-destructive">

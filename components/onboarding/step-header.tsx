@@ -16,7 +16,8 @@ export function OnboardingStepHeader({ step }: { step: OnboardingStep }) {
       </h1>
       {meta?.step === "wallet" && (
         <p className="mt-3 max-w-xl text-muted-foreground">
-          xpesa never holds your funds. Payments go directly to your wallet.
+          Connect a wallet you wish to receive payments to, or create a new one
+          with your email.
         </p>
       )}
     </header>

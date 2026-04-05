@@ -7,6 +7,7 @@ import type { HeroNavItem } from "@/lib/landing/hero-content"
 import { MobileMenu } from "./mobile-menu"
 import { useRouter } from "next/navigation"
 import { onNavigate } from "@/lib/utils"
+import { ModeToggle } from "../mode-toggle"
 
 type HeroNavProps = {
   navItems: HeroNavItem[]
@@ -33,15 +34,19 @@ export function HeroNav({ navItems }: HeroNavProps) {
         ))}
       </div>
 
-      <Button
-        size="lg"
-        className="hidden md:flex"
-        onClick={() => onNavigate("/login", router)}
-      >
-        Sign In
-      </Button>
+      <div className="hidden items-center gap-4 md:flex">
+        <ModeToggle />
+        <Button
+          size="lg"
+          className="hidden md:flex"
+          onClick={() => onNavigate("/login", router)}
+        >
+          Sign In
+        </Button>
+      </div>
 
-      <div className="md:hidden">
+      <div className="flex items-center gap-2 md:hidden">
+        <ModeToggle />
         <MobileMenu navItems={navItems} />
       </div>
     </nav>
