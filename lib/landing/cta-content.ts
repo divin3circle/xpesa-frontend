@@ -7,15 +7,21 @@ export const ctaContent = {
   points: [
     {
       label: "Payout clarity",
-      value: "USDC to local mobile money in one flow",
+      value: "USDC to M-Pesa. You see exactly what lands.",
+      description:
+        "Know your payout before you share a single link. No surprises, no conversion math.",
     },
     {
       label: "Creator trust",
-      value: "Built for how African creators actually withdraw",
+      value: "Built for African creators. Not adapted for them.",
+      description:
+        "Every other tool was built elsewhere and bolted on an offramp. xpesa starts with M-Pesa withdrawal as a core feature, not an afterthought.",
     },
     {
       label: "Audience fit",
-      value: "Fans pay online, creators spend locally",
+      value: "Your fans pay online. You spend locally.",
+      description:
+        "Fans pay the way they already do. You receive in KES, straight to M-Pesa. No one changes their habits.",
     },
   ],
   primaryCta: "Join creator waitlist",

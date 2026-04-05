@@ -5,12 +5,15 @@ import { BrandLogo } from "@/components/landing/brand-logo"
 import { Button } from "@/components/ui/button"
 import type { HeroNavItem } from "@/lib/landing/hero-content"
 import { MobileMenu } from "./mobile-menu"
+import { useRouter } from "next/navigation"
+import { onNavigate } from "@/lib/utils"
 
 type HeroNavProps = {
   navItems: HeroNavItem[]
 }
 
 export function HeroNav({ navItems }: HeroNavProps) {
+  const router = useRouter()
   return (
     <nav
       className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5 lg:px-10"
@@ -30,8 +33,12 @@ export function HeroNav({ navItems }: HeroNavProps) {
         ))}
       </div>
 
-      <Button size="lg" className="hidden md:flex">
-        Get Started
+      <Button
+        size="lg"
+        className="hidden md:flex"
+        onClick={() => onNavigate("/login", router)}
+      >
+        Sign In
       </Button>
 
       <div className="md:hidden">

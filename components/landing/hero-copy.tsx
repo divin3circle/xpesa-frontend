@@ -1,10 +1,15 @@
+"use client"
+
 import { Play } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { AsteriskRevealHeading } from "@/components/ui/asterisk-reveal-heading"
 import { heroCopy, heroStats } from "@/lib/landing/hero-content"
+import { onNavigate } from "@/lib/utils"
+import { useRouter } from "next/navigation"
 
 export function HeroCopyBlock() {
+  const router = useRouter()
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col items-center justify-center px-6 pt-14 pb-20 lg:px-10 lg:pt-20 lg:pb-28">
       <p className="mb-4 text-xs tracking-[0.2em] text-muted-foreground uppercase">
@@ -23,9 +28,12 @@ export function HeroCopyBlock() {
       </p>
 
       <div className="mt-8 flex flex-wrap items-center gap-3">
-        <Button size="lg">Join Waitlist</Button>
+        <Button size="lg" onClick={() => onNavigate("/waitlist", router)}>
+          Join Waitlist
+        </Button>
         <Button
           size="lg"
+          onClick={() => onNavigate("/signup", router)}
           variant="secondary"
           className="border border-muted-foreground bg-white/10 text-background hover:bg-white/15"
         >

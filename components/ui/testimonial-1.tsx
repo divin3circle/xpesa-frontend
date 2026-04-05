@@ -46,7 +46,7 @@ export default function Testimonial1({ className }: Testimonial1Props) {
           </p>
 
           <div className="mt-8 grid gap-3 md:grid-cols-3">
-            {ctaContent.points.map((point, index) => (
+            {ctaContent.points.map((point) => (
               <Tooltip.Provider key={point.label} delayDuration={120}>
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
@@ -65,7 +65,7 @@ export default function Testimonial1({ className }: Testimonial1Props) {
                       sideOffset={8}
                       className="z-50 max-w-xs rounded-xl border border-border bg-popover px-3 py-2 text-xs text-popover-foreground shadow-lg"
                     >
-                      Local payout moat signal #{index + 1}
+                      {point.description}
                       <Tooltip.Arrow className="fill-popover" />
                     </Tooltip.Content>
                   </Tooltip.Portal>
