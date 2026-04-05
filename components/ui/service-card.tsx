@@ -60,7 +60,10 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
         transition={{ duration: 0.25, ease: "easeOut" }}
       >
         <div
-          className={`relative z-10 flex h-64 flex-col rounded-2xl border border-background/10 bg-${bgColor} p-6`}
+          className={cn(
+            "relative z-10 flex h-64 flex-col rounded-2xl border border-background/10 p-6",
+            `bg-${bgColor}`
+          )}
         >
           <h3
             className={cn(

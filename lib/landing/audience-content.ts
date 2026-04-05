@@ -36,7 +36,7 @@ export const audienceContent = {
       icon: BookOpenText,
       imageSrc: campusStudentsImage.src,
       imageAlt: "Students studying with notebooks",
-      bgColor: "red-500",
+      bgColor: "destructive",
       text: "white",
     },
     {
@@ -47,8 +47,8 @@ export const audienceContent = {
       icon: MessageSquareShare,
       imageSrc: twitterEducatorsImage.src,
       imageAlt: "Phone showing social media feed",
-      bgColor: "purple-500",
-      text: "white",
+      bgColor: "foreground",
+      text: "background",
     },
     {
       title: "Freelancers selling templates",
@@ -69,7 +69,7 @@ export const audienceContent = {
       icon: Stethoscope,
       imageSrc: coachesImage.src,
       imageAlt: "Coach consulting a client",
-      bgColor: "green-500",
+      bgColor: "sidebar-primary",
       text: "white",
     },
   ] as AudienceArchetype[],
