@@ -3,7 +3,7 @@ import { Check, Flame, Sparkles, Wallet2 } from "lucide-react"
 export const pricingContent = {
   badge: {
     icon: Sparkles,
-    text: "Simple V1 pricing",
+    text: "All you need.",
   },
   heading: "Free to start. We take 5% on transactions. That's it.",
   subtitle:
@@ -18,7 +18,7 @@ export const pricingContent = {
     { text: "One transparent transaction fee", icon: Wallet2 },
     { text: "No hidden plan upgrades in V1", icon: Check },
   ],
-  featuresTitle: "Included in V1",
+  featuresTitle: "Included FREE!",
   features: [
     { text: "Custom creator page at xpesa.com/[handle]" },
     { text: "Up to 5 active links (gate + tip combined)" },

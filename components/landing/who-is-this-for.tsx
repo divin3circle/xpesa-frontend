@@ -63,6 +63,8 @@ export function WhoIsThisForSection() {
                   href={item.href}
                   imgSrc={item.imageSrc}
                   imgAlt={item.imageAlt}
+                  bgColor={item.bgColor}
+                  text={item.text}
                   icon={<Icon className="size-4" />}
                   variant={index % 2 === 0 ? "green" : "subtle"}
                   className="px-0"

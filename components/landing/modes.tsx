@@ -31,7 +31,7 @@ function FanMockup({
     >
       <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-white/10 bg-foreground/85 p-4 text-background md:flex-row">
         <div>
-          <div className="mb-2 inline-flex items-center gap-2 font-sans text-xs font-extrabold tracking-[0.2em] text-background/55 lowercase">
+          <div className="mb-2 inline-flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-background/55 uppercase">
             {icon}
             xpesa/goodcreator77
           </div>

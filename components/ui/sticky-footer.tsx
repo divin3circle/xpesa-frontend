@@ -10,6 +10,7 @@ import {
   footerSocialLinks,
 } from "@/lib/landing/footer-content"
 import { Button } from "@/components/ui/button"
+import { BrandLogo } from "../landing/brand-logo"
 
 type StickyFooterProps = React.ComponentProps<"footer">
 
@@ -20,9 +21,9 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
       style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
       {...props}
     >
-      <div className="relative bottom-0 h-155 w-full">
+      <div className="relative bottom-0 h-105 w-full">
         <div className="sticky top-[calc(100vh-620px)] h-full overflow-y-auto">
-          <div className="relative flex size-full flex-col justify-between gap-5 border-t border-border/70 px-4 py-8 md:px-12">
+          <div className="relative flex size-full flex-col justify-between gap-5 px-4 py-8 md:px-12">
             <div
               aria-hidden
               className="absolute inset-0 isolate z-0 contain-strict"
@@ -33,8 +34,8 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
 
             <div className="z-10 mt-8 flex flex-col gap-8 md:flex-row xl:mt-0">
               <AnimatedContainer className="w-full max-w-sm min-w-2xs space-y-4">
-                <FrameIcon className="size-8 text-chart-1" />
-                <p className="mt-8 text-sm text-muted-foreground md:mt-0">
+                <BrandLogo />
+                <p className="mt-8 text-sm text-background/75 md:mt-0">
                   xpesa helps creators in Africa monetize links and tips, then
                   withdraw earnings to local mobile money rails like M-Pesa.
                 </p>
@@ -45,12 +46,16 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
                       <Button
                         key={link.title}
                         size="icon"
-                        variant="outline"
-                        className="size-8"
+                        variant="ghost"
+                        className="size-12"
                         asChild
                       >
-                        <a href={link.href} aria-label={link.title}>
-                          <Icon className="size-4" />
+                        <a
+                          href={link.href}
+                          aria-label={link.title}
+                          className="text-background/75 transition-all duration-300 hover:text-background"
+                        >
+                          <Icon className="size-6d" />
                         </a>
                       </Button>
                     )
@@ -75,7 +80,7 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
                           <li key={link.title}>
                             <a
                               href={link.href}
-                              className="inline-flex items-center transition-all duration-300 hover:text-foreground"
+                              className="inline-flex items-center text-background/50 transition-all duration-300 hover:text-background"
                             >
                               {Icon && <Icon className="me-1 size-4" />}
                               {link.title}
@@ -89,9 +94,13 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
               ))}
             </div>
 
-            <div className="z-10 flex flex-col items-center justify-between gap-2 border-t border-border/70 pt-3 text-sm text-muted-foreground md:flex-row">
-              <p>© 2026 xpesa. All rights reserved.</p>
-              <p>Built for creator monetization in Africa.</p>
+            <div className="z-10 flex flex-col items-center justify-between gap-2 pt-3 text-sm text-muted-foreground md:flex-row">
+              <p className="font-heading text-xs font-semibold text-background/50">
+                © 2026 xpesa. All rights reserved.
+              </p>
+              <p className="font-heading text-xs font-semibold text-background/50">
+                Built for creator monetization in Africa.
+              </p>
             </div>
           </div>
         </div>

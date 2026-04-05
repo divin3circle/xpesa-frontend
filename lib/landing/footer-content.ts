@@ -1,7 +1,6 @@
 import {
   BookOpenText,
   CircleDollarSign,
-  ExternalLink,
   FileText,
   HandCoins,
   HelpCircle,
@@ -9,6 +8,12 @@ import {
   Landmark,
   ShieldCheck,
 } from "lucide-react"
+
+import {
+  IconBrandTwitter,
+  IconBrandLinkedin,
+  IconBrandYoutube,
+} from "@tabler/icons-react"
 
 export type FooterLink = {
   title: string
@@ -22,9 +27,9 @@ export type FooterLinkGroup = {
 }
 
 export const footerSocialLinks = [
-  { title: "Twitter/X", href: "#", icon: ExternalLink },
-  { title: "LinkedIn", href: "#", icon: ExternalLink },
-  { title: "YouTube", href: "#", icon: ExternalLink },
+  { title: "Twitter/X", href: "#", icon: IconBrandTwitter },
+  { title: "LinkedIn", href: "#", icon: IconBrandLinkedin },
+  { title: "YouTube", href: "#", icon: IconBrandYoutube },
 ]
 
 export const footerLinkGroups: FooterLinkGroup[] = [

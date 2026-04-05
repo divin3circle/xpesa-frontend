@@ -32,12 +32,24 @@ export interface ServiceCardProps
   href: string
   imgSrc: string
   imgAlt: string
+  bgColor: "red-500" | "green-500" | "purple-500" | "background"
+  text: "white" | "foreground"
   icon?: React.ReactNode
 }
 
 const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
   (
-    { className, variant, title, description, href, imgSrc, imgAlt, icon },
+    {
+      className,
+      variant,
+      title,
+      description,
+      href,
+      imgSrc,
+      imgAlt,
+      bgColor,
+      text,
+    },
     ref
   ) => {
     return (
@@ -47,22 +59,33 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
         whileHover={{ y: -4 }}
         transition={{ duration: 0.25, ease: "easeOut" }}
       >
-        <div className="relative z-10 flex h-full flex-col">
-          <div className="mb-3 inline-flex size-10 items-center justify-center rounded-full bg-primary/12 text-primary">
-            {icon}
-          </div>
-
-          <h3 className="font-heading text-2xl font-semibold tracking-tight">
+        <div
+          className={`relative z-10 flex h-64 flex-col rounded-2xl border border-background/10 bg-${bgColor} p-6`}
+        >
+          <h3
+            className={cn(
+              "font-heading text-2xl font-semibold tracking-tight",
+              `text-${text}`
+            )}
+          >
             {title}
           </h3>
-          <p className="mt-2 max-w-sm font-sans text-sm leading-relaxed text-muted-foreground">
+          <p
+            className={cn(
+              "mt-2 max-w-sm font-sans text-sm leading-relaxed",
+              `text-${text}`
+            )}
+          >
             {description}
           </p>
 
           <a
             href={href}
             aria-label={`Learn more about ${title}`}
-            className="mt-5 inline-flex items-center gap-2 text-xs font-semibold tracking-[0.14em] text-primary uppercase"
+            className={cn(
+              "mt-4 inline-flex items-center font-medium transition-all duration-300",
+              `text-${text}`
+            )}
           >
             Learn more
             <motion.span
@@ -81,7 +104,7 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
         <motion.img
           src={imgSrc}
           alt={imgAlt}
-          className="pointer-events-none absolute right-0 bottom-0 h-24 w-24 rounded-xl object-cover opacity-75 saturate-125"
+          className="pointer-events-none absolute right-0 bottom-[10%] z-50 mx-2 h-28 w-38 object-cover opacity-75 saturate-125"
           whileHover={{ scale: 1.06, rotate: 2, x: 3, y: -2 }}
           transition={{ duration: 0.3, ease: "easeOut" }}
         />

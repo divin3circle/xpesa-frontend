@@ -169,7 +169,7 @@ function SinglePricingCardContent({
 
   return (
     <Card
-      className={`relative overflow-hidden border-primary/20 bg-card/70 ${cardClassName ?? ""}`}
+      className={`relative overflow-hidden rounded-3xl border-primary/20 bg-card/70 ${cardClassName ?? ""}`}
     >
       <div className="flex flex-col md:flex-row">
         <div className="flex flex-col p-6 md:w-1/2 md:p-8">
@@ -182,19 +182,17 @@ function SinglePricingCardContent({
             </div>
           )}
 
-          <h3 className="mb-2 font-heading text-2xl font-bold text-foreground">
+          <h3 className="mb-2 font-heading text-2xl font-bold text-background">
             {title}
           </h3>
-          <p className="mb-4 text-muted-foreground">{subtitle}</p>
+          <p className="mb-4 text-background/75">{subtitle}</p>
 
           <div className="mb-6 flex items-baseline">
             <span className="font-heading text-4xl font-bold text-chart-1">
               {price.current}
             </span>
             {price.original && (
-              <span className="ml-2 text-muted-foreground">
-                {price.original}
-              </span>
+              <span className="ml-2 text-background/75">{price.original}</span>
             )}
             {price.discount && (
               <Badge
@@ -212,7 +210,7 @@ function SinglePricingCardContent({
               return (
                 <div key={benefit.text} className="flex items-center gap-2">
                   <BenefitIcon className="size-4 text-primary" />
-                  <span className="text-sm text-foreground/90">
+                  <span className="text-sm text-background/75">
                     {benefit.text}
                   </span>
                 </div>
@@ -249,7 +247,7 @@ function SinglePricingCardContent({
             {secondaryButton && (
               <Button
                 variant="outline"
-                className="w-full gap-2"
+                className="w-full gap-2 border-background/20 bg-transparent text-background hover:text-background/90"
                 size="lg"
                 onClick={secondaryButton.onClick}
                 asChild={!!secondaryButton.href}
@@ -295,7 +293,7 @@ function SinglePricingCardContent({
                 <div className="flex size-5 items-center justify-center rounded-full bg-primary/10">
                   <FeaturesIcon className="size-3 text-primary" />
                 </div>
-                <span className="text-sm text-foreground/90">
+                <span className="text-sm text-background/75">
                   {feature.text}
                 </span>
               </motion.div>
@@ -304,9 +302,9 @@ function SinglePricingCardContent({
 
           {testimonials.length > 0 && (
             <>
-              <Separator className="my-6" />
+              <Separator className="my-6 bg-background/10" />
 
-              <div className="relative min-h-30 overflow-hidden rounded-lg border border-border/50 p-4">
+              <div className="relative min-h-30 overflow-hidden rounded-2xl border border-background/10 p-4">
                 <AnimatePresence mode="wait">
                   {testimonials.map(
                     (testimonial, index) =>
@@ -324,10 +322,10 @@ function SinglePricingCardContent({
                               {testimonial.name.charAt(0)}
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-foreground">
+                              <p className="text-sm font-medium text-background">
                                 {testimonial.name}
                               </p>
-                              <p className="text-xs text-muted-foreground">
+                              <p className="text-xs text-background/75">
                                 {testimonial.role}
                               </p>
                             </div>
@@ -342,7 +340,7 @@ function SinglePricingCardContent({
                               )}
                             </div>
                           </div>
-                          <p className="text-sm text-foreground/85 italic">
+                          <p className="text-sm text-background/75">
                             {testimonial.content}
                           </p>
                         </motion.div>

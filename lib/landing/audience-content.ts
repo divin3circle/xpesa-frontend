@@ -1,4 +1,8 @@
 import type { LucideIcon } from "lucide-react"
+import campusStudentsImage from "@/public/campusimg.png"
+import twitterEducatorsImage from "@/public/twitter.png"
+import freelancersImage from "@/public/freelance.png"
+import coachesImage from "@/public/coachesimg.png"
 
 import {
   BookOpenText,
@@ -14,6 +18,8 @@ export type AudienceArchetype = {
   icon: LucideIcon
   imageSrc: string
   imageAlt: string
+  bgColor: "red-500" | "green-500" | "purple-500" | "background"
+  text: "white" | "foreground"
 }
 
 export const audienceContent = {
@@ -28,9 +34,10 @@ export const audienceContent = {
         "Students selling notes, past papers, and revision packs around Kenyatta, UoN, Strathmore, and USIU.",
       href: "#",
       icon: BookOpenText,
-      imageSrc:
-        "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&q=80",
+      imageSrc: campusStudentsImage.src,
       imageAlt: "Students studying with notebooks",
+      bgColor: "red-500",
+      text: "white",
     },
     {
       title: "Twitter/X educators",
@@ -38,9 +45,10 @@ export const audienceContent = {
         "Finance, career, and growth educators with active audiences already asking for M-Pesa tip options.",
       href: "#",
       icon: MessageSquareShare,
-      imageSrc:
-        "https://images.unsplash.com/photo-1611944212129-29977ae1398c?w=800&q=80",
+      imageSrc: twitterEducatorsImage.src,
       imageAlt: "Phone showing social media feed",
+      bgColor: "purple-500",
+      text: "white",
     },
     {
       title: "Freelancers selling templates",
@@ -48,9 +56,10 @@ export const audienceContent = {
         "Developers, designers, and VAs monetizing reusable templates, packs, and digital assets.",
       href: "#",
       icon: BriefcaseBusiness,
-      imageSrc:
-        "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80",
+      imageSrc: freelancersImage.src,
       imageAlt: "Freelancer coding on laptop",
+      bgColor: "background",
+      text: "foreground",
     },
     {
       title: "Coaches and consultants",
@@ -58,9 +67,10 @@ export const audienceContent = {
         "Micro-consultants like nutritionists, fitness coaches, and therapists selling one resource or receiving appreciation tips.",
       href: "#",
       icon: Stethoscope,
-      imageSrc:
-        "https://images.unsplash.com/photo-1573496799652-408c2ac9fe98?w=800&q=80",
+      imageSrc: coachesImage.src,
       imageAlt: "Coach consulting a client",
+      bgColor: "green-500",
+      text: "white",
     },
   ] as AudienceArchetype[],
 }
