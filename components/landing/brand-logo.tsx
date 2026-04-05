@@ -1,6 +1,7 @@
 import xpesaLogo from "@/public/logo.png"
 import Image from "next/image"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 type BrandLogoProps = {
   tone?: "light" | "default"
@@ -8,7 +9,7 @@ type BrandLogoProps = {
 
 export function BrandLogo({ tone = "light" }: BrandLogoProps) {
   return (
-    <div className="flex items-center gap-2" aria-label="xpesa home">
+    <Link href="/" className="flex items-center gap-2" aria-label="xpesa home">
       <Image
         src={xpesaLogo}
         alt="xpesa logo"
@@ -23,6 +24,6 @@ export function BrandLogo({ tone = "light" }: BrandLogoProps) {
       >
         xpesa
       </span>
-    </div>
+    </Link>
   )
 }
