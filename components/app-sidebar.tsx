@@ -1,7 +1,24 @@
-import * as React from "react"
+"use client"
 
-import { SearchForm } from "@/components/search-form"
-import { VersionSwitcher } from "@/components/version-switcher"
+import * as React from "react"
+import Link from "next/link"
+import {
+  AccountSetting01Icon,
+  AiLearningIcon,
+  Analytics01Icon,
+  BookOpen01Icon,
+  CreditCardIcon,
+  DashboardSquare02Icon,
+  Link01Icon,
+  Link02Icon,
+  Money02Icon,
+  Settings02Icon,
+  TransactionIcon,
+  User02Icon,
+  Wallet02Icon,
+} from "hugeicons-react"
+
+import { ProfileViewer } from "@/components/profile-viewer"
 import {
   Sidebar,
   SidebarContent,
@@ -14,162 +31,57 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
+import { navigationConfig, type NavItem } from "@/lib/navigation"
+import { useActiveLink } from "@/hooks/use-active-link"
 
-// This is sample data.
-const data = {
-  versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
-  navMain: [
-    {
-      title: "Getting Started",
-      url: "#",
-      items: [
-        {
-          title: "Installation",
-          url: "#",
-        },
-        {
-          title: "Project Structure",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Build Your Application",
-      url: "#",
-      items: [
-        {
-          title: "Routing",
-          url: "#",
-        },
-        {
-          title: "Data Fetching",
-          url: "#",
-          isActive: true,
-        },
-        {
-          title: "Rendering",
-          url: "#",
-        },
-        {
-          title: "Caching",
-          url: "#",
-        },
-        {
-          title: "Styling",
-          url: "#",
-        },
-        {
-          title: "Optimizing",
-          url: "#",
-        },
-        {
-          title: "Configuring",
-          url: "#",
-        },
-        {
-          title: "Testing",
-          url: "#",
-        },
-        {
-          title: "Authentication",
-          url: "#",
-        },
-        {
-          title: "Deploying",
-          url: "#",
-        },
-        {
-          title: "Upgrading",
-          url: "#",
-        },
-        {
-          title: "Examples",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "API Reference",
-      url: "#",
-      items: [
-        {
-          title: "Components",
-          url: "#",
-        },
-        {
-          title: "File Conventions",
-          url: "#",
-        },
-        {
-          title: "Functions",
-          url: "#",
-        },
-        {
-          title: "next.config.js Options",
-          url: "#",
-        },
-        {
-          title: "CLI",
-          url: "#",
-        },
-        {
-          title: "Edge Runtime",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Architecture",
-      url: "#",
-      items: [
-        {
-          title: "Accessibility",
-          url: "#",
-        },
-        {
-          title: "Fast Refresh",
-          url: "#",
-        },
-        {
-          title: "Next.js Compiler",
-          url: "#",
-        },
-        {
-          title: "Supported Browsers",
-          url: "#",
-        },
-        {
-          title: "Turbopack",
-          url: "#",
-        },
-      ],
-    },
-  ],
+const versions = ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"]
+
+/**
+ * Icon resolver - Maps icon names to Lucide React components
+ * Extend this mapping as needed for new icons
+ */
+function resolveIcon(iconName?: string): React.ReactNode {
+  if (!iconName) return null
+
+  const iconMap: Record<
+    string,
+    React.ComponentType<Record<string, unknown>>
+  > = {
+    "book-open": BookOpen01Icon,
+    "ai-learning": AiLearningIcon,
+    dashboard: DashboardSquare02Icon,
+    user: User02Icon,
+    profile: AccountSetting01Icon,
+    link: Link01Icon,
+    "link-create": Link02Icon,
+    analytics: Analytics01Icon,
+    wallet: Wallet02Icon,
+    money: Money02Icon,
+    transaction: TransactionIcon,
+    "credit-card": CreditCardIcon,
+    settings: Settings02Icon,
+  }
+
+  const IconComponent = iconMap[iconName]
+  return IconComponent ? (
+    <IconComponent size={16} strokeWidth={1.8} className="text-current" />
+  ) : null
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        <VersionSwitcher
-          versions={data.versions}
-          defaultVersion={data.versions[0]}
-        />
-        <SearchForm />
+        <ProfileViewer defaultVersion={versions[0]} />
       </SidebarHeader>
       <SidebarContent>
-        {/* We create a SidebarGroup for each parent. */}
-        {data.navMain.map((item) => (
-          <SidebarGroup key={item.title}>
-            <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
+        {navigationConfig.map((group) => (
+          <SidebarGroup key={group.title}>
+            <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {item.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={item.isActive}>
-                      <a href={item.url}>{item.title}</a>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+                {group.items.map((item) => (
+                  <NavItemComponent key={item.title} item={item} />
                 ))}
               </SidebarMenu>
             </SidebarGroupContent>
@@ -178,5 +90,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
+  )
+}
+
+/**
+ * NavItemComponent - Renders a single nav item with icon and active state detection
+ *
+ * Features:
+ * - Automatic active state detection via useActiveLink hook
+ * - Icon rendering from iconName strings (Lucide React icons)
+ * - Full keyboard navigation support via SidebarMenuButton
+ * - Responsive layout with icon-first design
+ */
+function NavItemComponent({ item }: { item: NavItem }) {
+  const isActive = useActiveLink(item.url)
+  const icon = resolveIcon(item.iconName)
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={isActive}>
+        <Link href={item.url} className="flex items-center gap-2">
+          {icon && <span className="shrink-0 text-current">{icon}</span>}
+          <span>{item.title}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   )
 }
