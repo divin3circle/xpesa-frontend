@@ -21,7 +21,7 @@ import { Input } from "./ui/input"
 
 export function InputOTPForm() {
   return (
-    <Card className="mx-auto w-full rounded-2xl md:w-3/4 lg:w-2/3">
+    <Card className="mx-auto w-full rounded-2xl border-none shadow-none md:w-3/4 lg:w-2/3">
       <CardHeader>
         <CardTitle>Password Reset</CardTitle>
         <CardDescription>

@@ -191,17 +191,21 @@ function SinglePricingCardContent({
             <span className="font-heading text-4xl font-bold text-chart-1">
               {price.current}
             </span>
-            {price.original && (
-              <span className="ml-2 text-background/75">{price.original}</span>
-            )}
-            {price.discount && (
-              <Badge
-                variant="outline"
-                className="ml-3 border-chart-1/40 text-chart-1"
-              >
-                <span>{price.discount}</span>
-              </Badge>
-            )}
+            <div className="flex flex-col md:flex-row">
+              {price.original && (
+                <span className="ml-2 text-background/75">
+                  {price.original}
+                </span>
+              )}
+              {price.discount && (
+                <Badge
+                  variant="outline"
+                  className="flex items-center justify-center border-chart-1/40 text-chart-1 md:ml-3"
+                >
+                  <span>{price.discount}</span>
+                </Badge>
+              )}
+            </div>
           </div>
 
           <div className="mb-6 space-y-3">
