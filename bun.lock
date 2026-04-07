@@ -15,6 +15,7 @@
         "@tabler/icons-react": "^3.41.1",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
+        "framer-motion": "^12.38.0",
         "hugeicons-react": "^0.4.0",
         "input-otp": "^1.4.2",
         "lucide-react": "^1.7.0",
