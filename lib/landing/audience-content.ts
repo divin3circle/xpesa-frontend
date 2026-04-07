@@ -69,8 +69,8 @@ export const audienceContent = {
       icon: Stethoscope,
       imageSrc: coachesImage.src,
       imageAlt: "Coach consulting a client",
-      bgColor: "sidebar-primary",
-      text: "white",
+      bgColor: "transparent",
+      text: "background",
     },
   ] as AudienceArchetype[],
 }
