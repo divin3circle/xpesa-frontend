@@ -21,7 +21,7 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
       style={{ clipPath: "polygon(0% 0, 100% 0%, 100% 100%, 0 100%)" }}
       {...props}
     >
-      <div className="relative bottom-0 h-105 w-full">
+      <div className="relative bottom-0 md:h-105 h-125 w-full">
         <div className="sticky top-[calc(100vh-620px)] h-full overflow-y-auto">
           <div className="relative flex size-full flex-col justify-between gap-5 px-4 py-8 md:px-12">
             <div
@@ -70,7 +70,7 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
                   className="w-full"
                 >
                   <div className="mb-10 md:mb-0">
-                    <h3 className="text-sm text-foreground uppercase">
+                    <h3 className="text-sm text-background font-semibold uppercase">
                       {group.label}
                     </h3>
                     <ul className="mt-4 space-y-2 text-sm text-muted-foreground md:text-xs lg:text-sm">
