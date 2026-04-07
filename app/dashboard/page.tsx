@@ -9,6 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { LinkSquare01Icon, SmartPhone02Icon } from "@hugeicons/core-free-icons"
 
 const stats = [
   { label: "Total earned", value: "$6,842.11", hint: "All time" },
@@ -49,17 +51,17 @@ export default function Page() {
         <h1 className="font-heading text-3xl font-semibold tracking-tight">
           Good afternoon, Wanjiru
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground md:text-base">
           Here is a live snapshot of your earnings, links, and payout readiness.
         </p>
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {stats.map((stat) => (
-          <Card key={stat.label}>
+          <Card key={stat.label} className="rounded-2xl shadow-none">
             <CardHeader className="pb-2">
               <CardDescription>{stat.label}</CardDescription>
-              <CardTitle className="text-2xl">{stat.value}</CardTitle>
+              <CardTitle className="text-3xl font-heading">{stat.value}</CardTitle>
             </CardHeader>
             <CardContent className="pt-0 text-xs text-muted-foreground">
               {stat.hint}
@@ -69,7 +71,7 @@ export default function Page() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-5">
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 shadow-none rounded-2xl">
           <CardHeader>
             <CardTitle>Recent transactions</CardTitle>
             <CardDescription>
@@ -101,7 +103,7 @@ export default function Page() {
           </CardContent>
         </Card>
 
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 shadow-none rounded-2xl">
           <CardHeader>
             <CardTitle>Quick actions</CardTitle>
             <CardDescription>
@@ -109,21 +111,24 @@ export default function Page() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <Button asChild className="w-full justify-start">
-              <Link href="/dashboard/links/create">Create new link</Link>
-            </Button>
-            <Button
-              variant="secondary"
-              asChild
-              className="w-full justify-start"
-            >
-              <Link href="/dashboard/wallet/withdraw">Withdraw to M-Pesa</Link>
-            </Button>
-            <div className="rounded-md border p-3 text-xs text-muted-foreground">
-              Wallet: <span className="font-mono">0x7A21...Fe89</span>
-              <br />
-              Network: Base Mainnet
-            </div>
+            <>
+              <Button className="w-full justify-between h-10 px-4 max-w-sm flex items-center">
+                <Link href="/dashboard/links/create">Create new link</Link>
+                <HugeiconsIcon icon={LinkSquare01Icon} />
+              </Button>
+              <Button
+                variant="secondary"
+                className="w-full max-w-sm h-10 px-4 justify-between flex items-center"
+              >
+                <Link href="/dashboard/wallet/withdraw">Withdraw to M-Pesa</Link>
+                <HugeiconsIcon icon={SmartPhone02Icon} />
+              </Button>
+              <div className="rounded-2xl border p-3 text-xs text-muted-foreground">
+                Wallet: <span className="font-mono">0x7A21...Fe89</span>
+                <br />
+                Network: Base Mainnet
+              </div>
+            </>
           </CardContent>
         </Card>
       </section>
