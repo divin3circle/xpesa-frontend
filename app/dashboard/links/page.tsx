@@ -52,15 +52,21 @@ export default function LinksPage() {
       </section>
 
       <section className="flex flex-wrap gap-2">
-        <Badge>All</Badge>
-        <Badge variant="secondary">Gate links</Badge>
-        <Badge variant="secondary">Tip links</Badge>
-        <Badge variant="outline">Inactive</Badge>
+        <Badge className="cursor-pointer px-3 py-1">All</Badge>
+        <Badge className="cursor-pointer px-3 py-1" variant="secondary">
+          Gate links
+        </Badge>
+        <Badge className="cursor-pointer px-3 py-1" variant="secondary">
+          Tip links
+        </Badge>
+        <Badge className="cursor-pointer px-3 py-1" variant="outline">
+          Inactive
+        </Badge>
       </section>
 
       <section className="grid gap-4">
         {links.map((item) => (
-          <Card key={item.title}>
+          <Card key={item.title} className="rounded-2xl shadow-none">
             <CardHeader className="pb-2">
               <div className="flex items-start justify-between gap-3">
                 <div>

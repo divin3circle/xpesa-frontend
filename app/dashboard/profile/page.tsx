@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -14,7 +13,6 @@ export default function ProfilePage() {
   return (
     <div className="space-y-6">
       <section className="space-y-2">
-        <Badge variant="outline">Settings</Badge>
         <h1 className="font-heading text-3xl font-semibold tracking-tight">
           Profile
         </h1>
@@ -24,7 +22,7 @@ export default function ProfilePage() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <Card>
+        <Card className="rounded-2xl bg-transparent shadow-none">
           <CardHeader>
             <CardTitle>Public profile</CardTitle>
             <CardDescription>
@@ -52,7 +50,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl bg-transparent shadow-none">
           <CardHeader>
             <CardTitle>Security and payouts</CardTitle>
             <CardDescription>
@@ -62,7 +60,11 @@ export default function ProfilePage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="wallet-address">Wallet address</Label>
-              <Input id="wallet-address" defaultValue="0x7A21...Fe89" readOnly />
+              <Input
+                id="wallet-address"
+                defaultValue="0x7A21...Fe89"
+                readOnly
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="mpesa">M-Pesa number</Label>
@@ -72,7 +74,7 @@ export default function ProfilePage() {
               <Button variant="secondary">Update payout number</Button>
               <Button variant="outline">Connect new wallet</Button>
             </div>
-            <div className="rounded-md border border-destructive/50 bg-destructive/5 p-3 text-sm">
+            <div className="rounded-2xl border border-destructive/50 bg-destructive/5 p-3 text-sm">
               <p className="font-medium text-destructive">Danger zone</p>
               <p className="text-muted-foreground">
                 Deleting your account disables all active links.

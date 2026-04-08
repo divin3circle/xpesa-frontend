@@ -9,6 +9,10 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Edit01FreeIcons } from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
+import Image from "next/image"
 
 export default function CreateLinkPage() {
   return (
@@ -23,7 +27,7 @@ export default function CreateLinkPage() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
-        <Card className="border-primary/60">
+        <Card className="cursor-pointer rounded-2xl border-primary/60">
           <CardHeader>
             <CardTitle>Gate a link</CardTitle>
             <CardDescription>
@@ -31,7 +35,7 @@ export default function CreateLinkPage() {
             </CardDescription>
           </CardHeader>
         </Card>
-        <Card>
+        <Card className="cursor-pointer rounded-2xl border-muted hover:bg-transparent">
           <CardHeader>
             <CardTitle>Accept tips</CardTitle>
             <CardDescription>
@@ -42,7 +46,7 @@ export default function CreateLinkPage() {
       </section>
 
       <section className="grid gap-4 xl:grid-cols-5">
-        <Card className="xl:col-span-3">
+        <Card className="rounded-2xl bg-transparent shadow-none xl:col-span-3">
           <CardHeader>
             <CardTitle>Link details</CardTitle>
             <CardDescription>
@@ -56,15 +60,17 @@ export default function CreateLinkPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
-              <textarea
+              <Textarea
                 id="description"
-                className="min-h-24 w-full rounded-md border bg-background px-3 py-2 text-sm"
                 placeholder="Tell fans what they get after payment."
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="destination">Destination URL</Label>
-              <Input id="destination" placeholder="https://example.com/private-resource" />
+              <Input
+                id="destination"
+                placeholder="https://example.com/private-resource"
+              />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
@@ -106,12 +112,30 @@ export default function CreateLinkPage() {
           </CardContent>
         </Card>
 
-        <Card className="xl:col-span-2">
+        <Card className="rounded-2xl border-chart-1 shadow-none xl:col-span-2">
           <CardHeader>
             <CardTitle>Fan preview</CardTitle>
-            <CardDescription>What your audience sees before payment.</CardDescription>
+            <CardDescription>
+              What your audience sees before payment.
+            </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="-mt-0.5">
+            <div className="group relative mb-2 cursor-pointer">
+              <Image
+                src="/icon.png"
+                alt="Wallet"
+                width={200}
+                height={100}
+                className="w-full rounded-2xl"
+              />
+              <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-background/75 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                <HugeiconsIcon
+                  icon={Edit01FreeIcons}
+                  className="size-5 text-chart-1"
+                />
+                <p className="mt-2 text-sm">Upload custom Thumbnail</p>
+              </div>
+            </div>
             <div className="space-y-3 rounded-xl border p-4">
               <Badge>Locked content</Badge>
               <p className="font-medium">React Native Crash Course</p>
@@ -119,7 +143,7 @@ export default function CreateLinkPage() {
                 Complete practical guide with project files and implementation
                 checklist.
               </p>
-              <div className="rounded-md bg-muted p-3 text-sm">
+              <div className="rounded-2xl bg-muted p-3 text-sm">
                 <p>Price: 12.00 USDC</p>
                 <p className="text-muted-foreground">~ KES 1,548</p>
               </div>
