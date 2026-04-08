@@ -9,11 +9,15 @@ type BrandLogoProps = {
 
 export function BrandLogo({ tone = "light" }: BrandLogoProps) {
   return (
-    <Link href="/" className="flex items-center gap-2" aria-label="xpesa home">
+    <Link
+      href="/"
+      className="group flex items-center gap-2"
+      aria-label="xpesa home"
+    >
       <Image
         src={xpesaLogo}
         alt="xpesa logo"
-        className="size-7 animate-spin rounded-md"
+        className="size-7 animate-[spin_3s_linear_infinite] rounded-md group-hover:animate-none"
       />
 
       <span

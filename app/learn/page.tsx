@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { BrandLogo } from "@/components/landing/brand-logo"
 
 const tracks = [
   {
@@ -32,33 +33,36 @@ export default function LearnPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 md:p-8">
       <section className="space-y-2">
-        <Badge variant="outline">Learning hub</Badge>
+        <BrandLogo tone="default" />
         <h1 className="font-heading text-4xl font-semibold tracking-tight">
           Learn xpesa
         </h1>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          Structured learning tracks for creators, operators, and builders using
-          xpesa V1.
+          Structured learning tracks for creators and XPesa users to get the
+          most out of the platform.
         </p>
       </section>
 
       <section className="grid gap-4 md:grid-cols-3">
         {tracks.map((track) => (
-          <Card key={track.title}>
+          <Card
+            key={track.title}
+            className="rounded-2xl bg-transparent shadow-none"
+          >
             <CardHeader>
               <CardTitle className="text-xl">{track.title}</CardTitle>
               <CardDescription>{track.description}</CardDescription>
             </CardHeader>
             <CardContent>
               <Button variant="secondary" className="w-full">
-                Start track
+                Start Track
               </Button>
             </CardContent>
           </Card>
         ))}
       </section>
 
-      <section className="rounded-xl border bg-muted/20 p-4 md:p-6">
+      <section className="rounded-2xl border bg-muted/20 p-4 md:p-6">
         <h2 className="font-heading text-2xl font-semibold">Next steps</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Once your first link is live, review analytics weekly and tune pricing
@@ -69,7 +73,7 @@ export default function LearnPage() {
             <Link href="/dashboard/links/create">Create a new link</Link>
           </Button>
           <Button variant="outline" asChild>
-            <Link href="/docs">Open docs</Link>
+            <Link href="/docs">Read docs</Link>
           </Button>
         </div>
       </section>

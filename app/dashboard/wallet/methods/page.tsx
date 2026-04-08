@@ -28,7 +28,7 @@ export default function SupportedMethodsPage() {
               <Badge>Selected</Badge>
             </div>
             <CardDescription>
-              Fast settlement to Kenyan phone numbers
+              Fast settlement to M-Pesa phone numbers
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
