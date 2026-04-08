@@ -35,7 +35,7 @@ export default function TransactionHistoryPage() {
         </p>
       </section>
 
-      <Card>
+      <Card className="border-none bg-transparent shadow-none">
         <CardHeader>
           <CardTitle>Filters</CardTitle>
         </CardHeader>
@@ -47,13 +47,16 @@ export default function TransactionHistoryPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="rounded-2xl bg-transparent shadow-none">
         <CardHeader>
           <CardTitle>Results</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {history.map((item) => (
-            <div key={item.hash} className="rounded-md border p-3 text-sm">
+            <div
+              key={item.hash}
+              className="cursor-pointer rounded-xl p-3 text-sm hover:bg-foreground/5"
+            >
               <div className="grid gap-2 md:grid-cols-7">
                 <p>{item.date}</p>
                 <p>{item.link}</p>

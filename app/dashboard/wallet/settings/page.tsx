@@ -22,7 +22,7 @@ export default function PayoutSettingsPage() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <Card>
+        <Card className="rounded-2xl bg-transparent shadow-none">
           <CardHeader>
             <CardTitle>Payout profile</CardTitle>
             <CardDescription>
@@ -42,7 +42,7 @@ export default function PayoutSettingsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl bg-transparent shadow-none">
           <CardHeader>
             <CardTitle>Preferences</CardTitle>
             <CardDescription>

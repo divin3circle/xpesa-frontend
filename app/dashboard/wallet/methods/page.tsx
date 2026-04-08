@@ -21,11 +21,11 @@ export default function SupportedMethodsPage() {
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3">
-        <Card className="border-primary/60">
+        <Card className="rounded-2xl border-2 border-chart-1/60 bg-transparent shadow-chart-1">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>M-Pesa</CardTitle>
-              <Badge>Primary</Badge>
+              <Badge>Selected</Badge>
             </div>
             <CardDescription>
               Fast settlement to Kenyan phone numbers
@@ -38,7 +38,7 @@ export default function SupportedMethodsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl bg-transparent shadow-none">
           <CardHeader>
             <CardTitle>Bank transfer</CardTitle>
             <CardDescription>Planned for Phase 2</CardDescription>
@@ -52,14 +52,14 @@ export default function SupportedMethodsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl bg-transparent shadow-none">
           <CardHeader>
             <CardTitle>Stablecoin hold</CardTitle>
             <CardDescription>Keep earnings in USDC</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <p>Processing: Instant</p>
-            <p>Network: Base Mainnet</p>
+            <p>Network: Multiple</p>
             <Button className="w-full" variant="outline">
               Manage wallet
             </Button>
