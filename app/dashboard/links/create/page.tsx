@@ -29,7 +29,7 @@ export default function CreateLinkPage() {
       <section className="grid gap-4 lg:grid-cols-3">
         <Card className="cursor-pointer rounded-2xl border-primary/60">
           <CardHeader>
-            <CardTitle>Gate a link</CardTitle>
+            <CardTitle className="font-heading text-xl">Gate a link</CardTitle>
             <CardDescription>
               Fan pays to unlock your destination URL.
             </CardDescription>
@@ -37,7 +37,7 @@ export default function CreateLinkPage() {
         </Card>
         <Card className="cursor-pointer rounded-2xl border-muted hover:bg-transparent">
           <CardHeader>
-            <CardTitle>Accept tips</CardTitle>
+            <CardTitle className="font-heading text-xl">Accept tips</CardTitle>
             <CardDescription>
               Fans send support with optional amount input.
             </CardDescription>

@@ -1,71 +1,55 @@
-import { Badge } from "@/components/ui/badge"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-
-const analytics = [
-  { label: "Total views", value: "3,247" },
-  { label: "Payments", value: "427" },
-  { label: "Conversion", value: "13.1%" },
-  { label: "Revenue", value: "$6,842" },
-]
+import { CreatorInsightsCards } from "@/components/dashboard/links-analytics/creator-insights-cards"
+import { DemographicsAnalysis } from "@/components/dashboard/links-analytics/demographics-analysis"
+import { EngagementHeatmap } from "@/components/dashboard/links-analytics/engagement-heatmap"
+import { LinkMomentumStats } from "@/components/dashboard/links-analytics/link-momentum-stats"
+import { MetricsCards } from "@/components/dashboard/links-analytics/metrics-cards"
+import { OptimizationOpportunities } from "@/components/dashboard/links-analytics/optimization-opportunities"
+import { RevenueConversionArea } from "@/components/dashboard/links-analytics/revenue-conversion-area"
+import { TopLinksBar } from "@/components/dashboard/links-analytics/top-links-bar"
+import { TrafficSourcesPie } from "@/components/dashboard/links-analytics/traffic-sources-pie"
 
 export default function LinksAnalyticsPage() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-x-hidden pb-4">
       <section className="space-y-2">
-        <Badge variant="outline">Analytics</Badge>
-        <h1 className="font-heading text-3xl font-semibold tracking-tight">
+        <h1 className="font-heading text-xl font-semibold tracking-tight md:text-4xl">
           Links performance
         </h1>
-        <p className="text-sm text-muted-foreground">
-          Track view-to-payment conversion and identify top earning links.
+        <p className="max-w-2xl text-sm text-muted-foreground">
+          Understand what converts, where traffic comes from, and who your
+          audience is so you can optimize every link.
         </p>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {analytics.map((item) => (
-          <Card key={item.label}>
-            <CardHeader className="pb-2">
-              <CardDescription>{item.label}</CardDescription>
-              <CardTitle className="text-2xl">{item.value}</CardTitle>
-            </CardHeader>
-          </Card>
-        ))}
+      <MetricsCards />
+
+      <section className="grid gap-4 xl:grid-cols-[1.3fr_1fr]">
+        <div className="min-w-0">
+          <RevenueConversionArea />
+        </div>
+        <div className="min-w-0">
+          <TrafficSourcesPie />
+        </div>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Top links this month</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <div className="rounded-md border p-3">
-              React Native Crash Course - $396
-            </div>
-            <div className="rounded-md border p-3">
-              Design teardown notes - $76
-            </div>
-            <div className="rounded-md border p-3">Buy me chai - $48</div>
-          </CardContent>
-        </Card>
+      <section className="grid gap-3 md:grid-cols-2">
+        <div className="min-w-0 space-y-3">
+          <TopLinksBar />
+          <LinkMomentumStats />
+          <OptimizationOpportunities />
+        </div>
+        <div className="min-w-0 space-y-4">
+          <DemographicsAnalysis />
+        </div>
+      </section>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Conversion funnel</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <div className="rounded-md border p-3">Views: 3,247</div>
-            <div className="rounded-md border p-3">Wallet connects: 812</div>
-            <div className="rounded-md border p-3">
-              Successful payments: 427
-            </div>
-          </CardContent>
-        </Card>
+      <section className="grid gap-4 xl:grid-cols-[1.3fr_1fr]">
+        <div className="min-w-0">
+          <EngagementHeatmap />
+        </div>
+        <div className="min-w-0">
+          <CreatorInsightsCards />
+        </div>
       </section>
     </div>
   )
