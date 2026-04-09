@@ -1,6 +1,16 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import Image from "next/image"
+
+import {
+  DocumentUploadZone,
+  type UploadedDoc,
+} from "@/components/upload/DocumentUploadZone"
+import {
+  PackUploadZone,
+  type PackFileState,
+} from "@/components/upload/PackUploadZone"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -15,197 +25,95 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Edit01FreeIcons } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
-import Image from "next/image"
 
 type LinkMode = "gate" | "document" | "pack" | "tip"
-
-type DocumentUploadState = {
-  fileName: string
-  fileSizeBytes: number
-  pageCount: number
-  status: "ready"
-}
-
-type PackFileState = {
-  id: string
-  name: string
-  fileSizeBytes: number
-  fileType: "pdf" | "docx" | "image"
-  pageCount?: number
-  dimensions?: string
-}
 
 const modeCards: Array<{
   mode: LinkMode
   emoji: string
   title: string
-  body: string
+  subtitle: string
 }> = [
   {
     mode: "gate",
     emoji: "🔗",
-    title: "Gate Link",
-    body: "Fan pays to unlock your destination URL.",
+    title: "Gate a link",
+    subtitle: "Fan pays to unlock your URL",
   },
   {
     mode: "document",
     emoji: "📄",
-    title: "Document",
-    body: "Single PDF or Word doc with secure in-browser viewing.",
+    title: "Upload a document",
+    subtitle: "Single PDF or Word doc. Secure viewer.",
   },
   {
     mode: "pack",
     emoji: "📦",
-    title: "File Pack",
-    body: "Up to 3 files. One payment unlocks the full pack.",
+    title: "Upload a file pack",
+    subtitle: "Up to 3 files. All viewed in-browser.",
   },
   {
     mode: "tip",
     emoji: "💚",
-    title: "Tip",
-    body: "Fans support you with pay-what-they-want tips.",
+    title: "Accept a tip",
+    subtitle: "Fan pays what they want. No content needed.",
   },
 ]
 
 function formatBytes(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  if (!bytes) return "0 KB"
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
-
-function getFileType(file: File): PackFileState["fileType"] {
-  const extension = file.name.split(".").pop()?.toLowerCase()
-  if (extension === "pdf") return "pdf"
-  if (extension === "docx") return "docx"
-  return "image"
 }
 
 export default function CreateLinkPage() {
   const [mode, setMode] = useState<LinkMode>("gate")
   const [title, setTitle] = useState("")
-  const [documentUpload, setDocumentUpload] =
-    useState<DocumentUploadState | null>(null)
+  const [description, setDescription] = useState("")
+  const [documentUpload, setDocumentUpload] = useState<UploadedDoc | null>(null)
   const [packFiles, setPackFiles] = useState<PackFileState[]>([])
-  const [draggingPackFileId, setDraggingPackFileId] = useState<string | null>(
-    null
-  )
+  const [uploadError, setUploadError] = useState("")
+  const [tipMessage, setTipMessage] = useState("Thank you for your support! 🙏")
 
-  const packBreakdown = useMemo(() => {
-    const counts = {
-      pdf: packFiles.filter((file) => file.fileType === "pdf").length,
-      docx: packFiles.filter((file) => file.fileType === "docx").length,
-      image: packFiles.filter((file) => file.fileType === "image").length,
-    }
+  const packSummary = useMemo(() => {
+    const pdfCount = packFiles.filter((file) => file.fileType === "pdf").length
+    const imageCount = packFiles.filter(
+      (file) => file.fileType === "image"
+    ).length
+    const totalBytes = packFiles.reduce(
+      (sum, file) => sum + file.fileSizeBytes,
+      0
+    )
 
-    return [
-      counts.pdf > 0 ? `${counts.pdf} PDF` : null,
-      counts.docx > 0 ? `${counts.docx} DOCX` : null,
-      counts.image > 0 ? `${counts.image} Image` : null,
+    const breakdown = [
+      pdfCount > 0 ? `${pdfCount} PDF` : null,
+      imageCount > 0 ? `${imageCount} Image` : null,
     ]
       .filter(Boolean)
       .join(" • ")
+
+    return {
+      totalBytes,
+      breakdown: breakdown || "No files added",
+    }
   }, [packFiles])
 
-  const packTotalSize = useMemo(
-    () => packFiles.reduce((sum, file) => sum + file.fileSizeBytes, 0),
-    [packFiles]
-  )
-
-  const updateTitleIfEmpty = (nextTitle: string) => {
-    setTitle((currentTitle) =>
-      currentTitle.trim().length === 0 ? nextTitle : currentTitle
-    )
-  }
-
-  const handleDocumentSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    updateTitleIfEmpty(file.name.replace(/\.[^/.]+$/, ""))
-
-    setDocumentUpload({
-      fileName: file.name,
-      fileSizeBytes: file.size,
-      pageCount: 1,
-      status: "ready",
-    })
-  }
-
-  const handlePackSelect = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const selectedFiles = Array.from(event.target.files ?? [])
-    const availableSlots = Math.max(0, 3 - packFiles.length)
-    const filesToAdd = selectedFiles.slice(0, availableSlots)
-
-    const nextItems = await Promise.all(
-      filesToAdd.map(async (file) => {
-        const id = `${file.name}-${file.lastModified}`
-        const fileType = getFileType(file)
-
-        if (fileType === "image") {
-          const url = URL.createObjectURL(file)
-          const dimensions = await new Promise<string>((resolve) => {
-            const img = new window.Image()
-            img.onload = () => {
-              resolve(`${img.width}x${img.height}`)
-              URL.revokeObjectURL(url)
-            }
-            img.onerror = () => {
-              resolve("Unknown")
-              URL.revokeObjectURL(url)
-            }
-            img.src = url
-          })
-
-          return {
-            id,
-            name: file.name,
-            fileSizeBytes: file.size,
-            fileType,
-            dimensions,
-          } as PackFileState
-        }
-
-        return {
-          id,
-          name: file.name,
-          fileSizeBytes: file.size,
-          fileType,
-          pageCount: 1,
-        } as PackFileState
-      })
-    )
-
-    const firstFileName = nextItems[0]?.name
-    if (firstFileName) {
-      updateTitleIfEmpty(firstFileName.replace(/\.[^/.]+$/, ""))
+  const onDocumentComplete = (result: UploadedDoc) => {
+    setDocumentUpload(result)
+    setUploadError("")
+    if (!title.trim()) {
+      setTitle(result.filename.replace(/\.[^/.]+$/, ""))
     }
-
-    setPackFiles((current) => [...current, ...nextItems])
-    event.target.value = ""
   }
 
-  const removePackFile = (id: string) => {
-    setPackFiles((current) => current.filter((file) => file.id !== id))
-  }
-
-  const reorderPackFiles = (draggedId: string, targetId: string) => {
-    setPackFiles((current) => {
-      const draggedIndex = current.findIndex((item) => item.id === draggedId)
-      const targetIndex = current.findIndex((item) => item.id === targetId)
-      if (
-        draggedIndex === -1 ||
-        targetIndex === -1 ||
-        draggedIndex === targetIndex
-      ) {
-        return current
+  const onPackFilesChange = (files: PackFileState[]) => {
+    setPackFiles(files)
+    if (!title.trim()) {
+      const firstReady = files.find((file) => file.status === "ready")
+      if (firstReady) {
+        setTitle(firstReady.originalFilename.replace(/\.[^/.]+$/, ""))
       }
-      const next = [...current]
-      const [dragged] = next.splice(draggedIndex, 1)
-      next.splice(targetIndex, 0, dragged)
-      return next
-    })
+    }
   }
 
   return (
@@ -226,19 +134,19 @@ export default function CreateLinkPage() {
             key={card.mode}
             className={`cursor-pointer border transition-colors ${
               mode === card.mode
-                ? "border-primary"
-                : "border-muted hover:border-primary/40"
+                ? "border-primary bg-primary/5"
+                : "border-border"
             }`}
             onClick={() => setMode(card.mode)}
           >
-            <CardHeader>
+            <CardHeader className="space-y-1">
               <CardTitle className="font-heading text-lg">
                 <span className="mr-2" aria-hidden>
                   {card.emoji}
                 </span>
                 {card.title}
               </CardTitle>
-              <CardDescription>{card.body}</CardDescription>
+              <CardDescription>{card.subtitle}</CardDescription>
             </CardHeader>
           </Card>
         ))}
@@ -262,15 +170,18 @@ export default function CreateLinkPage() {
                 onChange={(event) => setTitle(event.target.value)}
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="description">Description</Label>
               <Textarea
                 id="description"
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
                 placeholder="Tell fans what they get after payment."
               />
             </div>
 
-            {mode === "gate" && (
+            {mode === "gate" ? (
               <>
                 <div className="space-y-2">
                   <Label htmlFor="destination">Destination URL</Label>
@@ -281,13 +192,13 @@ export default function CreateLinkPage() {
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="price">Price (USDC)</Label>
-                    <Input id="price" placeholder="12.00" />
+                    <Label htmlFor="price-gate">Price (USDC)</Label>
+                    <Input id="price-gate" placeholder="12.00" />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="expiry">Access expiry</Label>
+                    <Label htmlFor="expiry-gate">Access expiry</Label>
                     <select
-                      id="expiry"
+                      id="expiry-gate"
                       className="h-10 w-full rounded-md border bg-background px-3 text-sm"
                     >
                       <option>Forever</option>
@@ -299,40 +210,23 @@ export default function CreateLinkPage() {
                   </div>
                 </div>
               </>
-            )}
+            ) : null}
 
-            {mode === "document" && (
+            {mode === "document" ? (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="document">Document upload</Label>
-                  <Input
-                    id="document"
-                    type="file"
-                    accept=".pdf,.docx"
-                    onChange={handleDocumentSelect}
+                  <Label>Document upload</Label>
+                  <DocumentUploadZone
+                    value={documentUpload}
+                    onUploadComplete={onDocumentComplete}
+                    onUploadError={(error) => setUploadError(error)}
+                    onRemove={() => setDocumentUpload(null)}
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Accepts PDF (50MB max) and DOCX (20MB max).
-                  </p>
+                  {uploadError ? (
+                    <p className="text-xs text-destructive">{uploadError}</p>
+                  ) : null}
                 </div>
-                {documentUpload && (
-                  <div className="rounded-xl border p-3 text-sm">
-                    <p className="font-medium">{documentUpload.fileName}</p>
-                    <p className="text-muted-foreground">
-                      {documentUpload.pageCount} pages •{" "}
-                      {formatBytes(documentUpload.fileSizeBytes)}
-                    </p>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="mt-2"
-                      onClick={() => setDocumentUpload(null)}
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                )}
+
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="price-document">Price (USDC)</Label>
@@ -347,6 +241,26 @@ export default function CreateLinkPage() {
                     />
                   </div>
                 </div>
+
+                {documentUpload ? (
+                  <div className="flex items-center gap-3 rounded-xl border p-3 text-xs text-muted-foreground">
+                    {documentUpload.thumbnailUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={documentUpload.thumbnailUrl}
+                        alt="Document thumbnail"
+                        className="h-12 w-12 rounded-md object-cover"
+                      />
+                    ) : (
+                      <div className="h-12 w-12 animate-pulse rounded-md bg-muted" />
+                    )}
+                    <div>
+                      <p>{documentUpload.pageCount} pages</p>
+                      <p>{formatBytes(documentUpload.fileSizeBytes)}</p>
+                    </div>
+                  </div>
+                ) : null}
+
                 <details className="rounded-xl border p-4">
                   <summary className="cursor-pointer text-sm font-medium">
                     Access Controls
@@ -356,14 +270,22 @@ export default function CreateLinkPage() {
                       Expiry
                       <select className="h-9 rounded-md border bg-background px-3 text-xs">
                         <option>Forever</option>
+                        <option>One-time only</option>
+                        <option>5 minutes</option>
+                        <option>1 hour</option>
                         <option>24 hours</option>
                         <option>7 days</option>
                         <option>30 days</option>
                       </select>
                     </label>
                     <label className="flex items-center justify-between text-sm">
-                      Max views
-                      <Input className="h-9 max-w-28" placeholder="Unlimited" />
+                      Max opens
+                      <Input
+                        className="h-9 max-w-28"
+                        placeholder="Unlimited"
+                        type="number"
+                        min={1}
+                      />
                     </label>
                     <label className="flex items-center justify-between text-sm">
                       IP binding
@@ -388,7 +310,7 @@ export default function CreateLinkPage() {
                       />
                     </label>
                     <label className="flex items-center justify-between text-sm">
-                      Download block
+                      Block download & print
                       <input
                         type="checkbox"
                         defaultChecked
@@ -398,68 +320,23 @@ export default function CreateLinkPage() {
                   </div>
                 </details>
               </>
-            )}
+            ) : null}
 
-            {mode === "pack" && (
+            {mode === "pack" ? (
               <>
                 <div className="space-y-2">
-                  <Label htmlFor="pack-files">Pack files</Label>
-                  <Input
-                    id="pack-files"
-                    type="file"
-                    multiple
-                    disabled={packFiles.length >= 3}
-                    accept=".pdf,.docx,.png,.jpg,.jpeg,.webp"
-                    onChange={handlePackSelect}
+                  <Label>Pack files</Label>
+                  <PackUploadZone
+                    files={packFiles}
+                    onFilesChange={onPackFilesChange}
                   />
                   <p className="text-xs text-muted-foreground">
-                    {packFiles.length} / 3 files added
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    PDFs and Word docs are viewed securely in-browser. Images
-                    are displayed in the viewer with no file downloads.
+                    PDFs and Word docs open in a secure in-browser viewer.
+                    Images are also displayed in the viewer - no file downloads
+                    for any type.
                   </p>
                 </div>
-                {packFiles.length > 0 && (
-                  <div className="space-y-2 rounded-xl border p-3">
-                    {packFiles.map((file) => (
-                      <div
-                        key={file.id}
-                        draggable
-                        onDragStart={() => setDraggingPackFileId(file.id)}
-                        onDragOver={(event) => event.preventDefault()}
-                        onDrop={() => {
-                          if (draggingPackFileId) {
-                            reorderPackFiles(draggingPackFileId, file.id)
-                          }
-                          setDraggingPackFileId(null)
-                        }}
-                        className="flex items-center justify-between gap-3 rounded-lg border p-2"
-                      >
-                        <div>
-                          <p className="text-sm font-medium">{file.name}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {file.fileType.toUpperCase()} •{" "}
-                            {formatBytes(file.fileSizeBytes)}
-                            {file.pageCount ? ` • ${file.pageCount} pages` : ""}
-                            {file.dimensions ? ` • ${file.dimensions}` : ""}
-                          </p>
-                        </div>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removePackFile(file.id)}
-                        >
-                          Remove
-                        </Button>
-                      </div>
-                    ))}
-                    <p className="text-xs text-muted-foreground">
-                      {packBreakdown} • {formatBytes(packTotalSize)}
-                    </p>
-                  </div>
-                )}
+
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="price-pack">Price (USDC)</Label>
@@ -470,6 +347,7 @@ export default function CreateLinkPage() {
                     <Input id="thumbnail-pack" type="file" accept="image/*" />
                   </div>
                 </div>
+
                 <details className="rounded-xl border p-4">
                   <summary className="cursor-pointer text-sm font-medium">
                     Access Controls
@@ -479,14 +357,22 @@ export default function CreateLinkPage() {
                       Expiry
                       <select className="h-9 rounded-md border bg-background px-3 text-xs">
                         <option>Forever</option>
+                        <option>One-time only</option>
+                        <option>5 minutes</option>
+                        <option>1 hour</option>
                         <option>24 hours</option>
                         <option>7 days</option>
                         <option>30 days</option>
                       </select>
                     </label>
                     <label className="flex items-center justify-between text-sm">
-                      Max views
-                      <Input className="h-9 max-w-28" placeholder="Unlimited" />
+                      Max opens
+                      <Input
+                        className="h-9 max-w-28"
+                        placeholder="Unlimited"
+                        type="number"
+                        min={1}
+                      />
                     </label>
                     <label className="flex items-center justify-between text-sm">
                       IP binding
@@ -513,43 +399,34 @@ export default function CreateLinkPage() {
                   </div>
                 </details>
               </>
-            )}
+            ) : null}
 
-            {mode === "tip" && (
+            {mode === "tip" ? (
               <>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="tip-amount">Suggested amount (USDC)</Label>
-                    <Input id="tip-amount" placeholder="2.00" />
+                    <Input
+                      id="tip-amount"
+                      placeholder="Leave empty for pay-what-you-want"
+                      type="number"
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="tip-thank-you">Thank-you message</Label>
-                    <Input
+                    <Textarea
                       id="tip-thank-you"
                       maxLength={150}
-                      defaultValue="Thank you for your support! 🙏"
+                      value={tipMessage}
+                      onChange={(event) => setTipMessage(event.target.value)}
                     />
+                    <p className="text-right text-xs text-muted-foreground">
+                      {tipMessage.length}/150
+                    </p>
                   </div>
                 </div>
               </>
-            )}
-
-            {(mode === "gate" || mode === "tip") && (
-              <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm">
-                  Suggested $1
-                </Button>
-                <Button variant="outline" size="sm">
-                  Suggested $2
-                </Button>
-                <Button variant="outline" size="sm">
-                  Suggested $5
-                </Button>
-                <Button variant="outline" size="sm">
-                  Suggested $10
-                </Button>
-              </div>
-            )}
+            ) : null}
 
             <div className="flex flex-wrap gap-2 pt-2">
               <Button>Create link</Button>
@@ -589,9 +466,9 @@ export default function CreateLinkPage() {
               </p>
               <p className="text-sm text-muted-foreground">
                 {mode === "pack"
-                  ? `${packFiles.length || 0} files in this bundle`
+                  ? `${packFiles.length} files • ${packSummary.breakdown}`
                   : mode === "document"
-                    ? "Secure in-browser document access"
+                    ? `${documentUpload?.pageCount ?? 0} pages • secure in-browser access`
                     : mode === "tip"
                       ? "Fans can choose any amount to support your work"
                       : "Complete practical guide with project files and implementation checklist."}
@@ -600,9 +477,9 @@ export default function CreateLinkPage() {
                 <p>Price: {mode === "tip" ? "Custom amount" : "12.00 USDC"}</p>
                 <p className="text-muted-foreground">
                   {mode === "pack"
-                    ? `${packBreakdown || "No files added"}`
+                    ? `${formatBytes(packSummary.totalBytes)}`
                     : mode === "document"
-                      ? `${documentUpload?.pageCount ?? 0} pages`
+                      ? `${formatBytes(documentUpload?.fileSizeBytes ?? 0)}`
                       : "~ KES 1,548"}
                 </p>
               </div>

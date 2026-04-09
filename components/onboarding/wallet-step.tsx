@@ -6,45 +6,33 @@ import { Check } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { OnboardingStepHeader } from "@/components/onboarding/step-header"
 import { useOnboardingStepGuard } from "@/components/onboarding/onboarding-step-guard"
 import { useOnboarding } from "@/components/onboarding/onboarding-provider"
 import { IconInfoCircleFilled } from "@tabler/icons-react"
-
-function createMockWalletAddress() {
-  return `0x${Math.random().toString(16).slice(2, 42).padEnd(40, "0")}`
-}
+import { ConnectButton, useActiveWallet } from "thirdweb/react"
+import { sepolia } from "thirdweb/chains"
+import { client } from "@/lib/utils"
+import { useTheme } from "next-themes"
 
 export function WalletStep() {
   useOnboardingStepGuard("wallet")
+  const wallet = useActiveWallet()
+  const theme = useTheme()
 
   const router = useRouter()
   const { markStepComplete, setWallet, state } = useOnboarding()
   const [connectedAddress, setConnectedAddress] = useState<string | null>(
     state.walletMethod === "existing" ? state.walletAddress : null
   )
-  const [generatedAddress, setGeneratedAddress] = useState<string | null>(
-    state.walletMethod === "embedded" ? state.walletAddress : null
-  )
-  const [email, setEmail] = useState("")
 
   const selectedWallet = useMemo(() => {
     if (state.walletAddress) {
       return state.walletAddress
     }
 
-    return connectedAddress ?? generatedAddress
-  }, [connectedAddress, generatedAddress, state.walletAddress])
-
-  function handleConnectExistingWallet() {
-    setConnectedAddress(createMockWalletAddress())
-  }
-
-  function handleCreateEmbeddedWallet() {
-    if (!email.includes("@")) return
-    setGeneratedAddress(createMockWalletAddress())
-  }
+    return connectedAddress
+  }, [connectedAddress, state.walletAddress])
 
   function handleContinue() {
     if (!selectedWallet || !state.walletMethod) return
@@ -64,82 +52,65 @@ export function WalletStep() {
               Connect existing wallet
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              Use the ConnectButton to connect your current wallet.
+              A wallet allows you to send and receive payments.
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button
-              type="button"
-              className="w-full"
-              onClick={handleConnectExistingWallet}
-              disabled={generatedAddress !== null || !connectedAddress}
-            >
-              Connect wallet
-            </Button>
-
-            {connectedAddress ? (
-              <div className="rounded-2xl border border-border/70 bg-muted/40 p-3 text-sm">
-                <p className="mb-2 text-muted-foreground">Connected address</p>
-                <p className="truncate font-mono text-xs">
-                  {connectedAddress.slice(0, 4)}...{connectedAddress.slice(-4)}
-                </p>
-                <Button
-                  type="button"
-                  size="sm"
-                  className="mt-3"
-                  onClick={() => setWallet(connectedAddress, "existing")}
-                >
-                  Use this wallet
-                </Button>
-              </div>
-            ) : null}
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-3xl border-border/70 shadow-none">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-xl">
-              Create a wallet
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Create a wallet with your email.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Input
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
+            <div className="text-sm text-muted-foreground">
+              Click the button below to connect your wallet. If you do not have
+              a wallet, you can create one too.
+            </div>
+            <ConnectButton
+              theme={theme.resolvedTheme === "dark" ? "dark" : "light"}
+              connectModal={{
+                title: "Connect your wallet",
+                titleIcon: "/logo.png",
+                size: "compact",
+              }}
+              accountAbstraction={{
+                chain: sepolia,
+                sponsorGas: true,
+              }}
+              onConnect={() => {
+                setConnectedAddress(wallet?.getAccount()?.address || "")
+              }}
+              client={client}
+              connectButton={{
+                label: "Connect Wallet",
+                className: "w-full",
+                style: {
+                  width: "100%",
+                  height: "40px",
+                  fontSize: "14px",
+                  backgroundColor: "oklch(0.696 0.17 162.48)",
+                  borderRadius: "100px",
+                  fontWeight: "700",
+                },
+              }}
             />
-            <Button
-              type="button"
-              className="w-full"
-              onClick={handleCreateEmbeddedWallet}
-              disabled={
-                !email.includes("@") ||
-                generatedAddress !== null ||
-                !connectedAddress
-              }
-            >
-              Create wallet with email
-            </Button>
 
-            {generatedAddress ? (
-              <div className="rounded-2xl border border-border/70 bg-muted/40 p-3 text-sm">
-                <p className="mb-2 text-muted-foreground">
-                  Generated wallet address
-                </p>
-                <p className="truncate text-xs">
-                  {generatedAddress.slice(0, 4)}...{generatedAddress.slice(-4)}
+            {wallet?.getAccount()?.address ? (
+              <div className="mt-2 rounded-2xl border border-border/70 bg-muted/40 p-3 text-sm">
+                <p className="mb-2 text-muted-foreground">Connected address</p>
+                <p className="truncate font-sans text-xs">
+                  {wallet?.getAccount()?.address.slice(0, 4)}...
+                  {wallet?.getAccount()?.address.slice(-4)}
                 </p>
                 <Button
                   type="button"
                   size="sm"
                   className="mt-3"
-                  onClick={() => setWallet(generatedAddress, "embedded")}
+                  onClick={() =>
+                    setWallet(wallet?.getAccount()?.address || "", "existing")
+                  }
+                  disabled={
+                    !wallet?.getAccount()?.address ||
+                    state.walletAddress === wallet?.getAccount()?.address
+                  }
                 >
-                  Use this wallet
+                  {state.walletAddress === wallet?.getAccount()?.address
+                    ? "Selected ✅"
+                    : "Use this wallet"}
                 </Button>
               </div>
             ) : null}
@@ -156,14 +127,14 @@ export function WalletStep() {
           )}
           {selectedWallet
             ? "Wallet selected"
-            : "Select a wallet to continue. We never holds your funds. Payments go directly to your wallet."}
+            : "Select a wallet to continue. We never hold your funds. Payments go directly to your wallet."}
         </div>
         <Button
           type="button"
           size="lg"
           disabled={!state.walletAddress}
           onClick={handleContinue}
-          className="w-full md:w-auto"
+          className="mt-2 w-full md:mt-0 md:w-auto"
         >
           Continue
         </Button>

@@ -130,3 +130,7 @@
     @apply font-sans;
   }
 }
+
+.tw-back-button {
+  background-color: red !important;
+}
