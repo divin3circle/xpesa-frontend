@@ -95,6 +95,12 @@ export default function WithdrawFundsPage() {
             <CardTitle>Recent withdrawals</CardTitle>
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
+            <div className="grid cursor-pointer grid-cols-2 gap-2 rounded-xl p-3 hover:bg-foreground/5 md:grid-cols-4">
+              <p className="font-sans font-semibold">Date</p>
+              <p className="font-sans font-semibold">Amount (USDC)</p>
+              <p className="font-sans font-semibold">Amount (KES)</p>
+              <p className="font-semibold text-muted-foreground">Status</p>
+            </div>
             {withdrawals.map((item) => (
               <div
                 key={`${item.date}-${item.usdc}`}

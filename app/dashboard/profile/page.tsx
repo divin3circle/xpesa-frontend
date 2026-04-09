@@ -71,8 +71,7 @@ export default function ProfilePage() {
               <Input id="mpesa" defaultValue="07XXXXXXXX" />
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button variant="secondary">Update payout number</Button>
-              <Button variant="outline">Connect new wallet</Button>
+              <Button variant="outline">Update payout number</Button>
             </div>
             <div className="rounded-2xl border border-destructive/50 bg-destructive/5 p-3 text-sm">
               <p className="font-medium text-destructive">Danger zone</p>

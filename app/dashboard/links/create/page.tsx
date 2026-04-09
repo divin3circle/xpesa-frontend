@@ -25,36 +25,42 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Edit01FreeIcons } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
+import {
+  DocumentCodeIcon,
+  Link01Icon,
+  Package01Icon,
+  TipsIcon,
+} from "hugeicons-react"
 
 type LinkMode = "gate" | "document" | "pack" | "tip"
 
 const modeCards: Array<{
   mode: LinkMode
-  emoji: string
+  emoji: React.ReactNode
   title: string
   subtitle: string
 }> = [
   {
     mode: "gate",
-    emoji: "🔗",
+    emoji: <Link01Icon />,
     title: "Gate a link",
-    subtitle: "Fan pays to unlock your URL",
+    subtitle: "Fan pays to unlock your a URL with premium content.",
   },
   {
     mode: "document",
-    emoji: "📄",
+    emoji: <DocumentCodeIcon />,
     title: "Upload a document",
-    subtitle: "Single PDF or Word doc. Secure viewer.",
+    subtitle: "Single PDF, Code or Word doc with secured view.",
   },
   {
     mode: "pack",
-    emoji: "📦",
+    emoji: <Package01Icon />,
     title: "Upload a file pack",
     subtitle: "Up to 3 files. All viewed in-browser.",
   },
   {
     mode: "tip",
-    emoji: "💚",
+    emoji: <TipsIcon />,
     title: "Accept a tip",
     subtitle: "Fan pays what they want. No content needed.",
   },
@@ -135,12 +141,12 @@ export default function CreateLinkPage() {
             className={`cursor-pointer border transition-colors ${
               mode === card.mode
                 ? "border-primary bg-primary/5"
-                : "border-border"
+                : "border-border hover:bg-foreground/5"
             }`}
             onClick={() => setMode(card.mode)}
           >
             <CardHeader className="space-y-1">
-              <CardTitle className="font-heading text-lg">
+              <CardTitle className="flex gap-1 font-heading text-lg">
                 <span className="mr-2" aria-hidden>
                   {card.emoji}
                 </span>
