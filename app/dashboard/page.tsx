@@ -1,6 +1,5 @@
 import Link from "next/link"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -90,7 +89,6 @@ export default function Page() {
   return (
     <div className="space-y-6">
       <section className="space-y-2">
-        <Badge variant="outline">Dashboard</Badge>
         <h1 className="font-heading text-3xl font-semibold tracking-tight">
           Good afternoon, Wanjiru
         </h1>

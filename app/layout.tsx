@@ -52,7 +52,12 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             {children}
-            <Toaster richColors position="top-right" />
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                className: "rounded-2xl font-semibold font-sans",
+              }}
+            />
           </ThemeProvider>
         </TooltipProvider>
       </body>

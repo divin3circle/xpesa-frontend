@@ -4,19 +4,12 @@ import { useMemo, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
-import {
-  CircleCheckBig,
-  Copy,
-  ExternalLink,
-  Hash,
-  Receipt,
-  Wallet,
-  X,
-} from "lucide-react"
+import { CircleCheckBig, Copy, ExternalLink, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { supportedNetworks, supportedTokens } from "@/lib/dashboard"
 import { cn } from "@/lib/utils"
+import { More01Icon } from "hugeicons-react"
 
 export interface TransactionRecord {
   hash: string
@@ -246,7 +239,7 @@ export function TransactionManagementTable({
                 onClick={() => setSelectedTx(tx)}
                 className="text-muted-foreground underline"
               >
-                Details
+                <More01Icon />
               </Button>
             </div>
           </motion.div>
@@ -354,92 +347,6 @@ export function TransactionManagementTable({
                     Status
                   </p>
                   <StatusBadge status={selectedTx.status} />
-                </div>
-              </div>
-
-              <div className="mt-4 grid gap-3 rounded-2xl border border-border/60 bg-background/70 p-3 md:grid-cols-[1.35fr_1fr]">
-                <div className="space-y-2 rounded-xl bg-muted/20 p-3">
-                  <div className="flex items-center gap-2">
-                    <Hash className="size-3.5 text-muted-foreground" />
-                    <p className="text-xs tracking-wide text-muted-foreground uppercase">
-                      Txn Hash
-                    </p>
-                  </div>
-                  <p className="font-mono text-xs leading-5 break-all text-foreground">
-                    {selectedTx.hash}
-                  </p>
-                </div>
-
-                <div className="space-y-2 rounded-xl bg-muted/20 p-3">
-                  <p className="text-xs tracking-wide text-muted-foreground uppercase">
-                    Status & timing
-                  </p>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <StatusBadge status={selectedTx.status} />
-                    <span className="text-sm text-muted-foreground">
-                      {selectedTx.date}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="rounded-xl bg-muted/20 p-3 md:col-span-2">
-                  <div className="mb-3 flex items-center gap-2">
-                    <Wallet className="size-4 text-muted-foreground" />
-                    <p className="text-xs tracking-wide text-muted-foreground uppercase">
-                      Wallet path
-                    </p>
-                  </div>
-                  <div className="grid gap-3 md:grid-cols-2">
-                    <div className="rounded-xl border border-border/60 bg-background/70 p-3">
-                      <p className="mb-2 text-xs tracking-wide text-muted-foreground uppercase">
-                        From address
-                      </p>
-                      <p className="font-mono text-xs leading-5 break-all">
-                        {selectedTx.fromAddress ?? selectedTx.wallet}
-                      </p>
-                    </div>
-                    <div className="rounded-xl border border-border/60 bg-background/70 p-3">
-                      <p className="mb-2 text-xs tracking-wide text-muted-foreground uppercase">
-                        To address
-                      </p>
-                      <p className="font-mono text-xs leading-5 break-all">
-                        {selectedTx.toAddress ?? selectedTx.wallet}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rounded-xl bg-muted/20 p-3 md:col-span-2">
-                  <div className="mb-3 flex items-center gap-2">
-                    <Receipt className="size-4 text-muted-foreground" />
-                    <p className="text-xs tracking-wide text-muted-foreground uppercase">
-                      Settlement summary
-                    </p>
-                  </div>
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-xl border border-border/60 bg-background/70 p-3">
-                      <p className="text-xs tracking-wide text-muted-foreground uppercase">
-                        Block
-                      </p>
-                      <p className="mt-1 font-medium">
-                        {selectedTx.blockNumber}
-                      </p>
-                    </div>
-                    <div className="rounded-xl border border-border/60 bg-background/70 p-3">
-                      <p className="text-xs tracking-wide text-muted-foreground uppercase">
-                        Gas fee
-                      </p>
-                      <p className="mt-1 font-medium">{selectedTx.gasFee}</p>
-                    </div>
-                    <div className="rounded-xl border border-border/60 bg-background/70 p-3">
-                      <p className="text-xs tracking-wide text-muted-foreground uppercase">
-                        Confirmations
-                      </p>
-                      <p className="mt-1 font-medium">
-                        {selectedTx.confirmations}
-                      </p>
-                    </div>
-                  </div>
                 </div>
               </div>
 

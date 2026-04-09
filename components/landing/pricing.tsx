@@ -18,9 +18,11 @@ export function PricingSection() {
           transition={{ duration: 0.45, ease: "easeOut" }}
           className="mb-10 text-center"
         >
-          <div className="mb-4 inline-flex items-center gap-1 rounded-full border border-primary/20 px-3 py-1 shadow-sm">
+          <div className="mb-4 inline-flex items-center gap-1">
             <CreditCard className="size-3.5 text-primary" />
-            <span className="text-xs font-medium text-background">Pricing</span>
+            <p className="font-sans text-xs font-semibold text-background">
+              Pricing
+            </p>
           </div>
           <AsteriskRevealHeading
             as="h2"

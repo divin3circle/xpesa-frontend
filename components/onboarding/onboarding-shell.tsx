@@ -57,15 +57,15 @@ export function OnboardingShell({ children }: { children: React.ReactNode }) {
                   href={`/onboarding/${entry.step}`}
                   className={cn(
                     "group flex items-start gap-3 rounded-2xl p-3 transition-colors",
-                    isActive ? "bg-foreground/10" : "hover:bg-foreground/10"
+                    isActive ? "bg-foreground/10" : "hover:bg-foreground/5"
                   )}
                   aria-current={isActive ? "step" : undefined}
                 >
-                  <span className="mt-0.5 inline-flex size-6 items-center justify-center rounded-full bg-white/15">
+                  <span className="mt-0.5 inline-flex size-6 items-center justify-center rounded-full">
                     {isComplete ? (
-                      <CheckCircle2 className="size-4 text-chart-1" />
+                      <CheckCircle2 className="size-6 text-chart-1" />
                     ) : (
-                      <Circle className="size-4 text-foreground/50" />
+                      <Circle className="size-6 text-foreground/50" />
                     )}
                   </span>
                   <div>

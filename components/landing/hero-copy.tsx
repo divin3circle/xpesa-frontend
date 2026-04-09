@@ -1,12 +1,11 @@
 "use client"
 
-import { Play } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { AsteriskRevealHeading } from "@/components/ui/asterisk-reveal-heading"
 import { heroCopy, heroStats } from "@/lib/landing/hero-content"
 import { onNavigate } from "@/lib/utils"
 import { useRouter } from "next/navigation"
+import { PlayIcon } from "hugeicons-react"
 
 export function HeroCopyBlock() {
   const router = useRouter()
@@ -37,7 +36,7 @@ export function HeroCopyBlock() {
           variant="secondary"
           className="border border-muted-foreground bg-white/10 text-background hover:bg-white/15"
         >
-          <Play className="size-4" aria-hidden="true" />
+          <PlayIcon className="mr-2" />
           Start Earning Today
         </Button>
       </div>

@@ -11,6 +11,9 @@ import { OnboardingStepHeader } from "@/components/onboarding/step-header"
 import { useOnboardingStepGuard } from "@/components/onboarding/onboarding-step-guard"
 import { useOnboarding } from "@/components/onboarding/onboarding-provider"
 import { isMpesaValid } from "@/lib/onboarding/validation"
+import Image from "next/image"
+import { Textarea } from "../ui/textarea"
+import { onNavigate } from "@/lib/utils"
 
 function getInitials(name: string) {
   const parts = name.trim().split(" ").filter(Boolean)
@@ -73,7 +76,17 @@ export function ProfileStep() {
       console.log("Onboarding payload", requestBody)
     }
 
-    toast.success("Setup complete. Welcome to xpesa.")
+    toast.success(
+      "Setup complete. Welcome to xpesa. Get started with our docs.",
+      {
+        action: {
+          label: "Learn more",
+          onClick() {
+            onNavigate("/learn", router)
+          },
+        },
+      }
+    )
     router.push("/dashboard")
   }
 
@@ -93,7 +106,7 @@ export function ProfileStep() {
 
         <div className="grid gap-2">
           <Label htmlFor="bio">Short bio (optional)</Label>
-          <textarea
+          <Textarea
             id="bio"
             value={bio}
             maxLength={120}
@@ -110,11 +123,12 @@ export function ProfileStep() {
           <Label htmlFor="avatar">Avatar (optional)</Label>
           <div className="flex items-center gap-4 rounded-3xl border border-border/70 bg-muted/30 p-4">
             {avatarDataUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={avatarDataUrl}
                 alt="Avatar preview"
-                className="h-14 w-16 rounded-full object-cover"
+                width={500}
+                height={500}
+                className="h-16 w-16 rounded-full object-cover"
               />
             ) : (
               <div className="flex h-14 w-16 items-center justify-center rounded-full bg-primary/15 font-heading text-lg font-semibold text-primary">

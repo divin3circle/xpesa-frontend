@@ -55,6 +55,7 @@ function resolveIcon(iconName?: string): React.ReactNode {
     link: Link01Icon,
     "link-create": Link02Icon,
     analytics: Analytics01Icon,
+    documents: BookOpen01Icon,
     wallet: Wallet02Icon,
     money: Money02Icon,
     transaction: TransactionIcon,

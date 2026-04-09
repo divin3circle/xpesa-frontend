@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Check, Copy, Mail, Wallet } from "lucide-react"
+import { Check } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -72,6 +72,7 @@ export function WalletStep() {
               type="button"
               className="w-full"
               onClick={handleConnectExistingWallet}
+              disabled={generatedAddress !== null || !connectedAddress}
             >
               Connect wallet
             </Button>
@@ -79,7 +80,9 @@ export function WalletStep() {
             {connectedAddress ? (
               <div className="rounded-2xl border border-border/70 bg-muted/40 p-3 text-sm">
                 <p className="mb-2 text-muted-foreground">Connected address</p>
-                <p className="truncate font-mono text-xs">{connectedAddress}</p>
+                <p className="truncate font-mono text-xs">
+                  {connectedAddress.slice(0, 4)}...{connectedAddress.slice(-4)}
+                </p>
                 <Button
                   type="button"
                   size="sm"
@@ -113,6 +116,11 @@ export function WalletStep() {
               type="button"
               className="w-full"
               onClick={handleCreateEmbeddedWallet}
+              disabled={
+                !email.includes("@") ||
+                generatedAddress !== null ||
+                !connectedAddress
+              }
             >
               Create wallet with email
             </Button>
@@ -122,7 +130,9 @@ export function WalletStep() {
                 <p className="mb-2 text-muted-foreground">
                   Generated wallet address
                 </p>
-                <p className="truncate font-mono text-xs">{generatedAddress}</p>
+                <p className="truncate text-xs">
+                  {generatedAddress.slice(0, 4)}...{generatedAddress.slice(-4)}
+                </p>
                 <Button
                   type="button"
                   size="sm"
@@ -137,7 +147,7 @@ export function WalletStep() {
         </Card>
       </div>
 
-      <div className="mt-8 flex items-center justify-between">
+      <div className="mt-8 flex flex-col items-center justify-between md:flex-row">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           {selectedWallet ? (
             <Check className="size-4 text-primary" />
@@ -153,6 +163,7 @@ export function WalletStep() {
           size="lg"
           disabled={!state.walletAddress}
           onClick={handleContinue}
+          className="w-full md:w-auto"
         >
           Continue
         </Button>

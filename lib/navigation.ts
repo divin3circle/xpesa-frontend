@@ -53,6 +53,11 @@ export const navigationConfig: NavGroup[] = [
         iconName: "dashboard",
       },
       {
+        title: "Transactions",
+        url: "/dashboard/transactions",
+        iconName: "transaction",
+      },
+      {
         title: "My Page",
         url: "/dashboard/my-page",
         iconName: "user",
@@ -95,11 +100,6 @@ export const navigationConfig: NavGroup[] = [
         title: "Withdraw Funds",
         url: "/dashboard/wallet/withdraw",
         iconName: "money",
-      },
-      {
-        title: "Transaction History",
-        url: "/dashboard/wallet/history",
-        iconName: "transaction",
       },
       {
         title: "Supported Methods",

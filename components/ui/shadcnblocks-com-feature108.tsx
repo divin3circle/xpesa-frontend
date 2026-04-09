@@ -97,12 +97,9 @@ export function Feature108({
     <section id="how-it-works" className="py-24">
       <div className="mx-auto w-full max-w-6xl px-6 lg:px-10">
         <div className="flex flex-col items-center gap-4 text-center">
-          <Badge
-            variant="default"
-            className="light:text-black bg-chart-1 font-sans text-sm text-background"
-          >
+          <p className="font-sans text-xs font-semibold text-background">
             {badge}
-          </Badge>
+          </p>
           <AsteriskRevealHeading
             as="h2"
             delayMs={760}
