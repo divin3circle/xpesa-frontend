@@ -1,3 +1,5 @@
+"use client"
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,11 +11,25 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { IconBrandGoogle, IconBrandTwitter } from "@tabler/icons-react"
+import { useState } from "react"
+import { useSignUp } from "@/hooks/use-auth"
+import LoadingSpinner from "./ui/loading-spinner"
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
+
+  const { mutate: signUp, isPending } = useSignUp()
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    signUp({ email, password })
+  }
+
   return (
     <form className={cn("flex flex-col gap-6", className)} {...props}>
       <FieldGroup>
@@ -24,20 +40,12 @@ export function SignupForm({
           </p>
         </div>
         <Field>
-          <FieldLabel htmlFor="name">Full Name</FieldLabel>
-          <Input
-            id="name"
-            type="text"
-            placeholder="John Doe"
-            required
-            className="border border-muted-foreground/20 bg-background"
-          />
-        </Field>
-        <Field>
           <FieldLabel htmlFor="email">Email</FieldLabel>
           <Input
             id="email"
             type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             placeholder="m@example.com"
             required
             className="border border-muted-foreground/20 bg-background"
@@ -52,6 +60,8 @@ export function SignupForm({
           <Input
             id="password"
             type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             required
             className="border border-muted-foreground/20 bg-background"
           />
@@ -64,13 +74,25 @@ export function SignupForm({
           <Input
             id="confirm-password"
             type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
             required
             className="border border-muted-foreground/20 bg-background"
           />
           <FieldDescription>Please confirm your password.</FieldDescription>
         </Field>
         <Field>
-          <Button type="submit">Create Account</Button>
+          <Button
+            type="submit"
+            disabled={
+              !(email && password && confirmPassword) ||
+              password !== confirmPassword
+            }
+            className="w-full"
+            onClick={(e) => handleSubmit(e)}
+          >
+            {isPending ? <LoadingSpinner /> : "Create Account"}
+          </Button>
         </Field>
         <FieldSeparator>Or continue with</FieldSeparator>
         <Field>

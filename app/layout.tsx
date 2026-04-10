@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { ThirdwebProvider } from "thirdweb/react"
+import { AppQueryClientProvider } from "@/components/query-client-provider"
 
 const oxaniumHeading = Oxanium({
   subsets: ["latin"],
@@ -45,24 +46,26 @@ export default function RootLayout({
       )}
     >
       <body>
-        <ThirdwebProvider>
-          <TooltipProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              {children}
-              <Toaster
-                position="top-right"
-                toastOptions={{
-                  className: "rounded-2xl font-semibold font-sans",
-                }}
-              />
-            </ThemeProvider>
-          </TooltipProvider>
-        </ThirdwebProvider>
+        <AppQueryClientProvider>
+          <ThirdwebProvider>
+            <TooltipProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="system"
+                enableSystem
+                disableTransitionOnChange
+              >
+                {children}
+                <Toaster
+                  position="top-right"
+                  toastOptions={{
+                    className: "rounded-2xl font-semibold font-sans",
+                  }}
+                />
+              </ThemeProvider>
+            </TooltipProvider>
+          </ThirdwebProvider>
+        </AppQueryClientProvider>
       </body>
     </html>
   )

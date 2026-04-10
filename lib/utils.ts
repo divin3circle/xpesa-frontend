@@ -5,6 +5,10 @@ import { createThirdwebClient } from "thirdweb"
 
 export const envConfig = {
   THIRDWEB_CLIENT_ID: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID || "",
+  SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+  SUPABASE_PUBLISHABLE_KEY:
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "",
+  APP_URL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
 }
 
 export const client = createThirdwebClient({
