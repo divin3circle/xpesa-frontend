@@ -47,10 +47,9 @@ export function LoginForm({
 
     try {
       await login(formData)
-      // Handle successful login (e.g., redirect to dashboard)
     } catch (error) {
-      // Handle login error (e.g., show error message)
       console.error("Login failed:", error)
+      toast.error("Login failed")
     }
   }
 

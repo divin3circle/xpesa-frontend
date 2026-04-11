@@ -82,7 +82,7 @@ export function WalletStep() {
                   width: "100%",
                   height: "40px",
                   fontSize: "14px",
-                  backgroundColor: "oklch(0.696 0.17 162.48)",
+                  backgroundColor: "",
                   borderRadius: "100px",
                   fontWeight: "700",
                 },

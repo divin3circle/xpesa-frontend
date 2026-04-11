@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, redirect } from "next/navigation"
 import { CheckCircle2, Circle } from "lucide-react"
 
 import { ONBOARDING_STEP_META } from "@/lib/onboarding/constants"
@@ -29,6 +29,14 @@ export function OnboardingShell({ children }: { children: React.ReactNode }) {
     ONBOARDING_STEP_META.findIndex((entry) => entry.step === activeStep)
   )
   const progress = ((currentStepIndex + 1) / ONBOARDING_STEP_META.length) * 100
+
+  const hashParams = new URLSearchParams(window.location.hash.slice(1));
+  const errorCode = hashParams.get('error_code');
+  const errorDescription = hashParams.get('error_description');
+
+  if (errorCode) {
+    redirect(`/error?q=${encodeURIComponent(errorDescription || 'Auth Error')}`)
+  }
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.15),transparent_45%),linear-gradient(145deg,hsl(var(--background)),hsl(var(--muted)/0.5))] p-4 md:p-8">

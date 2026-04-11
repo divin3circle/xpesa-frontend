@@ -12,8 +12,10 @@ import { useOnboardingStepGuard } from "@/components/onboarding/onboarding-step-
 import { useOnboarding } from "@/components/onboarding/onboarding-provider"
 import { isMpesaValid } from "@/lib/onboarding/validation"
 import Image from "next/image"
-import { Textarea } from "../ui/textarea"
-import { onNavigate } from "@/lib/utils"
+import { Textarea } from "../ui/textarea";
+import { createClient } from "@/lib/supabase/client";
+import { OnboardingData, useCompleteOnboarding } from "@/hooks/use-onboarding";
+import LoadingSpinner from "../ui/loading-spinner";
 
 function getInitials(name: string) {
   const parts = name.trim().split(" ").filter(Boolean)
@@ -25,6 +27,7 @@ function getInitials(name: string) {
 export function ProfileStep() {
   useOnboardingStepGuard("profile")
 
+  const { mutate: createCreatorMutation, isPending } = useCompleteOnboarding()
   const router = useRouter()
   const { state, setProfile, markStepComplete, getPayload } = useOnboarding()
   const [displayName, setDisplayName] = useState(
@@ -48,9 +51,14 @@ export function ProfileStep() {
     setAvatarDataUrl(objectUrl)
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
+    const supabase = createClient()
     if (!displayName || !isMpesaFieldValid) return
-
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      toast.error("You are not logged in.")
+      return;
+    }
     setProfile({
       displayName,
       bio,
@@ -72,22 +80,21 @@ export function ProfileStep() {
           mpesaNumber,
         },
       }
-
-      console.log("Onboarding payload", requestBody)
-    }
-
-    toast.success(
-      "Setup complete. Welcome to xpesa. Get started with our docs.",
-      {
-        action: {
-          label: "Learn more",
-          onClick() {
-            onNavigate("/learn", router)
-          },
-        },
+      const creatorDetails: OnboardingData = {
+        id: user.id,
+        email: user.email || "",
+        displayName: requestBody.profile.displayName,
+        handle: requestBody.handle,
+        bio: requestBody.profile.bio,
+        avatarUrl: requestBody.profile.avatarDataUrl,
+        walletAddress: requestBody.walletAddress,
+        mpesaNumber: requestBody.profile.mpesaNumber,
+        onboardingStep: 2,
+        onboardingComplete: true
       }
-    )
-    router.push("/dashboard")
+
+      createCreatorMutation({ creatorDetails })
+    }
   }
 
   return (
@@ -172,9 +179,10 @@ export function ProfileStep() {
           type="button"
           size="lg"
           onClick={handleSubmit}
-          disabled={!displayName || !isMpesaFieldValid}
+          className="flex items-center justify-center"
+          disabled={!displayName || !isMpesaFieldValid || isPending}
         >
-          Finish setup →
+          {isPending ? <LoadingSpinner /> : ' Finish setup →'}
         </Button>
       </div>
     </section>

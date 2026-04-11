@@ -29,6 +29,13 @@ async function signUpNewUser({
         emailRedirectTo: envConfig.APP_URL + "/onboarding",
       },
     })
+    const user = data.user
+    if (!user) {
+      console.log("Failed to create creators table, user not present.")
+    } else {
+      const { error: creatorError } = await supabase.from('creators').insert({ id: user.id })
+      console.log(creatorError)
+    }
     return { data, error }
   } catch (error) {
     console.error("Error signing up:", error)
@@ -55,6 +62,7 @@ export function useSignUp() {
           description:
             " Let's get you onboarded. In the meantime, check your email to confirm your account.",
         })
+
         onNavigate("/onboarding", router)
       }
     },
