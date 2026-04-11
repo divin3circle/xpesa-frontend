@@ -71,7 +71,7 @@ async function checkIfUserCompletedOnboarding(): Promise<boolean> {
 
   try {
     const { data, error } = await supabase.from(TABLENAMES.CREATORS).select('onboarding_complete').eq('id', user.id)
-    if (!data || !data[0].onboarding_complete) return false;
+    if (!data || !data[0].onboarding_complete || error) return false;
     return true
   } catch (error) {
     console.log(error);

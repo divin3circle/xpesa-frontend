@@ -4,6 +4,7 @@ import { AuthError, Session, User } from "@supabase/supabase-js"
 import { toast } from "sonner"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
+import { error } from "next/dist/build/output/log";
 
 interface AuthResponse {
   data: {
@@ -29,13 +30,6 @@ async function signUpNewUser({
         emailRedirectTo: envConfig.APP_URL + "/onboarding",
       },
     })
-    const user = data.user
-    if (!user) {
-      console.log("Failed to create creators table, user not present.")
-    } else {
-      const { error: creatorError } = await supabase.from('creators').insert({ id: user.id })
-      console.log(creatorError)
-    }
     return { data, error }
   } catch (error) {
     console.error("Error signing up:", error)
@@ -46,6 +40,32 @@ async function signUpNewUser({
         session: null,
       },
       error: error as AuthError,
+    }
+  }
+}
+
+async function signInUser({
+  email,
+  password
+}: {
+  email: string
+  password: string
+}): Promise<AuthResponse> {
+  try {
+    const supabase = createClient()
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+    return { data, error }
+  } catch (error) {
+    console.log("Error signing in user:", error)
+    return {
+      data: {
+        user: null,
+        session: null,
+      },
+      error: error as AuthError
     }
   }
 }
@@ -70,5 +90,26 @@ export function useSignUp() {
       console.error("Error during sign up:", error)
       toast.error("An unexpected error occurred. Please try again.")
     },
+  })
+}
+
+export function useSignIn() {
+  const router = useRouter();
+  return useMutation({
+    mutationFn: signInUser,
+    onSuccess: (response) => {
+      if (response.error) {
+        toast.error(response.error.message)
+      } else {
+        toast.success("Welcome back creator!")
+        onNavigate("/dashboard", router)
+      }
+    },
+    onError: (error) => {
+      console.log("Error during signin in:", error)
+      toast.error("Couldn't sign you in", {
+        description: error.message
+      })
+    }
   })
 }

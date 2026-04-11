@@ -9,9 +9,10 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { IconBrandGoogle, IconBrandTwitter } from "@tabler/icons-react"
-import { login } from "@/actions/auth"
 import { toast } from "sonner"
 import { useState } from "react"
+import { useSignIn } from "@/hooks/use-auth";
+import LoadingSpinner from "./ui/loading-spinner";
 
 export function LoginForm({
   className,
@@ -19,6 +20,7 @@ export function LoginForm({
 }: React.ComponentProps<"form">) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const { mutate: loginInUser, isPending } = useSignIn()
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -41,12 +43,8 @@ export function LoginForm({
       return
     }
 
-    const formData = new FormData()
-    formData.append("email", email)
-    formData.append("password", password)
-
     try {
-      await login(formData)
+      loginInUser({ email, password })
     } catch (error) {
       console.error("Login failed:", error)
       toast.error("Login failed")
@@ -98,7 +96,9 @@ export function LoginForm({
           />
         </Field>
         <Field>
-          <Button type="submit">Login</Button>
+          <Button disabled={isPending || email === "" || password === ""} className="flex items-center justify-center" type="submit">
+            {isPending ? <LoadingSpinner /> : "Login"}
+          </Button>
         </Field>
         <FieldSeparator>Or continue with</FieldSeparator>
         <Field>

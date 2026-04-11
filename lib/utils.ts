@@ -1,3 +1,4 @@
+import { Mouse18FreeIcons } from "@hugeicons/core-free-icons";
 import { clsx, type ClassValue } from "clsx"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { twMerge } from "tailwind-merge"
@@ -9,6 +10,7 @@ export const envConfig = {
   SUPABASE_PUBLISHABLE_KEY:
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "",
   APP_URL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  AVATARS_URL: process.env.NEXT_PUBLIC_SUPABASE_URL + "/storage/v1/object/public/"
 }
 
 export const client = createThirdwebClient({
@@ -21,4 +23,18 @@ export function cn(...inputs: ClassValue[]) {
 
 export function onNavigate(path: string, router: AppRouterInstance) {
   router.push(path)
+}
+
+export function getGreetingBasedOnCurrentTime(): string {
+  const timeNow = Date.now()
+
+  const hour = new Date(timeNow).getHours()
+
+  if (hour < 12) {
+    return "morning"
+  } else if (hour < 18 && hour > 12) {
+    return "afternoon"
+  } else {
+    return "evening"
+  }
 }

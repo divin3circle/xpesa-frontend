@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
@@ -26,6 +27,9 @@ import {
   SupportedToken,
   supportedTokens,
 } from "@/lib/dashboard"
+import { useUserDetails } from "@/hooks/use-user";
+import LoadingSpinner from "@/components/ui/loading-spinner"
+import { getGreetingBasedOnCurrentTime } from "@/lib/utils";
 
 const stats = [
   { label: "Total earned", value: "$6,842.11", hint: "All time" },
@@ -86,11 +90,21 @@ const recentTransactions: TransactionRecord[] = [
 ]
 
 export default function Page() {
+  const { data, isLoading, error } = useUserDetails()
+
+  if (isLoading || error) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full w-full">
+        <h1 className="font-sans mb- text-muted-foreground font-semibold">Just a moment..</h1>
+        <LoadingSpinner size={5} />
+      </div>
+    )
+  }
   return (
     <div className="space-y-6">
       <section className="space-y-2">
         <h1 className="font-heading text-3xl font-semibold tracking-tight">
-          Good afternoon, Wanjiru
+          Good {getGreetingBasedOnCurrentTime()}, {data?.creator?.display_name}
         </h1>
         <p className="text-sm text-muted-foreground md:text-base">
           Here is a live snapshot of your earnings, links, and payout readiness.
