@@ -2,6 +2,9 @@ import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
 export async function updateSession(request: NextRequest) {
+  const loginUrl = new URL("/login", request.url)
+  const isDashboardRoute = request.nextUrl.pathname.startsWith("/dashboard")
+
   let supabaseResponse = NextResponse.next({
     request,
   })
@@ -39,6 +42,16 @@ export async function updateSession(request: NextRequest) {
   // IMPORTANT: If you remove getClaims() and you use server-side rendering
   // with the Supabase client, your users may be randomly logged out.
   await supabase.auth.getClaims()
+
+  if (isDashboardRoute) {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.redirect(loginUrl)
+    }
+  }
 
   return supabaseResponse
 }
