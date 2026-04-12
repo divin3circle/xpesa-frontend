@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -8,8 +10,30 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import LoadingSpinner from "@/components/ui/loading-spinner";
+import { Textarea } from "@/components/ui/textarea";
+import { useUserDetails } from "@/hooks/use-user";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
+  const { data, isLoading, error } = useUserDetails()
+  const router = useRouter()
+  if (isLoading) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center">
+        <h1 className="text-xs font-sans font-semibold text-muted-foreground mb-4">
+          Just a  moment..
+        </h1>
+        <LoadingSpinner />
+      </div>
+    )
+  }
+
+  if (!data?.creator || error) {
+    router.push(`/error?q=${error?.message || "An unexpected error occurred"}`)
+    return;
+  }
+
   return (
     <div className="space-y-6">
       <section className="space-y-2">
@@ -32,17 +56,17 @@ export default function ProfilePage() {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="display-name">Display name</Label>
-              <Input id="display-name" defaultValue="Wanjiru M." />
+              <Input id="display-name" defaultValue={data.creator.display_name} disabled />
             </div>
             <div className="space-y-2">
               <Label htmlFor="handle">Handle</Label>
-              <Input id="handle" defaultValue="wanjiru" />
+              <Input id="handle" defaultValue={data.creator.handle} disabled />
             </div>
             <div className="space-y-2">
               <Label htmlFor="bio">Bio</Label>
-              <textarea
-                id="bio"
-                className="min-h-24 w-full rounded-md border bg-background px-3 py-2 text-sm"
+              <Textarea
+                id={data.creator.bio}
+                className="min-h-24 w-full rounded-2xl border bg-background px-3 py-2 text-sm"
                 defaultValue="Product designer sharing practical resources and guides for creators."
               />
             </div>
@@ -62,13 +86,13 @@ export default function ProfilePage() {
               <Label htmlFor="wallet-address">Wallet address</Label>
               <Input
                 id="wallet-address"
-                defaultValue="0x7A21...Fe89"
+                defaultValue={data.creator.wallet_address.slice(0, 6) + "..." + data.creator.wallet_address.slice(-4)}
                 readOnly
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="mpesa">M-Pesa number</Label>
-              <Input id="mpesa" defaultValue="07XXXXXXXX" />
+              <Input id="mpesa" defaultValue={data.creator.mpesa_number} />
             </div>
             <div className="flex flex-wrap gap-2">
               <Button variant="outline">Update payout number</Button>

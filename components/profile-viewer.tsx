@@ -104,7 +104,7 @@ export function ProfileViewer({ defaultVersion }: { defaultVersion: string }) {
             </DropdownMenuItem>
 
             <DropdownMenuItem
-              onSelect={() => {}}
+              onSelect={() => { }}
               className="flex items-center justify-between"
             >
               <span className="">App Version</span>
@@ -118,7 +118,7 @@ export function ProfileViewer({ defaultVersion }: { defaultVersion: string }) {
               </div>
             </DropdownMenuItem>
             <DropdownMenuItem
-              onSelect={() => {}}
+              onSelect={() => { }}
               className="flex items-center justify-between"
             >
               <div className="flex w-full items-center justify-between gap-2">

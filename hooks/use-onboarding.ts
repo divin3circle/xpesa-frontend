@@ -4,6 +4,7 @@ import { useQuery, useMutation } from "@tanstack/react-query"
 import { toast } from "sonner";
 import { redirect, useRouter } from "next/navigation";
 import { onNavigate } from "@/lib/utils";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 
 export interface OnboardingData {
@@ -60,13 +61,17 @@ async function createCreator({ creatorDetails }: {
   }
 }
 
-async function checkIfUserCompletedOnboarding(): Promise<boolean> {
+
+
+async function checkIfUserCompletedOnboarding({ router }: {
+  router: AppRouterInstance
+}): Promise<boolean> {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    console.log("User not authenticated.")
-    throw new Error("Not logged in")
+    router.push("/login")
+    return false
   }
 
   try {
@@ -80,9 +85,11 @@ async function checkIfUserCompletedOnboarding(): Promise<boolean> {
 }
 
 export function useIsOnboardingComplete() {
+  const router = useRouter()
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['onboarding'],
-    queryFn: checkIfUserCompletedOnboarding,
+    queryFn: () => checkIfUserCompletedOnboarding({ router }),
   })
 
   return { data, error, isLoading }

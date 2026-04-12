@@ -33,8 +33,8 @@ export default function SupportedMethodsPage() {
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <p>Processing: 1-5 minutes</p>
-            <p>Region: Kenya</p>
-            <Button className="w-full">Use method</Button>
+            <p>Region: All Supported countries</p>
+            <Button className="w-full">Selected method</Button>
           </CardContent>
         </Card>
 
@@ -45,7 +45,7 @@ export default function SupportedMethodsPage() {
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <p>Processing: Same-day</p>
-            <p>Region: Kenya + East Africa</p>
+            <p>Region: Inter-continental</p>
             <Button className="w-full" variant="secondary" disabled>
               Coming soon
             </Button>

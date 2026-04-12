@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link"
 
 import { Badge } from "@/components/ui/badge"
@@ -9,6 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { useUserDetails } from "@/hooks/use-user";
+import LoadingSpinner from "@/components/ui/loading-spinner";
+import { useRouter } from "next/navigation";
+import { envConfig } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 
 const activeLinks = [
   { title: "React Native Crash Course", type: "GATE", price: "$12" },
@@ -17,6 +24,30 @@ const activeLinks = [
 ]
 
 export default function MyPagePage() {
+  const { data, isLoading, error } = useUserDetails();
+  const router = useRouter();
+
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-full flex items-center justify-center flex-col">
+        <h1 className="text-muted-foreground font-sans text-xs mb-4">Just a moment..</h1>
+        <LoadingSpinner />
+      </div>
+    )
+  }
+
+  if (!data?.creator || error) {
+    router.push(`/error?q=${error?.message || "An unexpected error occurred"}`)
+    return;
+  }
+
+
+  const avatarURL =
+    !data || error
+      ? "/logo.png"
+      : envConfig.AVATARS_URL + data.creator?.avatar_url || "/logo.png"
+
   return (
     <div className="space-y-6">
       <section className="space-y-2">
@@ -24,7 +55,7 @@ export default function MyPagePage() {
           Preview creator page
         </h1>
         <p className="text-sm text-muted-foreground">
-          This is the page your audience sees at xpesa.com/wanjiru.
+          This is the page your audience sees at xpesa.com/{data.creator.handle}.
         </p>
       </section>
 
@@ -33,15 +64,27 @@ export default function MyPagePage() {
           <CardContent className="space-y-4">
             <div className="rounded-xl border p-6">
               <div className="mb-4 flex items-center gap-3">
-                <div className="h-12 w-12 rounded-full bg-muted" />
+                <div className="">
+                  {isLoading ? (
+                    <Skeleton className="h-8 w-8 rounded-full" />
+                  ) : (
+                    <Image
+                      src={avatarURL}
+                      alt="Avatar"
+                      width={100}
+                      height={100}
+                      className="h-8 w-8 rounded-2xl object-cover"
+                      unoptimized
+                    />
+                  )}
+                </div>
                 <div>
-                  <p className="font-medium">Wanjiru M.</p>
-                  <p className="text-xs text-muted-foreground">@wanjiru</p>
+                  <p className="font-medium">{data.creator.display_name}</p>
+                  <p className="text-xs text-muted-foreground">@{data.creator.handle}</p>
                 </div>
               </div>
-              <p className="mb-4 text-sm text-muted-foreground">
-                Product designer sharing resources, templates, and practical
-                guides for early creators.
+              <p className="mb-4 truncate max-w-full text-sm text-muted-foreground">
+                {data.creator.bio}
               </p>
               <div className="space-y-2">
                 {activeLinks.map((item) => (
@@ -72,7 +115,7 @@ export default function MyPagePage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="rounded-2xl border p-3 text-sm">
-              <p className="font-medium">xpesa.com/wanjiru</p>
+              <p className="font-medium">xpesa.com/{data.creator.handle}</p>
               <p className="text-xs text-muted-foreground">
                 Public URL for your audience
               </p>

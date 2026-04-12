@@ -178,7 +178,7 @@ export function OnboardingProvider({
     return (
       <div className="flex flex-col items-center justify-center h-screen w-screen">
         <h1 className="font-sans mb- text-muted-foreground font-semibold">Just a moment..</h1>
-        <LoadingSpinner size={8} />
+        <LoadingSpinner size={5} />
       </div>
     )
   }
