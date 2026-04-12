@@ -4,7 +4,6 @@ import { AuthError, Session, User } from "@supabase/supabase-js"
 import { toast } from "sonner"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
-import { error } from "next/dist/build/output/log";
 
 interface AuthResponse {
   data: {
@@ -12,6 +11,20 @@ interface AuthResponse {
     session: Session | null
   }
   error: AuthError | null
+}
+
+async function signOutUser() {
+  try {
+    const supabase = createClient()
+    const { error } = await supabase.auth.signOut()
+    if (error) {
+      throw error
+    }
+    toast.success("Signed out successfully")
+  } catch (error) {
+    console.error("Error signing out:", error)
+    toast.error("Failed to sign out. Please try again.")
+  }
 }
 
 async function signUpNewUser({
@@ -46,7 +59,7 @@ async function signUpNewUser({
 
 async function signInUser({
   email,
-  password
+  password,
 }: {
   email: string
   password: string
@@ -55,8 +68,8 @@ async function signInUser({
     const supabase = createClient()
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
-      password
-    });
+      password,
+    })
     return { data, error }
   } catch (error) {
     console.log("Error signing in user:", error)
@@ -65,7 +78,7 @@ async function signInUser({
         user: null,
         session: null,
       },
-      error: error as AuthError
+      error: error as AuthError,
     }
   }
 }
@@ -94,7 +107,7 @@ export function useSignUp() {
 }
 
 export function useSignIn() {
-  const router = useRouter();
+  const router = useRouter()
   return useMutation({
     mutationFn: signInUser,
     onSuccess: (response) => {
@@ -108,8 +121,22 @@ export function useSignIn() {
     onError: (error) => {
       console.log("Error during signin in:", error)
       toast.error("Couldn't sign you in", {
-        description: error.message
+        description: error.message,
       })
-    }
+    },
+  })
+}
+
+export function useSignOut() {
+  const router = useRouter()
+  return useMutation({
+    mutationFn: signOutUser,
+    onSuccess: () => {
+      onNavigate("/login", router)
+    },
+    onError: (error) => {
+      console.error("Error during sign out:", error)
+      toast.error("Failed to sign out. Please try again.")
+    },
   })
 }
