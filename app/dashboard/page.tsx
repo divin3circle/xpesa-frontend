@@ -29,7 +29,7 @@ import {
 } from "@/lib/dashboard"
 import { useUserDetails } from "@/hooks/use-user"
 import LoadingSpinner from "@/components/ui/loading-spinner"
-import { getGreetingBasedOnCurrentTime } from "@/lib/utils"
+import { getCurrentMonthName, getGreetingBasedOnCurrentTime, getReadableDateTime } from "@/lib/utils"
 import { useGetAllTimeEarnings } from "@/hooks/use-stats"
 import { redirect } from "next/navigation"
 
@@ -115,12 +115,24 @@ export default function Page() {
   if (error) {
     redirect(`/error?q=${error.message}`)
   }
-  if (allTimeEarningsError || !allTimeEarningsData) {
+  if (allTimeEarningsError) {
     redirect(
       `/error?q=${allTimeEarningsError?.message || "Failed to load earnings data"}`
     )
-    return
   }
+  if (!allTimeEarningsData || !data) {
+    return (
+      <div className="flex h-full w-full flex-col items-center justify-center">
+        <h1 className="mb- font-sans font-semibold text-muted-foreground">
+          Just a moment..
+        </h1>
+        <LoadingSpinner size={5} />
+      </div>
+    )
+  }
+
+
+
   return (
     <div className="space-y-6">
       <section className="space-y-2">
@@ -150,12 +162,12 @@ export default function Page() {
             )}
           </CardHeader>
           <CardContent className="pt-0 text-xs text-muted-foreground">
-            Since October 2025
+            Since {getReadableDateTime("month-and-year", data.creator?.created_at)}
           </CardContent>
         </Card>
         <Card className="rounded-2xl shadow-none">
           <CardHeader className="pb-2">
-            <CardDescription>All Time Earnings</CardDescription>
+            <CardDescription>This Month</CardDescription>
             {isAllTimeEarningsLoading ? (
               <div className="my-2 flex items-center justify-start font-heading text-3xl font-semibold text-muted-foreground">
                 $<LoadingSpinner size={5} />
@@ -165,52 +177,50 @@ export default function Page() {
               </div>
             ) : (
               <CardTitle className="font-heading text-3xl">
-                ${allTimeEarningsData?.allTimeEarnings}
+                ${allTimeEarningsData?.thisMonthEarnings}
               </CardTitle>
             )}
           </CardHeader>
           <CardContent className="pt-0 text-xs text-muted-foreground">
-            Since October 2025
+            Amount earned in {getCurrentMonthName()}
           </CardContent>
         </Card>
         <Card className="rounded-2xl shadow-none">
           <CardHeader className="pb-2">
-            <CardDescription>All Time Earnings</CardDescription>
+            <CardDescription>Transactions Count</CardDescription>
             {isAllTimeEarningsLoading ? (
               <div className="my-2 flex items-center justify-start font-heading text-3xl font-semibold text-muted-foreground">
-                $<LoadingSpinner size={5} />
-                <LoadingSpinner size={5} />.
+                <LoadingSpinner size={5} />
                 <LoadingSpinner size={5} />
                 <LoadingSpinner size={5} />
               </div>
             ) : (
               <CardTitle className="font-heading text-3xl">
-                ${allTimeEarningsData?.allTimeEarnings}
+                {allTimeEarningsData?.allTimeTransactions}
               </CardTitle>
             )}
           </CardHeader>
           <CardContent className="pt-0 text-xs text-muted-foreground">
-            Since October 2025
+            Since {getReadableDateTime("month-and-year", data.creator?.created_at)}
           </CardContent>
         </Card>
         <Card className="rounded-2xl shadow-none">
           <CardHeader className="pb-2">
-            <CardDescription>All Time Earnings</CardDescription>
+            <CardDescription>Active Links</CardDescription>
             {isAllTimeEarningsLoading ? (
               <div className="my-2 flex items-center justify-start font-heading text-3xl font-semibold text-muted-foreground">
-                $<LoadingSpinner size={5} />
-                <LoadingSpinner size={5} />.
+                <LoadingSpinner size={5} />
                 <LoadingSpinner size={5} />
                 <LoadingSpinner size={5} />
               </div>
             ) : (
               <CardTitle className="font-heading text-3xl">
-                ${allTimeEarningsData?.allTimeEarnings}
+                {allTimeEarningsData?.allTimeTransactions}
               </CardTitle>
             )}
           </CardHeader>
           <CardContent className="pt-0 text-xs text-muted-foreground">
-            Since October 2025
+            Since {getReadableDateTime("month-and-year", data.creator?.created_at)}
           </CardContent>
         </Card>
       </section>

@@ -38,3 +38,45 @@ export function getGreetingBasedOnCurrentTime(): string {
     return "evening"
   }
 }
+
+export function getCurrentMonthName() {
+  const months = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December"
+  ];
+
+  const now = new Date();
+  const currentMonthName = months[now.getMonth()];
+
+  return currentMonthName
+}
+
+type ExpectedDateFormat = "full" | "month-and-year" | "month-only" | "year";
+
+export function getReadableDateTime(formart: ExpectedDateFormat, timestamp: string | undefined): string {
+  if (!timestamp) return ""
+  const date = new Date(timestamp)
+  switch (formart) {
+    case "month-and-year":
+      return date.toLocaleString("en-US", {
+        month: 'long',
+        year: 'numeric'
+      })
+    case "month-only":
+      return date.toLocaleString("en-US", {
+        month: 'long'
+      })
+    case "year":
+      return date.toLocaleString("en-US", {
+        year: 'numeric'
+      })
+    default:
+      return date.toLocaleString("en-US", {
+        hour: "numeric",
+        minute: "numeric",
+        month: 'long',
+        year: 'numeric'
+      })
+  }
+
+}

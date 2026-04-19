@@ -1,15 +1,42 @@
 import { createClient } from "@/lib/supabase/client"
 import { useQuery } from "@tanstack/react-query"
-
-// We need stats about:
-// All time earnings, current month earnings, total transactions on creators links, active links.
-
-// const supabase = createClient();
+import { TransactionRecord } from "@/components/ui/transaction-management-table"
+import { TABLENAMES } from "@/lib/supabase/utilities"
 
 interface AllTimeEarningsResponse {
   allTimeEarnings: string
   thisMonthEarnings: string
   allTimeTransactions: number
+}
+
+async function getCurrentMonthEarnings(): Promise<string> {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  try {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return "0.0"
+    }
+    const { data, error } = await supabase
+      .from(TABLENAMES.TRANSACTIONS)
+      .select("creator_net_usdc")
+      .gte("created_at", thirtyDaysAgo.toISOString())
+    if (error || !data) {
+      console.log("Error getting this month's earnings: ", error)
+      return "0.0"
+    }
+    const sum = data?.reduce((a, c) => a + Number(c.creator_net_usdc), 0)
+
+    return sum?.toLocaleString(undefined, {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    }) || "0.0"
+  } catch (error) {
+    console.error("Error getting this month's earnings data", error);
+    return "0.0"
+  }
 }
 
 async function getAllTimeEarnings(): Promise<AllTimeEarningsResponse> {
@@ -20,12 +47,12 @@ async function getAllTimeEarnings(): Promise<AllTimeEarningsResponse> {
     } = await supabase.auth.getUser()
     if (!user)
       return {
-        allTimeEarnings: "0",
-        thisMonthEarnings: "0",
+        allTimeEarnings: "0.0",
+        thisMonthEarnings: "0.0",
         allTimeTransactions: 0,
       }
     const { data, error } = await supabase
-      .from("transactions")
+      .from(TABLENAMES.TRANSACTIONS)
       .select("creator_net_usdc")
       .eq("creator_id", user.id)
 
@@ -38,7 +65,7 @@ async function getAllTimeEarnings(): Promise<AllTimeEarningsResponse> {
           maximumFractionDigits: 2,
           minimumFractionDigits: 2,
         }) || "0",
-      thisMonthEarnings: "0",
+      thisMonthEarnings: await getCurrentMonthEarnings(),
       allTimeTransactions: data?.length || 0,
     }
   } catch (error) {

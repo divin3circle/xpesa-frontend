@@ -85,7 +85,10 @@ async function checkIfUserCompletedOnboarding({
       .from(TABLENAMES.CREATORS)
       .select("onboarding_complete")
       .eq("id", user.id)
-    if (data?.length === 0 || !data || data[0]?.onboarding_complete || error) {
+    if (!data || error) {
+      return false
+    }
+    if (data.length === 0) {
       return false
     }
     return true
