@@ -1,4 +1,3 @@
-import { Mouse18FreeIcons } from "@hugeicons/core-free-icons";
 import { clsx, type ClassValue } from "clsx"
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { twMerge } from "tailwind-merge"
@@ -79,4 +78,9 @@ export function getReadableDateTime(formart: ExpectedDateFormat, timestamp: stri
       })
   }
 
+}
+
+export function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
 }

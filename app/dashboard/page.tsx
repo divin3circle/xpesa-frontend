@@ -32,13 +32,8 @@ import LoadingSpinner from "@/components/ui/loading-spinner"
 import { getCurrentMonthName, getGreetingBasedOnCurrentTime, getReadableDateTime } from "@/lib/utils"
 import { useGetAllTimeEarnings } from "@/hooks/use-stats"
 import { redirect } from "next/navigation"
+import { useMyLinks } from "@/hooks/use-links";
 
-const stats = [
-  { label: "Total earned", value: "$6,842.11", hint: "All time" },
-  { label: "This month", value: "$1,204.75", hint: "+14.3% vs last month" },
-  { label: "Transactions", value: "427", hint: "Confirmed payments" },
-  { label: "Active links", value: "18", hint: "4 tip links, 14 gate links" },
-]
 
 const recentTransactions: TransactionRecord[] = [
   {
@@ -93,6 +88,8 @@ const recentTransactions: TransactionRecord[] = [
 
 export default function Page() {
   const { data, isLoading, error } = useUserDetails()
+  const { data: links, isLoading: isLinksLoading } = useMyLinks()
+  console.log(links)
   const {
     data: allTimeEarningsData,
     isLoading: isAllTimeEarningsLoading,
