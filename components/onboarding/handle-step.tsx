@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { CheckCircle2, LoaderCircle, XCircle } from "lucide-react"
 
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { OnboardingStepHeader } from "@/components/onboarding/step-header"
 import { useOnboardingStepGuard } from "@/components/onboarding/onboarding-step-guard"
 import { useOnboarding } from "@/components/onboarding/onboarding-provider"
+import { useDebouncedHandleCheck } from "@/hooks/use-onboarding"
 import { RESERVED_HANDLES } from "@/lib/onboarding/constants"
 import { isHandleValid } from "@/lib/onboarding/validation"
 
@@ -20,24 +21,19 @@ export function HandleStep() {
   const router = useRouter()
   const { state, setHandle, markStepComplete } = useOnboarding()
   const [handle, setHandleValue] = useState(state.handle)
-  const [debouncedHandle, setDebouncedHandle] = useState(state.handle)
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setDebouncedHandle(handle)
-    }, 500)
-
-    return () => window.clearTimeout(timer)
+  const checkedHandle = useMemo(() => {
+    return isHandleValid(handle) ? handle : ""
   }, [handle])
+  const { exists, isChecking } = useDebouncedHandleCheck(checkedHandle)
 
   const status = useMemo<HandleStatus>(() => {
     if (!handle) return "idle"
     if (!isHandleValid(handle)) return "invalid"
-    if (debouncedHandle !== handle) return "checking"
+    if (isChecking) return "checking"
 
-    const isTaken = RESERVED_HANDLES.has(handle.toLowerCase())
+    const isTaken = RESERVED_HANDLES.has(handle.toLowerCase()) || exists
     return isTaken ? "taken" : "available"
-  }, [debouncedHandle, handle])
+  }, [exists, handle, isChecking])
 
   const statusText = useMemo(() => {
     if (status === "available") return "Handle is available"

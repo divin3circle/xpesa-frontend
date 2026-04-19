@@ -27,9 +27,11 @@ import {
   SupportedToken,
   supportedTokens,
 } from "@/lib/dashboard"
-import { useUserDetails } from "@/hooks/use-user";
+import { useUserDetails } from "@/hooks/use-user"
 import LoadingSpinner from "@/components/ui/loading-spinner"
-import { getGreetingBasedOnCurrentTime } from "@/lib/utils";
+import { getGreetingBasedOnCurrentTime } from "@/lib/utils"
+import { useGetAllTimeEarnings } from "@/hooks/use-stats"
+import { redirect } from "next/navigation"
 
 const stats = [
   { label: "Total earned", value: "$6,842.11", hint: "All time" },
@@ -91,14 +93,33 @@ const recentTransactions: TransactionRecord[] = [
 
 export default function Page() {
   const { data, isLoading, error } = useUserDetails()
+  const {
+    data: allTimeEarningsData,
+    isLoading: isAllTimeEarningsLoading,
+    error: allTimeEarningsError,
+  } = useGetAllTimeEarnings()
 
-  if (isLoading || error) {
+  console.log("User details: ", allTimeEarningsData)
+
+  if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-full w-full">
-        <h1 className="font-sans mb- text-muted-foreground font-semibold">Just a moment..</h1>
+      <div className="flex h-full w-full flex-col items-center justify-center">
+        <h1 className="mb- font-sans font-semibold text-muted-foreground">
+          Just a moment..
+        </h1>
         <LoadingSpinner size={5} />
       </div>
     )
+  }
+
+  if (error) {
+    redirect(`/error?q=${error.message}`)
+  }
+  if (allTimeEarningsError || !allTimeEarningsData) {
+    redirect(
+      `/error?q=${allTimeEarningsError?.message || "Failed to load earnings data"}`
+    )
+    return
   }
   return (
     <div className="space-y-6">
@@ -112,19 +133,86 @@ export default function Page() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.label} className="rounded-2xl shadow-none">
-            <CardHeader className="pb-2">
-              <CardDescription>{stat.label}</CardDescription>
+        <Card className="rounded-2xl shadow-none">
+          <CardHeader className="pb-2">
+            <CardDescription>All Time Earnings</CardDescription>
+            {isAllTimeEarningsLoading ? (
+              <div className="my-2 flex items-center justify-start font-heading text-3xl font-semibold text-muted-foreground">
+                $<LoadingSpinner size={5} />
+                <LoadingSpinner size={5} />.
+                <LoadingSpinner size={5} />
+                <LoadingSpinner size={5} />
+              </div>
+            ) : (
               <CardTitle className="font-heading text-3xl">
-                {stat.value}
+                ${allTimeEarningsData?.allTimeEarnings}
               </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0 text-xs text-muted-foreground">
-              {stat.hint}
-            </CardContent>
-          </Card>
-        ))}
+            )}
+          </CardHeader>
+          <CardContent className="pt-0 text-xs text-muted-foreground">
+            Since October 2025
+          </CardContent>
+        </Card>
+        <Card className="rounded-2xl shadow-none">
+          <CardHeader className="pb-2">
+            <CardDescription>All Time Earnings</CardDescription>
+            {isAllTimeEarningsLoading ? (
+              <div className="my-2 flex items-center justify-start font-heading text-3xl font-semibold text-muted-foreground">
+                $<LoadingSpinner size={5} />
+                <LoadingSpinner size={5} />.
+                <LoadingSpinner size={5} />
+                <LoadingSpinner size={5} />
+              </div>
+            ) : (
+              <CardTitle className="font-heading text-3xl">
+                ${allTimeEarningsData?.allTimeEarnings}
+              </CardTitle>
+            )}
+          </CardHeader>
+          <CardContent className="pt-0 text-xs text-muted-foreground">
+            Since October 2025
+          </CardContent>
+        </Card>
+        <Card className="rounded-2xl shadow-none">
+          <CardHeader className="pb-2">
+            <CardDescription>All Time Earnings</CardDescription>
+            {isAllTimeEarningsLoading ? (
+              <div className="my-2 flex items-center justify-start font-heading text-3xl font-semibold text-muted-foreground">
+                $<LoadingSpinner size={5} />
+                <LoadingSpinner size={5} />.
+                <LoadingSpinner size={5} />
+                <LoadingSpinner size={5} />
+              </div>
+            ) : (
+              <CardTitle className="font-heading text-3xl">
+                ${allTimeEarningsData?.allTimeEarnings}
+              </CardTitle>
+            )}
+          </CardHeader>
+          <CardContent className="pt-0 text-xs text-muted-foreground">
+            Since October 2025
+          </CardContent>
+        </Card>
+        <Card className="rounded-2xl shadow-none">
+          <CardHeader className="pb-2">
+            <CardDescription>All Time Earnings</CardDescription>
+            {isAllTimeEarningsLoading ? (
+              <div className="my-2 flex items-center justify-start font-heading text-3xl font-semibold text-muted-foreground">
+                $<LoadingSpinner size={5} />
+                <LoadingSpinner size={5} />.
+                <LoadingSpinner size={5} />
+                <LoadingSpinner size={5} />
+              </div>
+            ) : (
+              <CardTitle className="font-heading text-3xl">
+                ${allTimeEarningsData?.allTimeEarnings}
+              </CardTitle>
+            )}
+          </CardHeader>
+          <CardContent className="pt-0 text-xs text-muted-foreground">
+            Since October 2025
+          </CardContent>
+        </Card>
       </section>
 
       <section className="grid gap-4 lg:grid-cols-5">

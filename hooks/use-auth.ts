@@ -4,6 +4,7 @@ import { AuthError, Session, User } from "@supabase/supabase-js"
 import { toast } from "sonner"
 import { useMutation } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
+import { useIsOnboardingComplete } from "./use-onboarding"
 
 interface AuthResponse {
   data: {
@@ -108,9 +109,15 @@ export function useSignUp() {
 
 export function useSignIn() {
   const router = useRouter()
+  const { data } = useIsOnboardingComplete()
   return useMutation({
     mutationFn: signInUser,
     onSuccess: (response) => {
+      if (!data) {
+        toast.success("Welcome back! Let's finish setting up your account.")
+        onNavigate("/onboarding", router)
+        return
+      }
       if (response.error) {
         toast.error(response.error.message)
       } else {

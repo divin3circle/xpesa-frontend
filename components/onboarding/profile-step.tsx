@@ -1,8 +1,8 @@
 "use client"
 
 import { ChangeEvent, useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { CheckCircle2, LoaderCircle, XCircle } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,10 +12,14 @@ import { useOnboardingStepGuard } from "@/components/onboarding/onboarding-step-
 import { useOnboarding } from "@/components/onboarding/onboarding-provider"
 import { isMpesaValid } from "@/lib/onboarding/validation"
 import Image from "next/image"
-import { Textarea } from "../ui/textarea";
-import { createClient } from "@/lib/supabase/client";
-import { OnboardingData, useCompleteOnboarding } from "@/hooks/use-onboarding";
-import LoadingSpinner from "../ui/loading-spinner";
+import { Textarea } from "../ui/textarea"
+import { createClient } from "@/lib/supabase/client"
+import {
+  OnboardingData,
+  useCompleteOnboarding,
+  useDebouncedDisplayNameCheck,
+} from "@/hooks/use-onboarding"
+import LoadingSpinner from "../ui/loading-spinner"
 
 function getInitials(name: string) {
   const parts = name.trim().split(" ").filter(Boolean)
@@ -28,9 +32,11 @@ export function ProfileStep() {
   useOnboardingStepGuard("profile")
 
   const { mutate: createCreatorMutation, isPending } = useCompleteOnboarding()
-  const router = useRouter()
   const { state, setProfile, markStepComplete, getPayload } = useOnboarding()
   const [displayName, setDisplayName] = useState(
+    state.profile.displayName || "New Creator"
+  )
+  const [initialDisplayName] = useState(
     state.profile.displayName || "New Creator"
   )
   const [bio, setBio] = useState(state.profile.bio)
@@ -40,6 +46,17 @@ export function ProfileStep() {
   const [mpesaNumber, setMpesaNumber] = useState(state.profile.mpesaNumber)
 
   const isMpesaFieldValid = isMpesaValid(mpesaNumber)
+
+  const displayNameToCheck = useMemo(() => {
+    return displayName !== initialDisplayName ? displayName : ""
+  }, [displayName, initialDisplayName])
+
+  const { exists: displayNameExists, isChecking: isCheckingDisplayName } =
+    useDebouncedDisplayNameCheck(displayNameToCheck, 500)
+
+  const isDisplayNameAvailable = useMemo(() => {
+    return displayNameToCheck && !displayNameExists
+  }, [displayNameToCheck, displayNameExists])
 
   const initials = useMemo(() => getInitials(displayName), [displayName])
 
@@ -54,10 +71,12 @@ export function ProfileStep() {
   async function handleSubmit() {
     const supabase = createClient()
     if (!displayName || !isMpesaFieldValid) return
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
     if (!user) {
       toast.error("You are not logged in.")
-      return;
+      return
     }
     setProfile({
       displayName,
@@ -90,7 +109,7 @@ export function ProfileStep() {
         walletAddress: requestBody.walletAddress,
         mpesaNumber: requestBody.profile.mpesaNumber,
         onboardingStep: 2,
-        onboardingComplete: true
+        onboardingComplete: true,
       }
 
       createCreatorMutation({ creatorDetails })
@@ -108,7 +127,38 @@ export function ProfileStep() {
             id="displayName"
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
+            aria-invalid={
+              displayNameToCheck && displayNameExists ? true : false
+            }
           />
+          <div className="flex min-h-5 items-center gap-2 text-sm">
+            {isDisplayNameAvailable ? (
+              <CheckCircle2 className="size-4 text-primary" />
+            ) : null}
+            {displayNameToCheck && displayNameExists ? (
+              <XCircle className="size-4 text-destructive" />
+            ) : null}
+            {displayNameToCheck && isCheckingDisplayName ? (
+              <LoaderCircle className="size-4 animate-spin text-muted-foreground" />
+            ) : null}
+            <p
+              className={
+                isDisplayNameAvailable
+                  ? "text-primary"
+                  : displayNameToCheck && displayNameExists
+                    ? "text-destructive"
+                    : "text-muted-foreground"
+              }
+            >
+              {isDisplayNameAvailable
+                ? "Display name is available"
+                : displayNameToCheck && displayNameExists
+                  ? "This display name is already taken"
+                  : displayNameToCheck && isCheckingDisplayName
+                    ? "Checking availability..."
+                    : ""}
+            </p>
+          </div>
         </div>
 
         <div className="grid gap-2">
@@ -135,7 +185,7 @@ export function ProfileStep() {
                 alt="Avatar preview"
                 width={500}
                 height={500}
-                className="h-16 w-16 rounded-full object-cover"
+                className="h-16 w-18 rounded-full object-cover"
               />
             ) : (
               <div className="flex h-14 w-16 items-center justify-center rounded-full bg-primary/15 font-heading text-lg font-semibold text-primary">
@@ -180,9 +230,15 @@ export function ProfileStep() {
           size="lg"
           onClick={handleSubmit}
           className="flex items-center justify-center"
-          disabled={!displayName || !isMpesaFieldValid || isPending}
+          disabled={
+            !displayName ||
+            !isMpesaFieldValid ||
+            isPending ||
+            isCheckingDisplayName ||
+            Boolean(displayNameToCheck && displayNameExists)
+          }
         >
-          {isPending ? <LoadingSpinner /> : ' Finish setup →'}
+          {isPending ? <LoadingSpinner /> : " Finish setup →"}
         </Button>
       </div>
     </section>
