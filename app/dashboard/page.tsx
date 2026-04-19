@@ -29,11 +29,14 @@ import {
 } from "@/lib/dashboard"
 import { useUserDetails } from "@/hooks/use-user"
 import LoadingSpinner from "@/components/ui/loading-spinner"
-import { getCurrentMonthName, getGreetingBasedOnCurrentTime, getReadableDateTime } from "@/lib/utils"
+import {
+  getCurrentMonthName,
+  getGreetingBasedOnCurrentTime,
+  getReadableDateTime,
+} from "@/lib/utils"
 import { useGetAllTimeEarnings } from "@/hooks/use-stats"
 import { redirect } from "next/navigation"
-import { useMyLinks } from "@/hooks/use-links";
-
+import { useMyLinks } from "@/hooks/use-links"
 
 const recentTransactions: TransactionRecord[] = [
   {
@@ -89,14 +92,11 @@ const recentTransactions: TransactionRecord[] = [
 export default function Page() {
   const { data, isLoading, error } = useUserDetails()
   const { data: links, isLoading: isLinksLoading } = useMyLinks()
-  console.log(links)
   const {
     data: allTimeEarningsData,
     isLoading: isAllTimeEarningsLoading,
     error: allTimeEarningsError,
   } = useGetAllTimeEarnings()
-
-  console.log("User details: ", allTimeEarningsData)
 
   if (isLoading) {
     return (
@@ -128,8 +128,6 @@ export default function Page() {
     )
   }
 
-
-
   return (
     <div className="space-y-6">
       <section className="space-y-2">
@@ -159,7 +157,8 @@ export default function Page() {
             )}
           </CardHeader>
           <CardContent className="pt-0 text-xs text-muted-foreground">
-            Since {getReadableDateTime("month-and-year", data.creator?.created_at)}
+            Since{" "}
+            {getReadableDateTime("month-and-year", data.creator?.created_at)}
           </CardContent>
         </Card>
         <Card className="rounded-2xl shadow-none">
@@ -198,13 +197,14 @@ export default function Page() {
             )}
           </CardHeader>
           <CardContent className="pt-0 text-xs text-muted-foreground">
-            Since {getReadableDateTime("month-and-year", data.creator?.created_at)}
+            Since{" "}
+            {getReadableDateTime("month-and-year", data.creator?.created_at)}
           </CardContent>
         </Card>
         <Card className="rounded-2xl shadow-none">
           <CardHeader className="pb-2">
             <CardDescription>Active Links</CardDescription>
-            {isAllTimeEarningsLoading ? (
+            {isLinksLoading ? (
               <div className="my-2 flex items-center justify-start font-heading text-3xl font-semibold text-muted-foreground">
                 <LoadingSpinner size={5} />
                 <LoadingSpinner size={5} />
@@ -212,12 +212,13 @@ export default function Page() {
               </div>
             ) : (
               <CardTitle className="font-heading text-3xl">
-                {allTimeEarningsData?.allTimeTransactions}
+                {links?.links.length || 0}
               </CardTitle>
             )}
           </CardHeader>
           <CardContent className="pt-0 text-xs text-muted-foreground">
-            Since {getReadableDateTime("month-and-year", data.creator?.created_at)}
+            Since{" "}
+            {getReadableDateTime("month-and-year", data.creator?.created_at)}
           </CardContent>
         </Card>
       </section>
@@ -248,7 +249,12 @@ export default function Page() {
                     <p className="text-sm font-medium">Wallet Address</p>
                     <div className="flex items-center gap-1">
                       <p className="font-heading text-sm text-muted-foreground">
-                        0x4D2B...A91e
+                        {data?.creator?.wallet_address
+                          ? `${data.creator.wallet_address.slice(
+                              0,
+                              6
+                            )}...${data.creator.wallet_address.slice(-4)}`
+                          : "Not connected"}
                       </p>
                       <HugeiconsIcon
                         icon={Copy01Icon}

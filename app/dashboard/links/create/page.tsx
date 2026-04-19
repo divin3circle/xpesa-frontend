@@ -31,6 +31,9 @@ import {
   Package01Icon,
   TipsIcon,
 } from "hugeicons-react"
+import { useCreateLink } from "@/hooks/use-links"
+import LoadingSpinner from "@/components/ui/loading-spinner"
+import type { CreateLinkParams } from "@/hooks/use-links"
 
 type LinkMode = "gate" | "document" | "pack" | "tip"
 
@@ -72,14 +75,158 @@ function formatBytes(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
+function parseOptionalNumber(value: string) {
+  const trimmedValue = value.trim()
+  if (!trimmedValue) return undefined
+
+  const parsedValue = Number(trimmedValue)
+  return Number.isFinite(parsedValue) ? parsedValue : undefined
+}
+
+type LinkFormValues = {
+  mode: LinkMode
+  title: string
+  description: string
+  destinationUrl: string
+  gatePriceUsdc: string
+  documentPriceUsdc: string
+  packPriceUsdc: string
+  tipSuggestedAmountUsdc: string
+  tipMessage: string
+  accessExpiryType: string
+  documentUpload: UploadedDoc | null
+  readyPackFiles: PackFileState[]
+}
+
+function buildCreateLinkParams({
+  mode,
+  title,
+  description,
+  destinationUrl,
+  gatePriceUsdc,
+  documentPriceUsdc,
+  packPriceUsdc,
+  tipSuggestedAmountUsdc,
+  tipMessage,
+  accessExpiryType,
+  documentUpload,
+  readyPackFiles,
+}: LinkFormValues): {
+  params: CreateLinkParams | null
+  errorMessage: string | null
+} {
+  const trimmedTitle = title.trim()
+  if (!trimmedTitle) {
+    return {
+      params: null,
+      errorMessage: "Please add a title before creating a link.",
+    }
+  }
+
+  const trimmedDescription = description.trim()
+
+  switch (mode) {
+    case "tip":
+      return {
+        params: {
+          type: "tip",
+          title: trimmedTitle,
+          description: trimmedDescription,
+          thankYouMessage: tipMessage,
+          suggestedAmountUsdc: parseOptionalNumber(tipSuggestedAmountUsdc),
+        },
+        errorMessage: null,
+      }
+
+    case "gate": {
+      const trimmedDestinationUrl = destinationUrl.trim()
+      if (!trimmedDestinationUrl) {
+        return {
+          params: null,
+          errorMessage: "Please add a destination URL for the gated link.",
+        }
+      }
+
+      return {
+        params: {
+          type: "gate",
+          title: trimmedTitle,
+          description: trimmedDescription,
+          destinationUrl: trimmedDestinationUrl,
+          priceUsdc: parseOptionalNumber(gatePriceUsdc),
+          accessExpiryType,
+        },
+        errorMessage: null,
+      }
+    }
+
+    case "document": {
+      if (!documentUpload) {
+        return {
+          params: null,
+          errorMessage: "Upload a document before creating this link.",
+        }
+      }
+
+      return {
+        params: {
+          type: "document",
+          title: trimmedTitle,
+          description: trimmedDescription,
+          documentR2Key: documentUpload.r2Key,
+          documentPageCount: documentUpload.pageCount,
+          documentFileSizeBytes: documentUpload.fileSizeBytes,
+          documentThumbnailR2Key: documentUpload.thumbnailUrl || undefined,
+          priceUsdc: parseOptionalNumber(documentPriceUsdc),
+          accessExpiryType,
+        },
+        errorMessage: null,
+      }
+    }
+
+    case "pack": {
+      if (!readyPackFiles.length) {
+        return {
+          params: null,
+          errorMessage:
+            "Upload at least one pack file before creating this link.",
+        }
+      }
+
+      return {
+        params: {
+          type: "pack",
+          title: trimmedTitle,
+          description: trimmedDescription,
+          packFileCount: readyPackFiles.length,
+          packTotalSizeBytes: readyPackFiles.reduce(
+            (sum, file) => sum + file.fileSizeBytes,
+            0
+          ),
+          priceUsdc: parseOptionalNumber(packPriceUsdc),
+          accessExpiryType,
+        },
+        errorMessage: null,
+      }
+    }
+  }
+}
+
 export default function CreateLinkPage() {
   const [mode, setMode] = useState<LinkMode>("gate")
+  const { mutate: createLink, isPending } = useCreateLink()
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
+  const [destinationUrl, setDestinationUrl] = useState("")
+  const [gatePriceUsdc, setGatePriceUsdc] = useState("")
+  const [documentPriceUsdc, setDocumentPriceUsdc] = useState("")
+  const [packPriceUsdc, setPackPriceUsdc] = useState("")
+  const [tipSuggestedAmountUsdc, setTipSuggestedAmountUsdc] = useState("")
   const [documentUpload, setDocumentUpload] = useState<UploadedDoc | null>(null)
   const [packFiles, setPackFiles] = useState<PackFileState[]>([])
   const [uploadError, setUploadError] = useState("")
   const [tipMessage, setTipMessage] = useState("Thank you for your support! 🙏")
+  const [accessExpiryType, setAccessExpiryType] = useState("Forever")
 
   const packSummary = useMemo(() => {
     const pdfCount = packFiles.filter((file) => file.fileType === "pdf").length
@@ -114,12 +261,61 @@ export default function CreateLinkPage() {
 
   const onPackFilesChange = (files: PackFileState[]) => {
     setPackFiles(files)
+    setUploadError("")
     if (!title.trim()) {
       const firstReady = files.find((file) => file.status === "ready")
       if (firstReady) {
         setTitle(firstReady.originalFilename.replace(/\.[^/.]+$/, ""))
       }
     }
+  }
+
+  const readyPackFiles = useMemo(
+    () => packFiles.filter((file) => file.status === "ready"),
+    [packFiles]
+  )
+
+  const canCreateLink = useMemo(() => {
+    if (isPending || !title.trim()) return false
+    if (mode === "document") return Boolean(documentUpload)
+    if (mode === "pack") return readyPackFiles.length > 0
+    if (mode === "gate") return Boolean(destinationUrl.trim())
+    return true
+  }, [
+    destinationUrl,
+    documentUpload,
+    isPending,
+    mode,
+    readyPackFiles.length,
+    title,
+  ])
+
+  async function handleCreateLink() {
+    if (isPending) return
+    const { params, errorMessage } = buildCreateLinkParams({
+      mode,
+      title,
+      description,
+      destinationUrl,
+      gatePriceUsdc,
+      documentPriceUsdc,
+      packPriceUsdc,
+      tipSuggestedAmountUsdc,
+      tipMessage,
+      accessExpiryType,
+      documentUpload,
+      readyPackFiles,
+    })
+
+    if (!params) {
+      if (errorMessage) {
+        setUploadError(errorMessage)
+      }
+      return
+    }
+
+    setUploadError("")
+    createLink(params)
   }
 
   return (
@@ -194,18 +390,29 @@ export default function CreateLinkPage() {
                   <Input
                     id="destination"
                     placeholder="https://example.com/private-resource"
+                    value={destinationUrl}
+                    onChange={(event) => setDestinationUrl(event.target.value)}
                   />
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="price-gate">Price (USDC)</Label>
-                    <Input id="price-gate" placeholder="12.00" />
+                    <Input
+                      id="price-gate"
+                      placeholder="12.00"
+                      value={gatePriceUsdc}
+                      onChange={(event) => setGatePriceUsdc(event.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="expiry-gate">Access expiry</Label>
                     <select
                       id="expiry-gate"
                       className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+                      value={accessExpiryType}
+                      onChange={(event) =>
+                        setAccessExpiryType(event.target.value)
+                      }
                     >
                       <option>Forever</option>
                       <option>One-time only</option>
@@ -236,7 +443,14 @@ export default function CreateLinkPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="price-document">Price (USDC)</Label>
-                    <Input id="price-document" placeholder="12.00" />
+                    <Input
+                      id="price-document"
+                      placeholder="12.00"
+                      value={documentPriceUsdc}
+                      onChange={(event) =>
+                        setDocumentPriceUsdc(event.target.value)
+                      }
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="thumbnail-document">Thumbnail</Label>
@@ -346,7 +560,12 @@ export default function CreateLinkPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="price-pack">Price (USDC)</Label>
-                    <Input id="price-pack" placeholder="20.00" />
+                    <Input
+                      id="price-pack"
+                      placeholder="20.00"
+                      value={packPriceUsdc}
+                      onChange={(event) => setPackPriceUsdc(event.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="thumbnail-pack">Thumbnail</Label>
@@ -416,6 +635,10 @@ export default function CreateLinkPage() {
                       id="tip-amount"
                       placeholder="Leave empty for pay-what-you-want"
                       type="number"
+                      value={tipSuggestedAmountUsdc}
+                      onChange={(event) =>
+                        setTipSuggestedAmountUsdc(event.target.value)
+                      }
                     />
                   </div>
                   <div className="space-y-2">
@@ -435,7 +658,9 @@ export default function CreateLinkPage() {
             ) : null}
 
             <div className="flex flex-wrap gap-2 pt-2">
-              <Button>Create link</Button>
+              <Button onClick={handleCreateLink} disabled={!canCreateLink}>
+                {isPending ? <LoadingSpinner size={4} /> : "Create link"}
+              </Button>
               <Button variant="secondary">Save draft</Button>
             </div>
           </CardContent>
