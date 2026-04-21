@@ -1,13 +1,16 @@
-'use client'
+"use client"
 
-import { use } from 'react'
+import { use } from "react"
 import { Button } from "../ui/button"
 import Image from "next/image"
 import { ReloadIcon } from "hugeicons-react"
 import { onNavigate } from "@/lib/utils"
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"
+import { ArrowLeftIcon } from "lucide-react"
 
-export default function ClientError({ searchParams }: {
+export default function ClientError({
+  searchParams,
+}: {
   searchParams: Promise<{ q?: string }>
 }) {
   const router = useRouter()
@@ -32,7 +35,14 @@ export default function ClientError({ searchParams }: {
         <ReloadIcon className="mr-2" />
         Try Again
       </Button>
+      <Button
+        variant="ghost"
+        className="mt-4 w-full md:w-1/3"
+        onClick={() => router.back()}
+      >
+        <ArrowLeftIcon className="mr-2" />
+        Go Back
+      </Button>
     </div>
-
   )
 }

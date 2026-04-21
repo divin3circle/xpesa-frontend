@@ -1,5 +1,6 @@
 "use client"
 import Link from "next/link"
+import { useEffect } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -19,18 +20,32 @@ import Image from "next/image"
 import { useState } from "react"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Checkmark } from "@hugeicons/core-free-icons"
-
-const activeLinks = [
-  { title: "React Native Crash Course", type: "GATE", price: "$12" },
-  { title: "Buy me chai", type: "TIP", price: "Any amount" },
-  { title: "Design teardown notes", type: "GATE", price: "$4" },
-]
+import { useMyLinks } from "@/hooks/use-links"
 
 export default function MyPagePage() {
   const { data, isLoading, error } = useUserDetails()
   const [copied, setCopied] = useState(false)
+  const {
+    data: myLinksData,
+    isLoading: isMyLinksLoading,
+    error: myLinksError,
+  } = useMyLinks()
 
   const router = useRouter()
+
+  useEffect(() => {
+    if (!isLoading && (!data?.creator || error)) {
+      router.push(`/error?q=${error?.message || "An unexpected error occurred"}`)
+    }
+  }, [data, error, isLoading, router])
+
+  useEffect(() => {
+    if (!myLinksData || myLinksError) {
+      router.push(
+        `/error?q=${myLinksError?.message || "An unexpected error occurred"}`
+      )
+    }
+  }, [myLinksData, myLinksError, router])
 
   if (isLoading) {
     return (
@@ -43,9 +58,8 @@ export default function MyPagePage() {
     )
   }
 
-  if (!data?.creator || error) {
-    router.push(`/error?q=${error?.message || "An unexpected error occurred"}`)
-    return
+  if (!data?.creator || error || !myLinksData || myLinksError) {
+    return null
   }
 
   const avatarURL =
@@ -68,7 +82,7 @@ export default function MyPagePage() {
       <section className="grid gap-4 lg:grid-cols-5">
         <Card className="rounded-2xl border-none bg-transparent shadow-none lg:col-span-3">
           <CardContent className="space-y-4">
-            <div className="rounded-xl border p-6">
+            <div className="rounded-2xl border p-6">
               <div className="mb-4 flex items-center gap-3">
                 <div className="">
                   {isLoading ? (
@@ -95,21 +109,46 @@ export default function MyPagePage() {
                 {data.creator.bio}
               </p>
               <div className="space-y-2">
-                {activeLinks.map((item) => (
-                  <div
-                    key={item.title}
-                    className="flex items-center justify-between rounded-2xl border p-3"
-                  >
-                    <div>
-                      <p className="text-sm font-medium">{item.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {item.type}
-                      </p>
+                {!isMyLinksLoading &&
+                  myLinksData?.links.slice(0, 3).map((item) => (
+                    <div
+                      key={item.title}
+                      className="flex items-center justify-between rounded-2xl border p-3"
+                    >
+                      <div>
+                        <p className="text-sm font-medium">{item.title}</p>
+                        <p className="text-xs text-muted-foreground uppercase">
+                          {item.type}
+                        </p>
+                      </div>
+                      <div className="flex items-center">
+                        <Badge>
+                          <span>{item.price_usdc ? "$" : ""}</span>
+                          {item.price_usdc?.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          }) || "Price not set"}
+                        </Badge>
+                      </div>
                     </div>
-                    <Badge>{item.price}</Badge>
-                  </div>
-                ))}
+                  ))}
+                {isMyLinksLoading &&
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <div
+                      className="flex items-start justify-between rounded-2xl border border-border/50 p-4"
+                      key={index}
+                    >
+                      <div className="w-1/2">
+                        <Skeleton className="h-4 w-2/3" />
+                        <Skeleton className="mt-1 h-3 w-1/3" />
+                      </div>
+                      <Skeleton className="h-3 w-16" />
+                    </div>
+                  ))}
               </div>
+              <p className="mt-2 text-center text-xs font-semibold text-muted-foreground">
+                Showing 3 of {myLinksData?.links.length || 0} links
+              </p>
             </div>
           </CardContent>
         </Card>

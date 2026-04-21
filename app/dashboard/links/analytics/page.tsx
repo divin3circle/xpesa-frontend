@@ -28,7 +28,7 @@ export default function LinksAnalyticsPage() {
 
   return (
     <div className="overflow-hidden">
-      <div className="absolute inset-0 z-10 flex h-screen w-full flex-col items-center justify-center backdrop-blur-xs">
+      <div className="absolute inset-0 z-10 flex h-screen w-full flex-col items-center justify-center backdrop-blur-md">
         <p className="text-xl font-semibold">Analytics Coming Soon</p>
         <Image
           src="/unreleased.webp"
@@ -37,7 +37,7 @@ export default function LinksAnalyticsPage() {
           height={200}
           className="my-6"
         />
-        <p className="md:text-md px-2 text-center font-sans text-sm text-foreground/90">
+        <p className="md:text-md max-w-lg px-2 text-center font-sans text-sm text-foreground/90">
           We are working hard to bring you detailed analytics to help you
           optimize your links and grow your audience. Stay tuned!
         </p>
