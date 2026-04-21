@@ -9,7 +9,14 @@ export const envConfig = {
   SUPABASE_PUBLISHABLE_KEY:
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "",
   APP_URL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-  AVATARS_URL: process.env.NEXT_PUBLIC_SUPABASE_URL + "/storage/v1/object/public/"
+  AVATARS_URL:
+    process.env.NEXT_PUBLIC_SUPABASE_URL + "/storage/v1/object/public/",
+  CF_ACCOUNT_ID: process.env.CF_ACCOUNT_ID || "",
+  R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID || "",
+  R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY || "",
+  R2_TOKEN_VALUE: process.env.R2_TOKEN_VALUE || "",
+  R2_ENDPOINT: process.env.R2_ENDPOINT || "",
+  R2_BUCKET_NAME: process.env.R2_BUCKET_NAME || "",
 }
 
 export const client = createThirdwebClient({
@@ -40,47 +47,59 @@ export function getGreetingBasedOnCurrentTime(): string {
 
 export function getCurrentMonthName() {
   const months = [
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-  ];
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ]
 
-  const now = new Date();
-  const currentMonthName = months[now.getMonth()];
+  const now = new Date()
+  const currentMonthName = months[now.getMonth()]
 
   return currentMonthName
 }
 
-type ExpectedDateFormat = "full" | "month-and-year" | "month-only" | "year";
+type ExpectedDateFormat = "full" | "month-and-year" | "month-only" | "year"
 
-export function getReadableDateTime(formart: ExpectedDateFormat, timestamp: string | undefined): string {
+export function getReadableDateTime(
+  formart: ExpectedDateFormat,
+  timestamp: string | undefined
+): string {
   if (!timestamp) return ""
   const date = new Date(timestamp)
   switch (formart) {
     case "month-and-year":
       return date.toLocaleString("en-US", {
-        month: 'long',
-        year: 'numeric'
+        month: "long",
+        year: "numeric",
       })
     case "month-only":
       return date.toLocaleString("en-US", {
-        month: 'long'
+        month: "long",
       })
     case "year":
       return date.toLocaleString("en-US", {
-        year: 'numeric'
+        year: "numeric",
       })
     default:
       return date.toLocaleString("en-US", {
         hour: "numeric",
         minute: "numeric",
-        month: 'long',
-        year: 'numeric'
+        month: "long",
+        year: "numeric",
       })
   }
-
 }
 
 export function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  return String(error);
+  if (error instanceof Error) return error.message
+  return String(error)
 }

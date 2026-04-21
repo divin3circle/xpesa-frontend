@@ -10,12 +10,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { useUserDetails } from "@/hooks/use-user";
-import LoadingSpinner from "@/components/ui/loading-spinner";
-import { useRouter } from "next/navigation";
-import { envConfig } from "@/lib/utils";
-import { Skeleton } from "@/components/ui/skeleton";
-import Image from "next/image";
+import { useUserDetails } from "@/hooks/use-user"
+import LoadingSpinner from "@/components/ui/loading-spinner"
+import { useRouter } from "next/navigation"
+import { envConfig } from "@/lib/utils"
+import { Skeleton } from "@/components/ui/skeleton"
+import Image from "next/image"
+import { useState } from "react"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Checkmark } from "@hugeicons/core-free-icons"
 
 const activeLinks = [
   { title: "React Native Crash Course", type: "GATE", price: "$12" },
@@ -24,14 +27,17 @@ const activeLinks = [
 ]
 
 export default function MyPagePage() {
-  const { data, isLoading, error } = useUserDetails();
-  const router = useRouter();
+  const { data, isLoading, error } = useUserDetails()
+  const [copied, setCopied] = useState(false)
 
+  const router = useRouter()
 
   if (isLoading) {
     return (
-      <div className="w-full h-full flex items-center justify-center flex-col">
-        <h1 className="text-muted-foreground font-sans text-xs mb-4">Just a moment..</h1>
+      <div className="flex h-full w-full flex-col items-center justify-center">
+        <h1 className="mb-4 font-sans text-xs text-muted-foreground">
+          Just a moment..
+        </h1>
         <LoadingSpinner />
       </div>
     )
@@ -39,9 +45,8 @@ export default function MyPagePage() {
 
   if (!data?.creator || error) {
     router.push(`/error?q=${error?.message || "An unexpected error occurred"}`)
-    return;
+    return
   }
-
 
   const avatarURL =
     !data || error
@@ -55,7 +60,8 @@ export default function MyPagePage() {
           Preview creator page
         </h1>
         <p className="text-sm text-muted-foreground">
-          This is the page your audience sees at xpesa.com/{data.creator.handle}.
+          This is the page your audience sees at xpesa.com/{data.creator.handle}
+          .
         </p>
       </section>
 
@@ -73,17 +79,19 @@ export default function MyPagePage() {
                       alt="Avatar"
                       width={100}
                       height={100}
-                      className="h-8 w-8 rounded-2xl object-cover"
+                      className="size-15 rounded-full border object-cover"
                       unoptimized
                     />
                   )}
                 </div>
                 <div>
                   <p className="font-medium">{data.creator.display_name}</p>
-                  <p className="text-xs text-muted-foreground">@{data.creator.handle}</p>
+                  <p className="text-xs text-muted-foreground">
+                    @{data.creator.handle}
+                  </p>
                 </div>
               </div>
-              <p className="mb-4 truncate max-w-full text-sm text-muted-foreground">
+              <p className="mb-4 max-w-full truncate text-sm text-muted-foreground">
                 {data.creator.bio}
               </p>
               <div className="space-y-2">
@@ -120,7 +128,28 @@ export default function MyPagePage() {
                 Public URL for your audience
               </p>
             </div>
-            <Button className="w-full">Copy page link</Button>
+            <Button
+              className="w-full"
+              disabled={copied}
+              onClick={() => {
+                setCopied(true)
+                navigator.clipboard.writeText(
+                  `${envConfig.APP_URL}/${data?.creator?.handle || ""}`
+                )
+              }}
+            >
+              {copied ? (
+                <span className="flex items-center justify-center gap-1">
+                  <HugeiconsIcon
+                    icon={Checkmark}
+                    className="size-4 text-green-500"
+                  />
+                  Link copied!
+                </span>
+              ) : (
+                "Copy creator page link"
+              )}
+            </Button>
             <Button variant="secondary" asChild className="w-full">
               <Link href="/dashboard/profile">Edit profile content</Link>
             </Button>

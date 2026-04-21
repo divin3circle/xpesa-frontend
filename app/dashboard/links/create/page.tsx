@@ -3,14 +3,6 @@
 import { useMemo, useState } from "react"
 import Image from "next/image"
 
-import {
-  DocumentUploadZone,
-  type UploadedDoc,
-} from "@/components/upload/DocumentUploadZone"
-import {
-  PackUploadZone,
-  type PackFileState,
-} from "@/components/upload/PackUploadZone"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -34,6 +26,27 @@ import {
 import { useCreateLink } from "@/hooks/use-links"
 import LoadingSpinner from "@/components/ui/loading-spinner"
 import type { CreateLinkParams } from "@/hooks/use-links"
+import { createClient } from "@/lib/supabase/client"
+import {
+  getUploadErrorMessage,
+  toPackFileType,
+  uploadDocumentAndFinalize,
+  uploadPackAndFinalize,
+} from "@/lib/links/upload-client"
+import { toast } from "sonner"
+
+type UploadedDoc = {
+  r2Key: string
+  pageCount: number | null
+  fileSizeBytes: number
+  filename: string
+}
+
+type SelectedPackFile = {
+  id: string
+  file: File
+  fileType: "pdf" | "image"
+}
 
 type LinkMode = "gate" | "document" | "pack" | "tip"
 
@@ -95,7 +108,9 @@ type LinkFormValues = {
   tipMessage: string
   accessExpiryType: string
   documentUpload: UploadedDoc | null
-  readyPackFiles: PackFileState[]
+  selectedPackFiles: SelectedPackFile[]
+  finalizedPackSizeBytes?: number
+  finalizedPackR2Key?: string
 }
 
 function buildCreateLinkParams({
@@ -110,7 +125,9 @@ function buildCreateLinkParams({
   tipMessage,
   accessExpiryType,
   documentUpload,
-  readyPackFiles,
+  selectedPackFiles,
+  finalizedPackSizeBytes,
+  finalizedPackR2Key,
 }: LinkFormValues): {
   params: CreateLinkParams | null
   errorMessage: string | null
@@ -176,7 +193,6 @@ function buildCreateLinkParams({
           documentR2Key: documentUpload.r2Key,
           documentPageCount: documentUpload.pageCount,
           documentFileSizeBytes: documentUpload.fileSizeBytes,
-          documentThumbnailR2Key: documentUpload.thumbnailUrl || undefined,
           priceUsdc: parseOptionalNumber(documentPriceUsdc),
           accessExpiryType,
         },
@@ -185,11 +201,25 @@ function buildCreateLinkParams({
     }
 
     case "pack": {
-      if (!readyPackFiles.length) {
+      if (!selectedPackFiles.length) {
         return {
           params: null,
           errorMessage:
             "Upload at least one pack file before creating this link.",
+        }
+      }
+
+      if (!finalizedPackSizeBytes) {
+        return {
+          params: null,
+          errorMessage: "Pack upload is not finalized yet. Please try again.",
+        }
+      }
+
+      if (!finalizedPackR2Key) {
+        return {
+          params: null,
+          errorMessage: "Pack upload key is missing. Please retry upload.",
         }
       }
 
@@ -198,11 +228,9 @@ function buildCreateLinkParams({
           type: "pack",
           title: trimmedTitle,
           description: trimmedDescription,
-          packFileCount: readyPackFiles.length,
-          packTotalSizeBytes: readyPackFiles.reduce(
-            (sum, file) => sum + file.fileSizeBytes,
-            0
-          ),
+          documentR2Key: finalizedPackR2Key,
+          packFileCount: selectedPackFiles.length,
+          packTotalSizeBytes: finalizedPackSizeBytes,
           priceUsdc: parseOptionalNumber(packPriceUsdc),
           accessExpiryType,
         },
@@ -214,8 +242,9 @@ function buildCreateLinkParams({
 
 export default function CreateLinkPage() {
   const [mode, setMode] = useState<LinkMode>("gate")
-  const { mutate: createLink, isPending } = useCreateLink()
+  const { mutateAsync: createLink, isPending } = useCreateLink()
   const [title, setTitle] = useState("")
+  const [documentUploadPending, setDocumentUploadPending] = useState(false)
   const [description, setDescription] = useState("")
   const [destinationUrl, setDestinationUrl] = useState("")
   const [gatePriceUsdc, setGatePriceUsdc] = useState("")
@@ -223,18 +252,31 @@ export default function CreateLinkPage() {
   const [packPriceUsdc, setPackPriceUsdc] = useState("")
   const [tipSuggestedAmountUsdc, setTipSuggestedAmountUsdc] = useState("")
   const [documentUpload, setDocumentUpload] = useState<UploadedDoc | null>(null)
-  const [packFiles, setPackFiles] = useState<PackFileState[]>([])
+  const [selectedDocumentFile, setSelectedDocumentFile] = useState<File | null>(
+    null
+  )
+  const [selectedPackFiles, setSelectedPackFiles] = useState<
+    SelectedPackFile[]
+  >([])
+  const [finalizedPackSizeBytes, setFinalizedPackSizeBytes] = useState<
+    number | undefined
+  >(undefined)
+  const [finalizedPackR2Key, setFinalizedPackR2Key] = useState<
+    string | undefined
+  >(undefined)
   const [uploadError, setUploadError] = useState("")
   const [tipMessage, setTipMessage] = useState("Thank you for your support! 🙏")
   const [accessExpiryType, setAccessExpiryType] = useState("Forever")
 
   const packSummary = useMemo(() => {
-    const pdfCount = packFiles.filter((file) => file.fileType === "pdf").length
-    const imageCount = packFiles.filter(
+    const pdfCount = selectedPackFiles.filter(
+      (file) => file.fileType === "pdf"
+    ).length
+    const imageCount = selectedPackFiles.filter(
       (file) => file.fileType === "image"
     ).length
-    const totalBytes = packFiles.reduce(
-      (sum, file) => sum + file.fileSizeBytes,
+    const totalBytes = selectedPackFiles.reduce(
+      (sum, file) => sum + file.file.size,
       0
     )
 
@@ -249,49 +291,116 @@ export default function CreateLinkPage() {
       totalBytes,
       breakdown: breakdown || "No files added",
     }
-  }, [packFiles])
+  }, [selectedPackFiles])
 
-  const onDocumentComplete = (result: UploadedDoc) => {
-    setDocumentUpload(result)
+  const onDocumentFileSelect = (file: File | null) => {
+    setSelectedDocumentFile(file)
+    setDocumentUpload(null)
     setUploadError("")
-    if (!title.trim()) {
-      setTitle(result.filename.replace(/\.[^/.]+$/, ""))
+
+    if (file && !title.trim()) {
+      setTitle(file.name.replace(/\.[^/.]+$/, ""))
     }
   }
 
-  const onPackFilesChange = (files: PackFileState[]) => {
-    setPackFiles(files)
+  const onPackFilesSelect = (files: FileList | null) => {
+    const picked = Array.from(files ?? []).slice(0, 3)
+    const mapped = picked.map((file, index) => ({
+      id: `${file.name}-${file.lastModified}-${index}`,
+      file,
+      fileType: toPackFileType(file.name),
+    }))
+
+    setSelectedPackFiles(mapped)
+    setFinalizedPackSizeBytes(undefined)
+    setFinalizedPackR2Key(undefined)
     setUploadError("")
-    if (!title.trim()) {
-      const firstReady = files.find((file) => file.status === "ready")
-      if (firstReady) {
-        setTitle(firstReady.originalFilename.replace(/\.[^/.]+$/, ""))
-      }
+
+    if (mapped.length && !title.trim()) {
+      setTitle(mapped[0].file.name.replace(/\.[^/.]+$/, ""))
     }
   }
-
-  const readyPackFiles = useMemo(
-    () => packFiles.filter((file) => file.status === "ready"),
-    [packFiles]
-  )
 
   const canCreateLink = useMemo(() => {
     if (isPending || !title.trim()) return false
-    if (mode === "document") return Boolean(documentUpload)
-    if (mode === "pack") return readyPackFiles.length > 0
+    if (mode === "document") return Boolean(selectedDocumentFile)
+    if (mode === "pack") return selectedPackFiles.length > 0
     if (mode === "gate") return Boolean(destinationUrl.trim())
     return true
   }, [
     destinationUrl,
-    documentUpload,
     isPending,
     mode,
-    readyPackFiles.length,
+    selectedDocumentFile,
+    selectedPackFiles.length,
     title,
   ])
 
   async function handleCreateLink() {
     if (isPending) return
+    const supabase = createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user?.id) {
+      setUploadError("You need to be logged in to create links.")
+      return
+    }
+
+    let finalizedDocumentUpload = documentUpload
+    let finalizedPackBytes = finalizedPackSizeBytes
+    let finalizedPackKey = finalizedPackR2Key
+
+    try {
+      setDocumentUploadPending(true)
+      if (mode === "document") {
+        if (!selectedDocumentFile) {
+          setUploadError("Please choose a document file.")
+          return
+        }
+
+        const finalized = await uploadDocumentAndFinalize({
+          creatorId: user.id,
+          file: selectedDocumentFile,
+        })
+
+        finalizedDocumentUpload = {
+          r2Key: finalized.r2Key,
+          pageCount: finalized.pageCount,
+          fileSizeBytes: finalized.fileSizeBytes,
+          filename: finalized.filename,
+        }
+      }
+
+      if (mode === "pack") {
+        if (!selectedPackFiles.length) {
+          setUploadError("Please add at least one file to your pack.")
+          return
+        }
+
+        const finalized = await uploadPackAndFinalize({
+          creatorId: user.id,
+          title,
+          files: selectedPackFiles.map((entry) => entry.file),
+        })
+
+        finalizedPackBytes = finalized.fileSizeBytes
+        finalizedPackKey = finalized.r2Key
+        setFinalizedPackSizeBytes(finalized.fileSizeBytes)
+        setFinalizedPackR2Key(finalized.r2Key)
+      }
+    } catch (error) {
+      setDocumentUploadPending(false)
+      toast.error(
+        getUploadErrorMessage(error) || "Upload failed. Please try again."
+      )
+      setUploadError(getUploadErrorMessage(error))
+      return
+    } finally {
+      setDocumentUploadPending(false)
+    }
+
     const { params, errorMessage } = buildCreateLinkParams({
       mode,
       title,
@@ -303,8 +412,10 @@ export default function CreateLinkPage() {
       tipSuggestedAmountUsdc,
       tipMessage,
       accessExpiryType,
-      documentUpload,
-      readyPackFiles,
+      documentUpload: finalizedDocumentUpload,
+      selectedPackFiles,
+      finalizedPackSizeBytes: finalizedPackBytes,
+      finalizedPackR2Key: finalizedPackKey,
     })
 
     if (!params) {
@@ -315,7 +426,7 @@ export default function CreateLinkPage() {
     }
 
     setUploadError("")
-    createLink(params)
+    await createLink(params)
   }
 
   return (
@@ -429,15 +540,13 @@ export default function CreateLinkPage() {
               <>
                 <div className="space-y-2">
                   <Label>Document upload</Label>
-                  <DocumentUploadZone
-                    value={documentUpload}
-                    onUploadComplete={onDocumentComplete}
-                    onUploadError={(error) => setUploadError(error)}
-                    onRemove={() => setDocumentUpload(null)}
+                  <Input
+                    type="file"
+                    accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    onChange={(event) =>
+                      onDocumentFileSelect(event.target.files?.[0] ?? null)
+                    }
                   />
-                  {uploadError ? (
-                    <p className="text-xs text-destructive">{uploadError}</p>
-                  ) : null}
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -464,17 +573,10 @@ export default function CreateLinkPage() {
 
                 {documentUpload ? (
                   <div className="flex items-center gap-3 rounded-xl border p-3 text-xs text-muted-foreground">
-                    {documentUpload.thumbnailUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={documentUpload.thumbnailUrl}
-                        alt="Document thumbnail"
-                        className="h-12 w-12 rounded-md object-cover"
-                      />
-                    ) : (
-                      <div className="h-12 w-12 animate-pulse rounded-md bg-muted" />
-                    )}
                     <div>
+                      <p className="font-medium text-foreground">
+                        {documentUpload.filename}
+                      </p>
                       <p>{documentUpload.pageCount} pages</p>
                       <p>{formatBytes(documentUpload.fileSizeBytes)}</p>
                     </div>
@@ -546,15 +648,30 @@ export default function CreateLinkPage() {
               <>
                 <div className="space-y-2">
                   <Label>Pack files</Label>
-                  <PackUploadZone
-                    files={packFiles}
-                    onFilesChange={onPackFilesChange}
+                  <Input
+                    type="file"
+                    multiple
+                    accept=".pdf,.docx,.png,.jpg,.jpeg,.webp"
+                    onChange={(event) => onPackFilesSelect(event.target.files)}
                   />
                   <p className="text-xs text-muted-foreground">
-                    PDFs and Word docs open in a secure in-browser viewer.
-                    Images are also displayed in the viewer - no file downloads
-                    for any type.
+                    Up to 3 files. Files will be zipped in your browser and
+                    uploaded as one secure pack.
                   </p>
+                  {selectedPackFiles.length > 0 ? (
+                    <div className="rounded-xl border p-3 text-xs text-muted-foreground">
+                      <p className="font-medium text-foreground">
+                        {selectedPackFiles.length} files selected
+                      </p>
+                      <ul className="mt-2 space-y-1">
+                        {selectedPackFiles.map((entry) => (
+                          <li key={entry.id}>
+                            {entry.file.name} - {formatBytes(entry.file.size)}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -657,9 +774,20 @@ export default function CreateLinkPage() {
               </>
             ) : null}
 
+            {uploadError ? (
+              <p className="text-sm text-destructive">{uploadError}</p>
+            ) : null}
+
             <div className="flex flex-wrap gap-2 pt-2">
-              <Button onClick={handleCreateLink} disabled={!canCreateLink}>
-                {isPending ? <LoadingSpinner size={4} /> : "Create link"}
+              <Button
+                onClick={handleCreateLink}
+                disabled={!canCreateLink || isPending || documentUploadPending}
+              >
+                {isPending || documentUploadPending ? (
+                  <LoadingSpinner size={4} />
+                ) : (
+                  "Create link"
+                )}
               </Button>
               <Button variant="secondary">Save draft</Button>
             </div>
@@ -674,7 +802,14 @@ export default function CreateLinkPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="-mt-0.5">
-            <div className="group relative mb-2 cursor-pointer">
+            <div
+              onClick={() =>
+                toast.info(
+                  "Custom video and image thumbnail upload coming soon."
+                )
+              }
+              className="group relative mb-2 cursor-pointer"
+            >
               <Image
                 src="/icon.png"
                 alt="Wallet"
@@ -697,7 +832,7 @@ export default function CreateLinkPage() {
               </p>
               <p className="text-sm text-muted-foreground">
                 {mode === "pack"
-                  ? `${packFiles.length} files • ${packSummary.breakdown}`
+                  ? `${selectedPackFiles.length} files • ${packSummary.breakdown}`
                   : mode === "document"
                     ? `${documentUpload?.pageCount ?? 0} pages • secure in-browser access`
                     : mode === "tip"

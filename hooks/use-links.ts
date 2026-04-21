@@ -64,7 +64,7 @@ type DocumentLinkParams = BaseLinkParams & {
   type: "document"
   destinationUrl?: string
   documentR2Key: string
-  documentPageCount: number
+  documentPageCount: number | null
   documentFileSizeBytes: number
   documentThumbnailR2Key?: string
   priceUsdc?: number
@@ -74,6 +74,7 @@ type DocumentLinkParams = BaseLinkParams & {
 
 type PackLinkParams = BaseLinkParams & {
   type: "pack"
+  documentR2Key: string
   packThumbnailR2Key?: string
   packFileCount: number
   packTotalSizeBytes: number
@@ -123,82 +124,92 @@ async function createLink(
   creatorId: string,
   params: CreateLinkParams
 ): Promise<{ data: Link | null; error: Error | null }> {
-  const supabase = createClient()
+  try {
+    const supabase = createClient()
 
-  const baseInsert: LinkInsert = {
-    creator_id: creatorId,
-    type: params.type,
-    title: params.title,
-    description: params.description ?? null,
-    thank_you_message: params.thankYouMessage ?? null,
-    thumbnail_url: params.thumbnailUrl ?? null,
-    access_expiry_type: params.accessExpiryType ?? null,
-    access_max_views: params.accessMaxViews ?? null,
-    access_ip_binding: params.accessIpBinding ?? false,
-    access_wallet_binding: params.accessWalletBinding ?? false,
-    destination_url: null,
-    document_r2_key: null,
-    document_page_count: null,
-    document_file_size_bytes: null,
-    document_thumbnail_r2_key: null,
-    pack_thumbnail_r2_key: null,
-    pack_file_count: null,
-    pack_total_size_bytes: null,
-    price_usdc: null,
-    suggested_amount_usdc: null,
-    doc_watermark_enabled: false,
-    doc_download_blocked: true,
+    const baseInsert: LinkInsert = {
+      creator_id: creatorId,
+      type: params.type,
+      title: params.title,
+      description: params.description ?? null,
+      thank_you_message: params.thankYouMessage ?? null,
+      thumbnail_url: params.thumbnailUrl ?? null,
+      access_expiry_type: params.accessExpiryType ?? null,
+      access_max_views: params.accessMaxViews ?? null,
+      access_ip_binding: params.accessIpBinding ?? false,
+      access_wallet_binding: params.accessWalletBinding ?? false,
+      destination_url: null,
+      document_r2_key: null,
+      document_page_count: null,
+      document_file_size_bytes: null,
+      document_thumbnail_r2_key: null,
+      pack_thumbnail_r2_key: null,
+      pack_file_count: null,
+      pack_total_size_bytes: null,
+      price_usdc: null,
+      suggested_amount_usdc: null,
+      doc_watermark_enabled: false,
+      doc_download_blocked: true,
+    }
+
+    let typeInsert: Partial<LinkInsert> = {}
+
+    switch (params.type) {
+      case "tip":
+        typeInsert = {
+          price_usdc: params.priceUsdc ?? null,
+          suggested_amount_usdc: params.suggestedAmountUsdc ?? null,
+        }
+        break
+
+      case "document":
+        typeInsert = {
+          destination_url: params.destinationUrl ?? null,
+          document_r2_key: params.documentR2Key,
+          document_page_count: params.documentPageCount,
+          document_file_size_bytes: params.documentFileSizeBytes,
+          document_thumbnail_r2_key: params.documentThumbnailR2Key ?? null,
+          price_usdc: params.priceUsdc ?? null,
+          doc_watermark_enabled: params.docWatermarkEnabled ?? false,
+          doc_download_blocked: params.docDownloadBlocked ?? true,
+        }
+        break
+
+      case "pack":
+        typeInsert = {
+          document_r2_key: params.documentR2Key,
+          pack_thumbnail_r2_key: params.packThumbnailR2Key ?? null,
+          pack_file_count: params.packFileCount,
+          pack_total_size_bytes: params.packTotalSizeBytes,
+          price_usdc: params.priceUsdc ?? null,
+          doc_download_blocked: params.docDownloadBlocked ?? true,
+        }
+        break
+
+      case "gate":
+        typeInsert = {
+          destination_url: params.destinationUrl,
+          price_usdc: params.priceUsdc ?? null,
+          suggested_amount_usdc: params.suggestedAmountUsdc ?? null,
+        }
+        break
+    }
+
+    const { data, error } = await supabase
+      .from("links")
+      .insert({ ...baseInsert, ...typeInsert })
+      .select()
+      .single()
+
+    return { data, error }
+  } catch (error) {
+    toast.error(getErrorMessage(error) || "Failed to create link")
+    return {
+      data: null,
+      error:
+        error instanceof Error ? error : new Error("An unknown error occurred"),
+    }
   }
-
-  let typeInsert: Partial<LinkInsert> = {}
-
-  switch (params.type) {
-    case "tip":
-      typeInsert = {
-        price_usdc: params.priceUsdc ?? null,
-        suggested_amount_usdc: params.suggestedAmountUsdc ?? null,
-      }
-      break
-
-    case "document":
-      typeInsert = {
-        destination_url: params.destinationUrl ?? null,
-        document_r2_key: params.documentR2Key,
-        document_page_count: params.documentPageCount,
-        document_file_size_bytes: params.documentFileSizeBytes,
-        document_thumbnail_r2_key: params.documentThumbnailR2Key ?? null,
-        price_usdc: params.priceUsdc ?? null,
-        doc_watermark_enabled: params.docWatermarkEnabled ?? false,
-        doc_download_blocked: params.docDownloadBlocked ?? true,
-      }
-      break
-
-    case "pack":
-      typeInsert = {
-        pack_thumbnail_r2_key: params.packThumbnailR2Key ?? null,
-        pack_file_count: params.packFileCount,
-        pack_total_size_bytes: params.packTotalSizeBytes,
-        price_usdc: params.priceUsdc ?? null,
-        doc_download_blocked: params.docDownloadBlocked ?? true,
-      }
-      break
-
-    case "gate":
-      typeInsert = {
-        destination_url: params.destinationUrl,
-        price_usdc: params.priceUsdc ?? null,
-        suggested_amount_usdc: params.suggestedAmountUsdc ?? null,
-      }
-      break
-  }
-
-  const { data, error } = await supabase
-    .from("links")
-    .insert({ ...baseInsert, ...typeInsert })
-    .select()
-    .single()
-
-  return { data, error }
 }
 
 async function getCreatorLinks(): Promise<LinkResponse> {
