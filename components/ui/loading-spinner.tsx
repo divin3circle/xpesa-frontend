@@ -11,7 +11,7 @@ function LoadingSpinner({ size = 4 }: LoadingSpinnerProps) {
       <Image
         src="/logo.png"
         alt="Loading..."
-        width={size * 16}
+        width={size * 20}
         height={size * 16}
         className="size animate-spin rounded-full"
       />

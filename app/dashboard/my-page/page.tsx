@@ -1,6 +1,5 @@
 "use client"
 import Link from "next/link"
-import { useEffect } from "react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -13,7 +12,6 @@ import {
 } from "@/components/ui/card"
 import { useUserDetails } from "@/hooks/use-user"
 import LoadingSpinner from "@/components/ui/loading-spinner"
-import { useRouter } from "next/navigation"
 import { envConfig } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 import Image from "next/image"
@@ -31,21 +29,19 @@ export default function MyPagePage() {
     error: myLinksError,
   } = useMyLinks()
 
-  const router = useRouter()
+  // const router = useRouter()
 
-  useEffect(() => {
-    if (!isLoading && (!data?.creator || error)) {
-      router.push(`/error?q=${error?.message || "An unexpected error occurred"}`)
-    }
-  }, [data, error, isLoading, router])
+  // if (!isLoading && (!data?.creator || error)) {
+  //   console.error("Error fetching user details:", error)
+  //   router.push(`/error?q=${error?.message || "Ano unexpected error occurred"}`)
+  // }
 
-  useEffect(() => {
-    if (!myLinksData || myLinksError) {
-      router.push(
-        `/error?q=${myLinksError?.message || "An unexpected error occurred"}`
-      )
-    }
-  }, [myLinksData, myLinksError, router])
+  // if (!isMyLinksLoading && (!myLinksData || myLinksError)) {
+  //   console.error("Error fetching my links:", myLinksError)
+  //   router.push(
+  //     `/error?q=${myLinksError?.message || "An unexpected error occurred"}`
+  //   )
+  // }
 
   if (isLoading) {
     return (
@@ -138,7 +134,7 @@ export default function MyPagePage() {
                       className="flex items-start justify-between rounded-2xl border border-border/50 p-4"
                       key={index}
                     >
-                      <div className="w-1/2">
+                      <div className="">
                         <Skeleton className="h-4 w-2/3" />
                         <Skeleton className="mt-1 h-3 w-1/3" />
                       </div>
@@ -162,7 +158,9 @@ export default function MyPagePage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="rounded-2xl border p-3 text-sm">
-              <p className="font-medium">xpesa.com/{data.creator.handle}</p>
+              <p className="font-medium">
+                xpesa.com/creator/{data.creator.handle}
+              </p>
               <p className="text-xs text-muted-foreground">
                 Public URL for your audience
               </p>
@@ -173,7 +171,7 @@ export default function MyPagePage() {
               onClick={() => {
                 setCopied(true)
                 navigator.clipboard.writeText(
-                  `${envConfig.APP_URL}/${data?.creator?.handle || ""}`
+                  `${envConfig.APP_URL}/creator/${data?.creator?.handle || ""}`
                 )
               }}
             >

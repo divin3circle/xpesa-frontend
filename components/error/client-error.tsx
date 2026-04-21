@@ -16,7 +16,7 @@ export default function ClientError({
   const router = useRouter()
   const errorMessage = use(searchParams)
   return (
-    <div className="flex h-screen w-full flex-col items-center justify-center">
+    <div className="flex h-screen w-full flex-col items-center justify-center px-2">
       <p className="text-lg font-medium">Whoops! That didn&apos;t work.</p>
       <Image
         src="/error.png"
