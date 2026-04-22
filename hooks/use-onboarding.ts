@@ -2,9 +2,8 @@ import { createClient } from "@/lib/supabase/client"
 import { TABLENAMES } from "@/lib/supabase/utilities"
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { redirect, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { onNavigate } from "@/lib/utils"
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime"
 import { useEffect, useState } from "react"
 
 export interface OnboardingData {
@@ -65,18 +64,13 @@ async function createCreator({
   }
 }
 
-async function checkIfUserCompletedOnboarding({
-  router,
-}: {
-  router: AppRouterInstance
-}): Promise<boolean> {
+async function checkIfUserCompletedOnboarding(): Promise<boolean> {
   const supabase = createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   if (!user) {
-    router.push("/login")
     return false
   }
 
@@ -85,13 +79,13 @@ async function checkIfUserCompletedOnboarding({
       .from(TABLENAMES.CREATORS)
       .select("onboarding_complete")
       .eq("id", user.id)
+      .limit(1)
+
     if (!data || error) {
       return false
     }
-    if (data.length === 0) {
-      return false
-    }
-    return true
+
+    return data[0]?.onboarding_complete === true
   } catch (error) {
     console.log(error)
     return false
@@ -227,11 +221,9 @@ export function useDebouncedDisplayNameCheck(displayName: string, delay = 500) {
 }
 
 export function useIsOnboardingComplete() {
-  const router = useRouter()
-
   const { data, isLoading, error } = useQuery({
     queryKey: ["onboarding"],
-    queryFn: () => checkIfUserCompletedOnboarding({ router }),
+    queryFn: checkIfUserCompletedOnboarding,
   })
 
   return { data, error, isLoading }
@@ -247,7 +239,7 @@ export function useCompleteOnboarding() {
         action: {
           label: "Learn more",
           onClick() {
-            redirect("/learn")
+            onNavigate("/learn", router)
           },
         },
       })

@@ -1,5 +1,7 @@
 "use client"
 
+import { useEffect } from "react"
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -18,6 +20,15 @@ import { useRouter } from "next/navigation"
 export default function ProfilePage() {
   const { data, isLoading, error } = useUserDetails()
   const router = useRouter()
+
+  useEffect(() => {
+    if (!isLoading && (!data?.creator || error)) {
+      router.replace(
+        `/error?q=${error?.message || "An unexpected error occurred"}`
+      )
+    }
+  }, [data, error, isLoading, router])
+
   if (isLoading) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center">
@@ -29,10 +40,7 @@ export default function ProfilePage() {
     )
   }
 
-  if (!isLoading && (!data?.creator || error)) {
-    router.push(`/error?q=${error?.message || "An unexpected error occurred"}`)
-    return
-  }
+  if (!data?.creator || error) return null
 
   return (
     <div className="space-y-6">

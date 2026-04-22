@@ -21,9 +21,6 @@ import {
   ONBOARDING_STEP_ORDER,
   WalletMethod,
 } from "@/lib/onboarding/types"
-import { useIsOnboardingComplete } from "@/hooks/use-onboarding"
-import { redirect } from "next/navigation"
-import LoadingSpinner from "../ui/loading-spinner"
 
 interface OnboardingContextValue {
   state: OnboardingState
@@ -44,8 +41,6 @@ export function OnboardingProvider({
 }: {
   children: React.ReactNode
 }) {
-  const { data, error, isLoading } = useIsOnboardingComplete()
-
   const [state, setState] = useState<OnboardingState>(INITIAL_ONBOARDING_STATE)
   const [isHydrated, setIsHydrated] = useState(false)
 
@@ -173,23 +168,6 @@ export function OnboardingProvider({
       reset,
     ]
   )
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen w-screen flex-col items-center justify-center">
-        <h1 className="mb- font-sans font-semibold text-muted-foreground">
-          Just a moment..
-        </h1>
-        <LoadingSpinner size={5} />
-      </div>
-    )
-  }
-  if (error) {
-    redirect(`/error?q=${error.message}`)
-  }
-  if (data) {
-    redirect("/dashboard")
-  }
 
   return (
     <OnboardingContext.Provider value={value}>

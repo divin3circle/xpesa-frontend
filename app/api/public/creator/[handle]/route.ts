@@ -127,7 +127,7 @@ export async function GET(
     }
 
     const avatarUrl = creator.avatar_url
-      ? `${supabaseUrl}/storage/v1/object/public/xpesa-public/${creator.avatar_url}`
+      ? `${supabaseUrl}/storage/v1/object/public/${creator.avatar_url}`
       : null
 
     return NextResponse.json<GetCreatorResponse>({

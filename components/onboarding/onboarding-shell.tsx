@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname, redirect } from "next/navigation"
+import { useEffect } from "react"
+import { usePathname, useRouter } from "next/navigation"
 import { CheckCircle2, Circle } from "lucide-react"
 
 import { ONBOARDING_STEP_META } from "@/lib/onboarding/constants"
@@ -21,6 +22,7 @@ function getStepFromPath(pathname: string): OnboardingStep {
 }
 
 export function OnboardingShell({ children }: { children: React.ReactNode }) {
+  const router = useRouter()
   const pathname = usePathname()
   const activeStep = getStepFromPath(pathname)
   const { state } = useOnboarding()
@@ -30,13 +32,16 @@ export function OnboardingShell({ children }: { children: React.ReactNode }) {
   )
   const progress = ((currentStepIndex + 1) / ONBOARDING_STEP_META.length) * 100
 
-  const hashParams = new URLSearchParams(window.location.hash.slice(1));
-  const errorCode = hashParams.get('error_code');
-  const errorDescription = hashParams.get('error_description');
+  useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.slice(1))
+    const errorCode = hashParams.get("error_code")
+    const errorDescription = hashParams.get("error_description")
 
-  if (errorCode) {
-    redirect(`/error?q=${encodeURIComponent(errorDescription || 'Auth Error')}`)
-  }
+    if (!errorCode) return
+    router.replace(
+      `/error?q=${encodeURIComponent(errorDescription || "Auth Error")}`
+    )
+  }, [router])
 
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,hsl(var(--primary)/0.15),transparent_45%),linear-gradient(145deg,hsl(var(--background)),hsl(var(--muted)/0.5))] p-4 md:p-8">

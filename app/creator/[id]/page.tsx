@@ -1,6 +1,8 @@
 "use client"
 
+import { CreatorProfileView } from "@/components/creator-public/creator-profile-view"
 import LoadingSpinner from "@/components/ui/loading-spinner"
+import { useCreatorAnalytics } from "@/hooks/use-creator-analytics"
 import { usePublicCreator } from "@/hooks/use-public"
 import { use } from "react"
 
@@ -11,6 +13,8 @@ interface CreatorPageProps {
 export default function CreatorPage({ params }: CreatorPageProps) {
   const { id: creatorHandle } = use(params)
   const { data, isLoading, error } = usePublicCreator(creatorHandle)
+  const { data: analytics, isLoading: isAnalyticsLoading } =
+    useCreatorAnalytics(creatorHandle, data?.links ?? [])
 
   if (isLoading)
     return (
@@ -30,14 +34,11 @@ export default function CreatorPage({ params }: CreatorPageProps) {
   if (!data) return null
 
   return (
-    <div className="mt-2 max-w-7xl px-2">
-      <h1>{data.creator.display_name}</h1>
-      <p>{data.creator.bio}</p>
-      <div>
-        {data.links.map((link) => (
-          <div key={link.id}>{link.title}</div>
-        ))}
-      </div>
-    </div>
+    <CreatorProfileView
+      creator={data.creator}
+      links={data.links}
+      analytics={analytics}
+      isAnalyticsLoading={isAnalyticsLoading}
+    />
   )
 }
