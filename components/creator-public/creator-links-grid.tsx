@@ -49,7 +49,7 @@ export function CreatorLinksGrid({ links }: CreatorLinksGridProps) {
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
         <div className="space-y-1">
           <h2 className="text-2xl font-semibold tracking-tight">
-            My Highlights
+            Creator Highlights
           </h2>
           <p className="text-sm text-muted-foreground">
             Showing {filteredLinks.length} of {links.length} content items
@@ -70,7 +70,7 @@ export function CreatorLinksGrid({ links }: CreatorLinksGridProps) {
       {filteredLinks.length === 0 ? (
         <Card className="border-border/70">
           <CardContent className="p-8 text-center text-muted-foreground">
-            No content matches your search yet.
+            No content available.
           </CardContent>
         </Card>
       ) : (

@@ -248,7 +248,7 @@ export function TransactionManagementTable({
 
       <div className="mt-4">
         <Button variant="outline" asChild>
-          <Link href={historyHref}>View all transactions</Link>
+          <Link href={historyHref}>View More</Link>
         </Button>
       </div>
 

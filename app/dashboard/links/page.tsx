@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card"
 import { useMyLinks, type Link as LinkRecord } from "@/hooks/use-links"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useRouter } from "next/navigation"
 
 type LinkType = "gate" | "document" | "pack" | "tip"
 
@@ -126,6 +127,7 @@ const LinkSkeleton = () => (
 export default function LinksPage() {
   const [activeFilter, setActiveFilter] = useState<FilterTab>("All")
   const { data, isLoading, error } = useMyLinks()
+  const router = useRouter()
 
   const links = useMemo(() => (data?.links ?? []).map(toLinkItem), [data])
 
@@ -232,8 +234,14 @@ export default function LinksPage() {
                     </p>
                   )}
                   <div className="flex flex-wrap gap-2">
-                    <Button size="sm" variant="secondary">
-                      Copy link
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        router.push(`/pay/${item.id}`)
+                      }}
+                    >
+                      Open link
                     </Button>
                     <Button size="sm" variant="outline">
                       Edit

@@ -1,0 +1,131 @@
+"use client"
+
+import Image from "next/image"
+import { useParams } from "next/navigation"
+
+import { Badge } from "@/components/ui/badge"
+import { Card } from "@/components/ui/card"
+import LoadingSpinner from "@/components/ui/loading-spinner"
+import { usePublicLink } from "@/hooks/use-public"
+import placeholderBanner from "@/public/placeholderBanner.jpg"
+import {
+  Comment01Icon,
+  Share01Icon,
+  ThumbsDown,
+  ThumbsUp,
+} from "@hugeicons/core-free-icons"
+import { HugeiconsIcon } from "@hugeicons/react"
+
+function formatUsdc(value: number | null) {
+  if (!value || value <= 0) return "Free"
+
+  return `$${value.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`
+}
+
+function buildTypeLabel(type: string) {
+  return type.charAt(0).toUpperCase() + type.slice(1)
+}
+
+const engagementItems = [
+  {
+    id: "like",
+    title: "Like",
+    icon: ThumbsUp,
+  },
+  {
+    id: "comment",
+    title: "Comment",
+    icon: Comment01Icon,
+  },
+  {
+    id: "share",
+    title: "Share",
+    icon: Share01Icon,
+  },
+  {
+    id: "dislike",
+    title: "Dislike",
+    icon: ThumbsDown,
+  },
+]
+
+export function PayLinkPreviewCard() {
+  const params = useParams<{ linkId: string }>()
+  const linkId = params?.linkId
+
+  const { data, isLoading, error } = usePublicLink(linkId)
+
+  if (isLoading) {
+    return (
+      <Card className="flex min-h-80 items-center justify-center border-border/70">
+        <LoadingSpinner />
+      </Card>
+    )
+  }
+
+  if (error || !data?.link) {
+    return (
+      <Card className="flex min-h-80 items-center justify-center border-border/70 px-6 text-sm text-muted-foreground">
+        Could not load link details.
+      </Card>
+    )
+  }
+
+  const link = data.link
+
+  return (
+    <Card className="relative min-h-80 overflow-hidden border-border/70">
+      <div className="absolute inset-0">
+        <Image
+          src={placeholderBanner}
+          alt={link.title}
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
+      <div className="absolute inset-0 bg-linear-to-t from-background via-background/35 to-transparent" />
+
+      <div className="absolute inset-x-0 bottom-0 p-4 sm:p-6">
+        <div className="rounded-3xl border border-border/60 bg-background/45 p-4 backdrop-blur-xl sm:p-5">
+          <div className="space-y-2">
+            <h2 className="line-clamp-2 text-2xl font-semibold tracking-tight">
+              {link.title}
+            </h2>
+            <p className="line-clamp-2 text-sm text-muted-foreground">
+              {link.description || "Creator-protected content preview."}
+            </p>
+          </div>
+
+          <div className="flex flex-col-reverse items-center justify-between pt-4 md:flex-row">
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <Badge variant="secondary">{buildTypeLabel(link.type)}</Badge>
+              <Badge variant="outline">{formatUsdc(link.price_usdc)}</Badge>
+              {link.access_wallet_binding ? (
+                <Badge variant="outline">Wallet-bound</Badge>
+              ) : null}
+              {link.access_max_views ? (
+                <Badge variant="outline">
+                  Max {link.access_max_views} opens
+                </Badge>
+              ) : null}
+            </div>
+            <div className="flex items-center gap-2">
+              {engagementItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-1 text-sm text-muted-foreground"
+                >
+                  <HugeiconsIcon icon={item.icon} className="size-4" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </Card>
+  )
+}
