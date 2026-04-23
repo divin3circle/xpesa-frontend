@@ -5,7 +5,7 @@ import { useParams } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
-import LoadingSpinner from "@/components/ui/loading-spinner"
+import { Skeleton } from "@/components/ui/skeleton"
 import { usePublicLink } from "@/hooks/use-public"
 import placeholderBanner from "@/public/placeholderBanner.jpg"
 import {
@@ -60,9 +60,9 @@ export function PayLinkPreviewCard() {
 
   if (isLoading) {
     return (
-      <Card className="flex min-h-80 items-center justify-center border-border/70">
-        <LoadingSpinner />
-      </Card>
+      <div className="flex h-64 flex-col justify-between gap-2 md:flex-row md:items-center">
+        <Skeleton className="h-full w-full rounded-2xl" />
+      </div>
     )
   }
 
@@ -100,7 +100,7 @@ export function PayLinkPreviewCard() {
             </p>
           </div>
 
-          <div className="flex flex-col-reverse md:items-center justify-between pt-4 md:flex-row">
+          <div className="flex flex-col-reverse justify-between pt-4 md:flex-row md:items-center">
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <Badge variant="secondary">{buildTypeLabel(link.type)}</Badge>
               <Badge variant="secondary">{link.view_count} views</Badge>
@@ -118,10 +118,15 @@ export function PayLinkPreviewCard() {
               {engagementItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex cursor-pointer group items-center gap-1 text-sm text-muted-foreground p-2 bg-background/10 backdrop-blur-sm rounded-2xl"
+                  className="group flex cursor-pointer items-center gap-1 rounded-2xl bg-background/10 p-2 text-sm text-muted-foreground backdrop-blur-sm"
                 >
-                  <HugeiconsIcon icon={item.icon} className="size-6 group-hover:text-pink-500" />
-                  <span className="text-xs font-semibold text-muted-foreground">{item.title}</span>
+                  <HugeiconsIcon
+                    icon={item.icon}
+                    className="size-6 group-hover:text-pink-500"
+                  />
+                  <span className="text-xs font-semibold text-muted-foreground">
+                    {item.title}
+                  </span>
                 </div>
               ))}
             </div>

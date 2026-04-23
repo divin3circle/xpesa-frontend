@@ -5,11 +5,12 @@ import Link from "next/link"
 import { useParams } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import LoadingSpinner from "@/components/ui/loading-spinner"
 import { usePublicLink } from "@/hooks/use-public"
+import Image from "next/image"
 
 function formatUsdc(value: number | null) {
   if (!value || value <= 0) return "0.00"
@@ -54,11 +55,9 @@ export function PayPurchaseCard() {
 
   if (isLoading) {
     return (
-      <Card className="border-border/70">
-        <CardContent className="flex min-h-[280px] items-center justify-center">
-          <LoadingSpinner />
-        </CardContent>
-      </Card>
+      <div className="flex h-64 flex-col justify-between gap-2 md:flex-row md:items-center">
+        <Skeleton className="h-full w-full rounded-2xl" />
+      </div>
     )
   }
 
@@ -79,7 +78,8 @@ export function PayPurchaseCard() {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Pay to unlock this creator content.
+          You will be able to view the content according to the access
+          conditions set by the creator.
         </p>
 
         {accessPills.length > 0 ? (
@@ -93,7 +93,7 @@ export function PayPurchaseCard() {
         ) : null}
 
         <div className="space-y-2">
-          <label htmlFor="amount" className="text-sm font-medium">
+          <label htmlFor="amount" className="mb-1 text-sm font-medium">
             Amount (USDC)
           </label>
           <Input
@@ -106,7 +106,29 @@ export function PayPurchaseCard() {
         </div>
 
         {!successToken ? (
-          <Button onClick={onConfirmPayment}>Confirm payment</Button>
+          <>
+            <Button onClick={onConfirmPayment}>Confirm payment</Button>
+            <div className="mt-2 flex items-center gap-2">
+              <div className="flex items-center gap-1 rounded-full border border-border/70 px-3 py-1">
+                <Image src="/usdc.svg" alt="USDC" width={16} height={16} />
+                <span className="text-sm font-semibold text-muted-foreground">
+                  USDC
+                </span>
+              </div>
+              <div className="flex items-center gap-1 rounded-full border border-border/70 px-3 py-1">
+                <Image src="/usdt.svg" alt="USDC" width={16} height={16} />
+                <span className="text-sm font-semibold text-muted-foreground">
+                  USDT
+                </span>
+              </div>
+              <div className="flex items-center gap-1 rounded-full border border-border/70 px-3 py-1">
+                <Image src="/mpesa.png" alt="USDC" width={16} height={16} />
+                <span className="text-sm font-semibold text-muted-foreground">
+                  Mobile Money
+                </span>
+              </div>
+            </div>
+          </>
         ) : (
           <div className="space-y-3 rounded-xl border p-4">
             <p className="text-sm text-muted-foreground">Payment successful.</p>
