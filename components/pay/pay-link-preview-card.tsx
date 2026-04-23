@@ -100,9 +100,10 @@ export function PayLinkPreviewCard() {
             </p>
           </div>
 
-          <div className="flex flex-col-reverse items-center justify-between pt-4 md:flex-row">
+          <div className="flex flex-col-reverse md:items-center justify-between pt-4 md:flex-row">
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <Badge variant="secondary">{buildTypeLabel(link.type)}</Badge>
+              <Badge variant="secondary">{link.view_count} views</Badge>
               <Badge variant="outline">{formatUsdc(link.price_usdc)}</Badge>
               {link.access_wallet_binding ? (
                 <Badge variant="outline">Wallet-bound</Badge>
@@ -117,9 +118,10 @@ export function PayLinkPreviewCard() {
               {engagementItems.map((item) => (
                 <div
                   key={item.id}
-                  className="flex items-center gap-1 text-sm text-muted-foreground"
+                  className="flex cursor-pointer group items-center gap-1 text-sm text-muted-foreground p-2 bg-background/10 backdrop-blur-sm rounded-2xl"
                 >
-                  <HugeiconsIcon icon={item.icon} className="size-4" />
+                  <HugeiconsIcon icon={item.icon} className="size-6 group-hover:text-pink-500" />
+                  <span className="text-xs font-semibold text-muted-foreground">{item.title}</span>
                 </div>
               ))}
             </div>

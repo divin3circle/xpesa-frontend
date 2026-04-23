@@ -101,6 +101,7 @@ export function PayPurchaseCard() {
             value={amount}
             onChange={(event) => setAmount(event.target.value)}
             placeholder="0.00"
+            readOnly={link.type !== "tip"}
           />
         </div>
 

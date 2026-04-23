@@ -9,9 +9,9 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { getLinkImageURL } from "@/lib/utils"
-import router from "next/router"
 import { Button } from "../ui/button"
 import { ArrowRight01Icon } from "hugeicons-react"
+import { useRouter } from "next/navigation";
 
 type CreatorLinksGridProps = {
   links: LinkPublic[]
@@ -33,6 +33,7 @@ function formatType(type: string) {
 export function CreatorLinksGrid({ links }: CreatorLinksGridProps) {
   const [searchTerm, setSearchTerm] = useState("")
 
+  const router = useRouter()
   const filteredLinks = useMemo(() => {
     const normalized = searchTerm.trim().toLowerCase()
     if (!normalized) return links
@@ -110,7 +111,7 @@ export function CreatorLinksGrid({ links }: CreatorLinksGridProps) {
                 <Button
                   variant="ghost"
                   className="group mt-4 w-full"
-                  onClick={() => router.back()}
+                  onClick={() => router.push(`/pay/${link.id}`)}
                 >
                   See details
                   <ArrowRight01Icon className="size-4 duration-500 ease-in-out group-hover:translate-x-3.5" />
