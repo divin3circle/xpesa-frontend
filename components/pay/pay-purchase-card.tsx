@@ -108,7 +108,8 @@ export function PayPurchaseCard() {
         {!successToken ? (
           <>
             <Button onClick={onConfirmPayment}>Confirm payment</Button>
-            <div className="mt-2 flex items-center gap-2">
+            <h1 className="font-heading font-semibold text-muted-foreground">Supported Methods</h1>
+            <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 rounded-full border border-border/70 px-3 py-1">
                 <Image src="/usdc.svg" alt="USDC" width={16} height={16} />
                 <span className="text-sm font-semibold text-muted-foreground">
@@ -122,7 +123,7 @@ export function PayPurchaseCard() {
                 </span>
               </div>
               <div className="flex items-center gap-1 rounded-full border border-border/70 px-3 py-1">
-                <Image src="/mpesa.png" alt="USDC" width={16} height={16} />
+                <Image src="/mpesa.png" alt="USDC" className="rounded-full" width={16} height={16} />
                 <span className="text-sm font-semibold text-muted-foreground">
                   Mobile Money
                 </span>
