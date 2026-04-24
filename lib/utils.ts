@@ -36,6 +36,8 @@ export const envConfig = {
   R2_TOKEN_VALUE: process.env.R2_TOKEN_VALUE || "",
   R2_ENDPOINT: process.env.R2_ENDPOINT || "",
   R2_BUCKET_NAME: process.env.R2_BUCKET_NAME || "",
+  ENV: process.env.ENV || "DEV",
+  FEE: process.env.FEE || "5"
 }
 
 export const client = createThirdwebClient({

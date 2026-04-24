@@ -6,11 +6,15 @@ import { useParams } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ConnectButton, useActiveAccount } from "thirdweb/react"
+
+import { PAYMENT_CHAIN, USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { usePublicLink } from "@/hooks/use-public"
 import Image from "next/image"
+import { smartAccountConfig } from "@/lib/thirdweb/account-abstraction";
 
 function formatUsdc(value: number | null) {
   if (!value || value <= 0) return "0.00"
@@ -24,6 +28,8 @@ function formatUsdc(value: number | null) {
 export function PayPurchaseCard() {
   const params = useParams<{ linkId: string }>()
   const linkId = params?.linkId
+  const account = useActiveAccount();
+  const [isPaying, setIsPaying] = useState(false);
 
   const { data, isLoading, error } = usePublicLink(linkId)
 
@@ -31,6 +37,8 @@ export function PayPurchaseCard() {
   const [amount, setAmount] = useState("")
 
   const link = data?.link
+
+  const [tipAmount, setTipAmount] = useState(link?.price_usdc || link?.suggested_amount_usdc || "1")
 
   const accessPills = useMemo(() => {
     if (!link) return []
@@ -52,6 +60,7 @@ export function PayPurchaseCard() {
   const onConfirmPayment = () => {
     setSuccessToken("demo-access-token")
   }
+
 
   if (isLoading) {
     return (
@@ -123,7 +132,7 @@ export function PayPurchaseCard() {
                 </span>
               </div>
               <div className="flex items-center gap-1 rounded-full border border-border/70 px-3 py-1">
-                <Image src="/mpesa.png" alt="USDC" className="rounded-full" width={16} height={16} />
+                <Image src="/mpesa.png" alt="USDC" className="rounded size-5" width={100} height={100} />
                 <span className="text-sm font-semibold text-muted-foreground">
                   Mobile Money
                 </span>
