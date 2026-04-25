@@ -58,7 +58,9 @@ export default function DocsPage() {
           </CardHeader>
           <CardContent className="space-y-2 text-sm text-muted-foreground">
             <p>Frontend: Next.js App Router, TypeScript, Tailwind, shadcn/ui</p>
-            <p>Wallet + chain: ThirdWeb, Base mainnet, USDC, x402 flow</p>
+            <p>
+              Wallet + chain: ThirdWeb, Hedera (env-driven), USDC, x402 flow
+            </p>
             <p>Data: Neon Postgres + Drizzle, Upstash Redis, Cloudflare R2</p>
             <p>Payouts: Kotani Pay M-Pesa offramp pipeline</p>
           </CardContent>

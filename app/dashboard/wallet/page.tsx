@@ -76,7 +76,7 @@ export default function WalletPage() {
             <p>
               Address: <span className="font-mono">0x7A21...Fe89</span>
             </p>
-            <p>Network: Base Mainnet</p>
+            <p>Network: Hedera (env-driven)</p>
             <p className="text-muted-foreground">
               Payments route directly to this address.
             </p>

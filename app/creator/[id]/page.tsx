@@ -5,6 +5,7 @@ import LoadingSpinner from "@/components/ui/loading-spinner"
 import { useCreatorAnalytics } from "@/hooks/use-creator-analytics"
 import { usePublicCreator } from "@/hooks/use-public"
 import { use } from "react"
+import Image from "next/image"
 
 interface CreatorPageProps {
   params: Promise<{ id: string }>
@@ -27,7 +28,14 @@ export default function CreatorPage({ params }: CreatorPageProps) {
     )
   if (error)
     return (
-      <div className="h-screen w-screen text-red-500">
+      <div className="flex h-screen w-screen flex-col items-center justify-center text-red-500">
+        <Image
+          src="/error.png"
+          alt="Error"
+          width={300}
+          height={200}
+          className="my-6"
+        />
         Error: {error.message}
       </div>
     )

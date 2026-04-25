@@ -24,6 +24,28 @@ function formatCurrency(value: number) {
   })}`
 }
 
+function getExplorerTransactionUrl(network: string, txHash: string) {
+  const normalized = network.toLowerCase()
+
+  if (normalized === "hedera-mainnet") {
+    return `https://hashscan.io/mainnet/transaction/${txHash}`
+  }
+
+  if (normalized === "hedera-testnet") {
+    return `https://hashscan.io/testnet/transaction/${txHash}`
+  }
+
+  if (normalized.includes("polygon")) {
+    return `https://polygonscan.com/tx/${txHash}`
+  }
+
+  if (normalized.includes("solana")) {
+    return `https://solscan.io/tx/${txHash}`
+  }
+
+  return `https://hashscan.io/mainnet/transaction/${txHash}`
+}
+
 function toTransactionRecord(tx: PublicTransaction): TransactionRecord {
   return {
     hash: tx.tx_hash || shorten(tx.id),
@@ -40,7 +62,7 @@ function toTransactionRecord(tx: PublicTransaction): TransactionRecord {
     fromAddress: tx.fan_wallet_address,
     toAddress: tx.creator_id,
     explorerUrl: tx.tx_hash
-      ? `https://basescan.org/tx/${tx.tx_hash}`
+      ? getExplorerTransactionUrl(tx.network, tx.tx_hash)
       : undefined,
   }
 }

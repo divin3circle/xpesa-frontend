@@ -45,7 +45,7 @@ const recentTransactions: TransactionRecord[] = [
     amount: "$12.00",
     date: "Today, 11:42",
     hash: "0x9f...e2b",
-    network: "Base",
+    network: "Hedera",
     token: "USDC",
     blockNumber: 24561219,
     gasFee: "$0.03",
@@ -53,7 +53,7 @@ const recentTransactions: TransactionRecord[] = [
     status: "confirmed",
     fromAddress: "0x5A7B...F329",
     toAddress: "0x4D2B...A91e",
-    explorerUrl: "https://basescan.org",
+    explorerUrl: "https://hashscan.io/mainnet",
   },
   {
     link: "Product Design Teardown",

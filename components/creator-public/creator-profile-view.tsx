@@ -38,7 +38,7 @@ export function CreatorProfileView({
       <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_290px]">
         <CreatorHeroCard
           creator={creator}
-          primaryNetwork={analytics?.primaryNetwork ?? "Base"}
+          primaryNetwork={analytics?.primaryNetwork ?? "Hedera"}
         />
 
         {isAnalyticsLoading || !analytics ? (
@@ -57,7 +57,7 @@ export function CreatorProfileView({
             uniqueSupporters: 0,
             totalFeesUsdc: 0,
             totalRevenueUsdc: 0,
-            primaryNetwork: "Base",
+            primaryNetwork: "Hedera",
             averagePriceUsdc: 0,
             conversionRate: 0,
             topContentType: "N/A",

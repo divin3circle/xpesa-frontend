@@ -37,7 +37,15 @@ export const envConfig = {
   R2_ENDPOINT: process.env.R2_ENDPOINT || "",
   R2_BUCKET_NAME: process.env.R2_BUCKET_NAME || "",
   ENV: process.env.ENV || "DEV",
-  FEE: process.env.FEE || "5"
+  FEE: process.env.FEE || "5",
+  RPC_URL:
+    process.env.ENV === "DEV"
+      ? process.env.HEDERA_TESTNET_RPC_URL
+      : process.env.HEDERA_MAINNET_RPC_URL,
+  USDC_CONTRACT_ADDRESS:
+    process.env.ENV === "DEV"
+      ? process.env.TESTNET_USDC_CONTRACT_ADDRESS
+      : process.env.MAINNET_USDC_CONTRACT_ADDRESS,
 }
 
 export const client = createThirdwebClient({

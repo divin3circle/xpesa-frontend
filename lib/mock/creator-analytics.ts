@@ -30,7 +30,7 @@ const MOCK_TRANSACTION_DATA_BY_HANDLE: Record<
     uniqueSupporters: 14,
     totalFeesUsdc: 67.4,
     totalRevenueUsdc: 790,
-    primaryNetwork: "Base",
+    primaryNetwork: "Hedera",
   },
 }
 
@@ -88,7 +88,7 @@ export async function getCreatorAnalyticsMock(
     totalRevenueUsdc:
       mocked?.totalRevenueUsdc ??
       confirmedSales * Math.max(averagePriceUsdc, 1),
-    primaryNetwork: mocked?.primaryNetwork ?? "Base",
+    primaryNetwork: mocked?.primaryNetwork ?? "Hedera",
     averagePriceUsdc,
     conversionRate,
     topContentType: formatTopType(links),

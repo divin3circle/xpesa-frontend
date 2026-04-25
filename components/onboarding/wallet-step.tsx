@@ -11,9 +11,9 @@ import { useOnboardingStepGuard } from "@/components/onboarding/onboarding-step-
 import { useOnboarding } from "@/components/onboarding/onboarding-provider"
 import { IconInfoCircleFilled } from "@tabler/icons-react"
 import { ConnectButton, useActiveWallet } from "thirdweb/react"
-import { sepolia } from "thirdweb/chains"
 import { client } from "@/lib/utils"
 import { useTheme } from "next-themes"
+import { defaultChain } from "@/lib/thirdweb/account-abstraction"
 
 export function WalletStep() {
   useOnboardingStepGuard("wallet")
@@ -68,7 +68,7 @@ export function WalletStep() {
                 size: "compact",
               }}
               accountAbstraction={{
-                chain: sepolia,
+                chain: defaultChain,
                 sponsorGas: true,
               }}
               onConnect={() => {

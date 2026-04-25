@@ -8,6 +8,7 @@ export interface CreatorPublicProfile {
   handle: string
   bio: string | null
   avatar_url: string | null
+  wallet_address: string | null
 }
 
 export interface LinkPublic {
@@ -57,7 +58,7 @@ export async function GET(
 
     const { data: creator, error: creatorError } = await supabase
       .from("creators")
-      .select("id, display_name, handle, bio, avatar_url")
+      .select("id, display_name, handle, bio, avatar_url, wallet_address")
       .eq("handle", handle.toLowerCase())
       .eq("is_active", true)
       .single()

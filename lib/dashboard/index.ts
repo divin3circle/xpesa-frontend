@@ -4,7 +4,6 @@ import avax from "@/public/avax.svg"
 import pol from "@/public/pol.svg"
 import usdc from "@/public/usdc.svg"
 import usdt from "@/public/usdt.svg"
-import base from "@/public/base.svg"
 
 export const supportedTokens = [
   { name: "USDT", symbol: "USDT", icon: usdt.src },
@@ -25,8 +24,10 @@ export interface SupportedNetwork {
 
 export const supportedNetworks = [
   { name: "HederaEVM", symbol: "Hedera", icon: hbar.src },
+  { name: "Hedera", symbol: "Hedera", icon: hbar.src },
+  { name: "hedera-mainnet", symbol: "Hedera", icon: hbar.src },
+  { name: "hedera-testnet", symbol: "Hedera", icon: hbar.src },
   { name: "Avalanche", symbol: "Avalanche", icon: avax.src },
-  { name: "Base", symbol: "Base", icon: base.src },
   { name: "Solana", symbol: "Solana", icon: sol.src },
   { name: "Polygon", symbol: "Polygon", icon: pol.src },
 ]
