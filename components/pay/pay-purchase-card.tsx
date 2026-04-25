@@ -16,6 +16,7 @@ import { usePublicLink } from "@/hooks/use-public"
 import Image from "next/image"
 import { smartAccountConfig } from "@/lib/thirdweb/account-abstraction"
 import { PayButton } from "./pay-button"
+import { useTheme } from "next-themes"
 
 function formatUsdc(value: number | null) {
   if (!value || value <= 0) return "0.00"
@@ -31,6 +32,7 @@ export function PayPurchaseCard() {
   const linkId = params?.linkId
   const account = useActiveAccount()
   const [isPaying, setIsPaying] = useState(false)
+  const { theme } = useTheme();
 
   const { data, isLoading, error } = usePublicLink(linkId)
 
@@ -110,12 +112,23 @@ export function PayPurchaseCard() {
           {!account ? (
             <ConnectButton
               client={client}
+              theme={theme === "dark" ? "dark" : "light"}
               chain={PAYMENT_CHAIN}
               accountAbstraction={smartAccountConfig}
+              connectButton={{
+                label: "Connect to Pay",
+                style: {
+                  backgroundColor: theme === "dark" ? "#fff" : "#000",
+                  color: theme === "dark" ? "#000" : "#fff",
+                  width: "100%",
+                  marginBottom: "1rem",
+                  borderRadius: "20px",
+                }
+              }}
               connectModal={{
                 title: "Connect to pay",
                 titleIcon:
-                  "https://drive.google.com/file/d/16wm4ubk9361h8XHjSUc-YLSrhsRPKS9R/view?usp=sharing",
+                  "/logo.png",
               }}
             />
           ) : (

@@ -45,11 +45,6 @@ const engagementItems = [
     title: "Share",
     icon: Share01Icon,
   },
-  {
-    id: "dislike",
-    title: "Dislike",
-    icon: ThumbsDown,
-  },
 ]
 
 export function PayLinkPreviewCard() {
@@ -118,7 +113,7 @@ export function PayLinkPreviewCard() {
               {engagementItems.map((item) => (
                 <div
                   key={item.id}
-                  className="group flex cursor-pointer items-center gap-1 rounded-2xl bg-background/10 p-2 text-sm text-muted-foreground backdrop-blur-sm"
+                  className="group w-24 flex cursor-pointer items-center justify-center gap-1 rounded-2xl bg-background/10 p-2 text-sm text-muted-foreground backdrop-blur-sm"
                 >
                   <HugeiconsIcon
                     icon={item.icon}

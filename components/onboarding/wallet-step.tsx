@@ -67,10 +67,7 @@ export function WalletStep() {
                 titleIcon: "/logo.png",
                 size: "compact",
               }}
-              accountAbstraction={{
-                chain: defaultChain,
-                sponsorGas: true,
-              }}
+              chain={defaultChain}
               onConnect={() => {
                 setConnectedAddress(wallet?.getAccount()?.address || "")
               }}

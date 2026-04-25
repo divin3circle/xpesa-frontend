@@ -41,12 +41,15 @@ export const envConfig = {
   RPC_URL:
     process.env.ENV === "DEV"
       ? process.env.HEDERA_TESTNET_RPC_URL
-      : process.env.HEDERA_MAINNET_RPC_URL,
+      : process.env.HEDERA_MAINNET_RPC_URL || "https://testnet.hashio.io/api",
   USDC_CONTRACT_ADDRESS:
     process.env.ENV === "DEV"
       ? process.env.TESTNET_USDC_CONTRACT_ADDRESS
-      : process.env.MAINNET_USDC_CONTRACT_ADDRESS,
+      : process.env.MAINNET_USDC_CONTRACT_ADDRESS || "0x00000000000000000000000000000000006E4dc3",
 }
+
+export const HEDERA_HTS_ADDR = "0x0000000000000000000000000000000000000167";
+
 
 export const client = createThirdwebClient({
   clientId: envConfig.THIRDWEB_CLIENT_ID,

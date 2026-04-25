@@ -15,6 +15,7 @@ import { client } from "@/lib/utils"
 import { usePublicCreator } from "@/hooks/use-public"
 import { toast } from "sonner"
 import LoadingSpinner from "../ui/loading-spinner"
+import { useMyBalance } from "@/hooks/use-balance"
 
 const PLATFORM_WALLET = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS!
 
@@ -35,6 +36,7 @@ export function PayButton({
 }) {
   const router = useRouter()
   const { data, isLoading, error } = usePublicCreator(handle)
+  const { data:balance, isLoading:balanceIsLoading, error:balanceError } = useMyBalance(account)
 
   const creatorWalletAddress = data?.creator.wallet_address ?? ""
 
@@ -118,7 +120,7 @@ export function PayButton({
           router.push(`/view/${accessToken}`)
           break
         case "pack":
-          router.push(`/pack/${accessToken}`)
+          router.push(`/view/${accessToken}`)
           break
         case "tip":
           router.push(`/pay/${link.id}/thankyou?token=${accessToken}`)
@@ -135,6 +137,7 @@ export function PayButton({
   }
 
   return (
+   <>
     <button
       onClick={handlePay}
       disabled={isPaying || amount <= 0}
@@ -142,5 +145,9 @@ export function PayButton({
     >
       {isPaying ? "Processing..." : `Pay ${amount} USDC`}
     </button>
+    <p className="text-xs text-muted-foreground">My balance:{" "}
+      <span className="underline font-semibold cursor-pointer">{balanceIsLoading ? "*.**" : balanceError ? balance : balance} USDC</span>
+       </p>
+   </>
   )
 }
