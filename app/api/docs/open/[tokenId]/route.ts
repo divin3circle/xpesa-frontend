@@ -1,7 +1,10 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { Redis } from "@upstash/redis"
 import { verifyMessage } from "viem"
+import { GetObjectCommand } from "@aws-sdk/client-s3"
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
+import { r2, R2_BUCKET } from "@/lib/r2"
 import {
   getRequestIp,
   hashIp,
@@ -10,6 +13,18 @@ import {
 } from "@/lib/view-access"
 
 const redis = Redis.fromEnv()
+
+export interface PageAccessResponse {
+  title: string
+  pageCount: number | null
+  watermarkEnabled: boolean
+  downloadBlocked: boolean
+  linkId: string
+  requiredWallet: string
+  viewsRemaining: number | null
+  expiresIn: number | null
+  signedUrl: string
+}
 
 export async function POST(
   request: Request,
@@ -39,7 +54,7 @@ export async function POST(
   const { data: link, error: linkError } = await supabase
     .from("links")
     .select(
-      "title, document_page_count, doc_watermark_enabled, doc_download_blocked, access_ip_binding, access_max_views"
+      "title, document_page_count, doc_watermark_enabled, doc_download_blocked, access_ip_binding, access_max_views, document_r2_key"
     )
     .eq("id", token.link_id)
     .single()
@@ -90,6 +105,23 @@ export async function POST(
     })
     .eq("id", tokenId)
 
+  let signedUrl = ""
+  if (link.document_r2_key) {
+    try {
+      const command = new GetObjectCommand({
+        Bucket: R2_BUCKET,
+        Key: link.document_r2_key,
+      })
+      signedUrl = await getSignedUrl(r2, command, { expiresIn: 3600 })
+    } catch (err) {
+      console.error("Failed to generate signed URL", err)
+      return Response.json(
+        { error: "signed_url_generation_failed" },
+        { status: 500 }
+      )
+    }
+  }
+
   return Response.json({
     title: link.title,
     pageCount: link.document_page_count,
@@ -102,5 +134,6 @@ export async function POST(
         ? Math.max(token.max_views - (token.view_count ?? 0) - 1, 0)
         : null,
     expiresIn: null,
+    signedUrl,
   })
 }

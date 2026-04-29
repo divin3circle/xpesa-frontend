@@ -1,13 +1,30 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { Redis } from "@upstash/redis"
 import { verifyMessage } from "viem"
+import { GetObjectCommand } from "@aws-sdk/client-s3"
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
+import { r2, R2_BUCKET } from "@/lib/r2"
 import {
   getRequestIp,
   hashIp,
   normalizeAddress,
   withinGraceWindow,
 } from "@/lib/view-access"
+
+export interface PackAccessResponse {
+  title: string
+  files: {
+    id: string
+    original_filename: string
+    file_type: string
+    sort_order: number
+  }[]
+  watermarkEnabled: boolean
+  expiresAt: string | null
+  viewsRemaining: number | null
+  signedUrl: string
+}
 
 const redis = Redis.fromEnv()
 
@@ -39,7 +56,7 @@ export async function POST(
   const { data: link, error: linkError } = await supabase
     .from("links")
     .select(
-      "title, pack_file_count, pack_total_size_bytes, access_ip_binding, access_max_views"
+      "title, pack_file_count, pack_total_size_bytes, access_ip_binding, access_max_views, document_r2_key"
     )
     .eq("id", token.link_id)
     .single()
@@ -100,6 +117,23 @@ export async function POST(
     return Response.json({ error: "pack_files_query_error" }, { status: 500 })
   }
 
+  let packSignedUrl = ""
+  if (link.document_r2_key) {
+    try {
+      const command = new GetObjectCommand({
+        Bucket: R2_BUCKET,
+        Key: link.document_r2_key,
+      })
+      packSignedUrl = await getSignedUrl(r2, command, { expiresIn: 3600 })
+    } catch (err) {
+      console.error("Failed to generate pack signed URL", err)
+      return Response.json(
+        { error: "signed_url_generation_failed" },
+        { status: 500 }
+      )
+    }
+  }
+
   return Response.json({
     title: link.title,
     files: packFiles ?? [],
@@ -109,5 +143,6 @@ export async function POST(
       typeof token.max_views === "number"
         ? Math.max(token.max_views - (token.view_count ?? 0) - 1, 0)
         : null,
+    signedUrl: packSignedUrl,
   })
 }

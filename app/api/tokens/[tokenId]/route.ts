@@ -3,6 +3,26 @@ import { Redis } from "@upstash/redis"
 
 const redis = Redis.fromEnv()
 
+export interface TokenResponse {
+  token: {
+    id: string
+    fanWalletAddress: string
+    expiresAt: string
+  }
+  link: {
+    id: string
+    type: "document" | "pack"
+    title: string
+    description: string | null
+  }
+  files: {
+    id: string
+    name: string
+    type: "document" | "pack" | "gate" | "tip"
+    size: string
+  }[]
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ tokenId: string }> }
@@ -42,20 +62,27 @@ export async function GET(
       .select("id, original_filename, file_type, file_size_bytes")
       .eq("link_id", link.id)
       .order("sort_order", { ascending: true })
-    
-    files = packFiles?.map(f => ({
-      id: f.id,
-      name: f.original_filename,
-      type: f.file_type,
-      size: f.file_size_bytes ? `${(f.file_size_bytes / 1024 / 1024).toFixed(1)} MB` : "Unknown"
-    })) || []
+
+    files =
+      packFiles?.map((f) => ({
+        id: f.id,
+        name: f.original_filename,
+        type: f.file_type,
+        size: f.file_size_bytes
+          ? `${(f.file_size_bytes / 1024 / 1024).toFixed(1)} MB`
+          : "Unknown",
+      })) || []
   } else if (link.type === "document") {
-    files = [{
-      id: link.id,
-      name: link.title,
-      type: "pdf", // Default for document type
-      size: link.document_file_size_bytes ? `${(link.document_file_size_bytes / 1024 / 1024).toFixed(1)} MB` : "Unknown"
-    }]
+    files = [
+      {
+        id: link.id,
+        name: link.title,
+        type: "pdf", // Default for document type
+        size: link.document_file_size_bytes
+          ? `${(link.document_file_size_bytes / 1024 / 1024).toFixed(1)} MB`
+          : "Unknown",
+      },
+    ]
   }
 
   return Response.json({
@@ -70,6 +97,6 @@ export async function GET(
       title: link.title,
       description: link.description,
     },
-    files
+    files,
   })
 }
