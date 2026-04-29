@@ -36,6 +36,7 @@ export async function POST(
 
   const cached = await redis.get(`access:${tokenId}`)
   if (!cached) {
+    console.warn(`Access token ${tokenId} not found in cache`)
     return Response.json({ error: "expired" }, { status: 403 })
   }
 

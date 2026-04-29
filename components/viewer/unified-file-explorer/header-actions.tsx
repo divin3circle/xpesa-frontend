@@ -39,9 +39,13 @@ export function HeaderActions({
       </div>
       <div className="flex gap-3">
         {!isAuthorized && !isWrongWallet && (
-          <Button onClick={onConfirm} className="rounded-xl shadow-none">
+          <Button
+            onClick={onConfirm}
+            className="rounded-xl shadow-none"
+            disabled={isAuthorizing}
+          >
             <HugeiconsIcon icon={CheckmarkBadge01Icon} />
-            Confirm Access
+            {isAuthorizing ? "Confirming..." : "Confirm Access"}
           </Button>
         )}
         {isAuthorized && onDownload && (
