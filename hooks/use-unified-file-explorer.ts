@@ -36,6 +36,7 @@ export function useUnifiedFileExplorer(fanWalletAddress: string) {
     tokenId: string
     onOpen?: (file: FileItem) => void
   }) {
+    console.log("File clicked:", file)
     if (!account?.address) {
       toast.error("Please connect your wallet first")
       return

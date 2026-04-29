@@ -175,25 +175,27 @@ export function UnifiedFileExplorer({
         isAuthorized={isAuthorized}
       />
 
-      <section className="my-12">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-sans text-xl font-semibold">
-            {linkType === "pack" ? "Folder Contents" : "Included Assets"}
-          </h2>
-        </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {files.map((file) => (
-            <div key={file.id}>
-              <FileCard
-                file={file}
-                onClick={(clickedFile) =>
-                  handleFileClick({ file: clickedFile, tokenId, onOpen })
-                }
-              />
-            </div>
-          ))}
-        </div>
-      </section>
+      {isAuthorized && files.length === 0 && (
+        <section className="my-12">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="font-sans text-xl font-semibold">
+              {linkType === "pack" ? "Folder Contents" : "Included Assets"}
+            </h2>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {files.map((file) => (
+              <div key={file.id}>
+                <FileCard
+                  file={file}
+                  onClick={(clickedFile) =>
+                    handleFileClick({ file: clickedFile, tokenId, onOpen })
+                  }
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {viewingFileUrl && selectedFile && (
         <PdfOverlay
