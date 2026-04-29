@@ -11,6 +11,7 @@ import {
   type PublicTransaction,
   useTransactionsByLinkId,
 } from "@/hooks/use-transactions"
+import { Skeleton } from "../ui/skeleton"
 
 function shorten(value: string) {
   if (value.length <= 12) return value
@@ -67,6 +68,28 @@ function toTransactionRecord(tx: PublicTransaction): TransactionRecord {
   }
 }
 
+function TxnsLoadingSkeleton() {
+  return (
+    <div className="flex flex-col justify-between gap-4 rounded-4xl border border-border/70 bg-transparent p-4 md:flex-row md:items-center md:gap-0 md:p-6">
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-50" />
+        <Skeleton className="h-3 w-75" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-1">
+          <Skeleton className="h-8 w-8 rounded-full" />
+          <Skeleton className="h-3 w-20" />
+        </div>
+        <Skeleton className="h-3 w-12" />
+      </div>
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-50" />
+        <Skeleton className="h-3 w-75" />
+      </div>
+    </div>
+  )
+}
+
 export function PayLinkTransactions() {
   const params = useParams<{ linkId: string }>()
   const linkId = params?.linkId
@@ -78,6 +101,16 @@ export function PayLinkTransactions() {
     [data?.transactions]
   )
 
+  if (isLoading) {
+    return (
+      <>
+        <TxnsLoadingSkeleton />
+        <TxnsLoadingSkeleton />
+        <TxnsLoadingSkeleton />
+      </>
+    )
+  }
+
   const description = isLoading
     ? "Loading link transaction history..."
     : "Last transactions for this specific link"
@@ -87,7 +120,7 @@ export function PayLinkTransactions() {
       title="Link transactions"
       description={description}
       transactions={transactions}
-      historyHref="/dashboard/wallet/history"
+      historyHref={`/pay/${linkId}/transactions`}
       className="border border-border/70 bg-card/25"
     />
   )
