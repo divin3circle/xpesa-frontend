@@ -40,6 +40,7 @@ function truncateWallet(wallet: string) {
 
 export function useViewDocumentSession(tokenId?: string) {
   const [walletAddress, setWalletAddress] = useState("")
+  const [signingWalletAddress, setSigningWalletAddress] = useState("")
   const [signature, setSignature] = useState("")
   const [signingState, setSigningState] = useState<DocumentSigningState>("idle")
   const [status, setStatus] = useState<"idle" | "loading" | "ready">("idle")
@@ -64,13 +65,18 @@ export function useViewDocumentSession(tokenId?: string) {
       tokenId,
     }: {
       walletAddress: string
+      signingWalletAddress: string
       signature: string
       tokenId: string
     }) => {
       const openRes = await fetch(`/api/docs/open/${tokenId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress, signature }),
+        body: JSON.stringify({
+          walletAddress,
+          signingWalletAddress,
+          signature,
+        }),
       })
 
       const openData = (await openRes.json()) as OpenResponse
@@ -87,7 +93,12 @@ export function useViewDocumentSession(tokenId?: string) {
       const pagesRes = await fetch(`/api/docs/pages/${tokenId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ walletAddress, signature, pageNums }),
+        body: JSON.stringify({
+          walletAddress,
+          signingWalletAddress,
+          signature,
+          pageNums,
+        }),
       })
 
       const pagesData = (await pagesRes.json()) as {
@@ -119,6 +130,9 @@ export function useViewDocumentSession(tokenId?: string) {
       })
 
       setWalletAddress(signed.walletAddress)
+      setSigningWalletAddress(
+        signed.signingWalletAddress ?? signed.walletAddress
+      )
       setSignature(signed.signature)
       setSigningState("signed")
       toast.success("Session signed", {
@@ -142,6 +156,7 @@ export function useViewDocumentSession(tokenId?: string) {
     try {
       const { openData, pages } = await openDocumentMutation.mutateAsync({
         walletAddress,
+        signingWalletAddress,
         signature,
         tokenId,
       })

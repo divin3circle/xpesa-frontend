@@ -5,12 +5,7 @@ import { GetObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
 import { r2, R2_BUCKET } from "@/lib/r2"
-import {
-  getRequestIp,
-  hashIp,
-  normalizeAddress,
-  withinGraceWindow,
-} from "@/lib/view-access"
+import { normalizeAddress } from "@/lib/view-access"
 
 const redis = Redis.fromEnv()
 
@@ -32,12 +27,22 @@ export async function POST(
 ) {
   const supabase = createAdminClient()
   const { tokenId } = await params
-  const { walletAddress, signature } = await request.json()
+  const { walletAddress, signingWalletAddress, signature } = await request.json()
+
+  if (!walletAddress || !signature) {
+    return Response.json(
+      { error: "Missing wallet address or signature" },
+      { status: 400 }
+    )
+  }
 
   const cached = await redis.get(`access:${tokenId}`)
   if (!cached) {
-    console.warn(`Access token ${tokenId} not found in cache`)
-    return Response.json({ error: "expired" }, { status: 403 })
+    console.warn(`[docs/open] Access token ${tokenId} not found in Redis cache`)
+    return Response.json(
+      { error: "expired", detail: "token_not_in_cache" },
+      { status: 403 }
+    )
   }
 
   const { data: token, error } = await supabase
@@ -49,7 +54,11 @@ export async function POST(
     .single()
 
   if (error || !token) {
-    return Response.json({ error: "not_found" }, { status: 404 })
+    console.warn(`[docs/open] Token ${tokenId} not found in DB`, error)
+    return Response.json(
+      { error: "Not found", detail: "Your token not found in our systems." },
+      { status: 404 }
+    )
   }
 
   const { data: link, error: linkError } = await supabase
@@ -61,11 +70,18 @@ export async function POST(
     .single()
 
   if (linkError || !link) {
-    return Response.json({ error: "not_found" }, { status: 404 })
+    console.warn(`[docs/open] Link ${token.link_id} not found in DB`, linkError)
+    return Response.json(
+      { error: "not_found", detail: "link_not_found" },
+      { status: 404 }
+    )
   }
 
+  const verificationAddress =
+    (signingWalletAddress ?? walletAddress) as `0x${string}`
+
   const isValidSignature = await verifyMessage({
-    address: walletAddress as `0x${string}`,
+    address: verificationAddress,
     message: `xpesa-open:${tokenId}`,
     signature: signature as `0x${string}`,
   })
@@ -75,27 +91,25 @@ export async function POST(
     normalizeAddress(walletAddress) !==
       normalizeAddress(token.fan_wallet_address)
   ) {
+    console.warn(
+      `[docs/open] Signature or wallet mismatch for token ${tokenId}`,
+      {
+        isValidSignature,
+        providedWallet: walletAddress,
+        requiredWallet: token.fan_wallet_address,
+      }
+    )
     return Response.json(
       {
-        error: "wrong_wallet",
+        error: "Wrong wallet",
         requiredWallet: token.fan_wallet_address,
       },
       { status: 403 }
     )
   }
 
-  if (token.bound_ip_hash) {
-    const requestIp = getRequestIp(request)
-    const currentIpHash = hashIp(requestIp)
-    const ipChanged = currentIpHash !== token.bound_ip_hash
-
-    if (ipChanged && !withinGraceWindow(token.last_accessed_at)) {
-      return Response.json({ error: "ip_mismatch" }, { status: 403 })
-    }
-  }
-
   if (token.max_views && token.view_count >= token.max_views) {
-    return Response.json({ error: "view_limit_reached" }, { status: 403 })
+    return Response.json({ error: "View limit reached" }, { status: 403 })
   }
 
   await supabase

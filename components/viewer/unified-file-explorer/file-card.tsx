@@ -16,7 +16,7 @@ interface Props {
   idx?: number
 }
 
-function getFileIcon(fileName: string): string {
+export function getFileIcon(fileName: string): string {
   const ext = fileName.split(".").pop()?.toLowerCase()
 
   switch (ext) {

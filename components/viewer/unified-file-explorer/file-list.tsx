@@ -2,10 +2,13 @@
 
 import React from "react"
 import { Input } from "@/components/ui/input"
-import { IconSearch, IconFilter, IconDotsVertical } from "@tabler/icons-react"
+import { IconSearch, IconFilter } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { FileItem } from "@/hooks/use-unified-file-explorer"
 import Image from "next/image"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { Download01FreeIcons } from "@hugeicons/core-free-icons"
+import { getFileIcon } from "./file-card"
 
 interface Props {
   files: FileItem[]
@@ -35,9 +38,7 @@ export function FileList({ files, onFileClick, isAuthorized }: Props) {
   return (
     <>
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h2 className="font-heading text-sm font-bold tracking-wider text-muted-foreground uppercase">
-          All Files
-        </h2>
+        <h2 className="font-sans text-xl font-semibold">All Files</h2>
         <div className="flex items-center gap-3">
           <div className="relative">
             <IconSearch className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -56,7 +57,7 @@ export function FileList({ files, onFileClick, isAuthorized }: Props) {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl shadow-sm">
+      <div className="overflow-hidden rounded-2xl border border-border/70">
         <table className="w-full text-left text-sm">
           <thead>
             <tr className="border-b border-border/70 text-muted-foreground">
@@ -74,18 +75,19 @@ export function FileList({ files, onFileClick, isAuthorized }: Props) {
             {files.map((file) => (
               <tr
                 key={file.id}
-                className="group cursor-pointer transition-colors hover:bg-[#F9FAFB]"
+                className="group cursor-pointer transition-colors hover:bg-border/70"
                 onClick={() => onFileClick(file)}
               >
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="rounded-lg bg-[#F3F4F6] p-2">
-                      {/* small icon placeholder */}
-                      <span className="inline-block h-5 w-5 bg-slate-200" />
-                    </div>
-                    <span className="font-medium text-[#111827]">
-                      {file.name}
-                    </span>
+                    <Image
+                      src={getFileIcon(file.type)}
+                      alt={getFileIcon(file.name)}
+                      width={64}
+                      height={64}
+                      className="h-8 w-8 rounded-md"
+                    />
+                    <span className="font-medium">{file.name}</span>
                   </div>
                 </td>
                 <td className="hidden px-6 py-4 text-muted-foreground md:table-cell">
@@ -98,9 +100,9 @@ export function FileList({ files, onFileClick, isAuthorized }: Props) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 rounded-lg opacity-0 group-hover:opacity-100"
+                    className="h-8 w-8 rounded-lg opacity-100 group-hover:opacity-100 md:opacity-0"
                   >
-                    <IconDotsVertical className="h-4 w-4" />
+                    <HugeiconsIcon icon={Download01FreeIcons} />
                   </Button>
                 </td>
               </tr>

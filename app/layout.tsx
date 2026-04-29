@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { ThirdwebProvider } from "thirdweb/react"
 import { AppQueryClientProvider } from "@/components/query-client-provider"
+import { FanWalletProvider } from "@/components/fan-wallet-context"
 
 const oxaniumHeading = Oxanium({
   subsets: ["latin"],
@@ -48,22 +49,24 @@ export default function RootLayout({
       <body>
         <AppQueryClientProvider>
           <ThirdwebProvider>
-            <TooltipProvider>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="system"
-                enableSystem
-                disableTransitionOnChange
-              >
-                {children}
-                <Toaster
-                  position="top-right"
-                  toastOptions={{
-                    className: "rounded-2xl font-semibold font-sans",
-                  }}
-                />
-              </ThemeProvider>
-            </TooltipProvider>
+            <FanWalletProvider>
+              <TooltipProvider>
+                <ThemeProvider
+                  attribute="class"
+                  defaultTheme="system"
+                  enableSystem
+                  disableTransitionOnChange
+                >
+                  {children}
+                  <Toaster
+                    position="top-right"
+                    toastOptions={{
+                      className: "rounded-2xl font-semibold font-sans",
+                    }}
+                  />
+                </ThemeProvider>
+              </TooltipProvider>
+            </FanWalletProvider>
           </ThirdwebProvider>
         </AppQueryClientProvider>
       </body>

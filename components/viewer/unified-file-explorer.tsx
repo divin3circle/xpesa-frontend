@@ -1,9 +1,8 @@
 "use client"
 
+import { useState, useEffect, useRef } from "react"
 import { motion } from "framer-motion"
-import { IconStar } from "@tabler/icons-react"
 import { toast } from "sonner"
-import { Button } from "@/components/ui/button"
 import {
   useUnifiedFileExplorer,
   type FileItem,
@@ -15,6 +14,10 @@ import { FileCard } from "./unified-file-explorer/file-card"
 import { FileList } from "./unified-file-explorer/file-list"
 import { PdfOverlay } from "./unified-file-explorer/pdf-overlay"
 import { useUnlockToken } from "@/hooks/use-unlock-token"
+import { FanWalletConnectModal } from "@/components/fan-wallet-connect-modal"
+import { useFanWalletContext } from "@/components/fan-wallet-context"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { StarAward01FreeIcons } from "@hugeicons/core-free-icons"
 
 interface UnifiedFileExplorerProps {
   tokenId: string
@@ -31,6 +34,19 @@ export function UnifiedFileExplorer({
   linkType,
   fanWalletAddress,
 }: UnifiedFileExplorerProps) {
+  const [showFanConnectModal, setShowFanConnectModal] = useState(false)
+  const hasShownModalRef = useRef(false)
+  const { fanSmartAccountAddress } = useFanWalletContext()
+
+  useEffect(() => {
+    if (!fanSmartAccountAddress && !hasShownModalRef.current) {
+      hasShownModalRef.current = true
+      queueMicrotask(() => {
+        setShowFanConnectModal(true)
+      })
+    }
+  }, [fanSmartAccountAddress])
+
   const {
     account,
     selectedFile,
@@ -40,12 +56,21 @@ export function UnifiedFileExplorer({
     setIsAuthorized,
   } = useUnifiedFileExplorer(fanWalletAddress)
 
-  const unlock = useUnlockToken(tokenId, linkType)
+  const effectiveFanAddress = fanSmartAccountAddress || fanWalletAddress
+
+  const unlock = useUnlockToken(tokenId, linkType, effectiveFanAddress)
   const { storeContent } = useUnlockedContent()
 
   async function handleConfirm() {
+    if (!fanSmartAccountAddress) {
+      setShowFanConnectModal(true)
+      return
+    }
+
     if (isWrongWallet) {
-      toast.error("Please switch to the correct wallet to continue")
+      toast.error(
+        "Wrong wallet. Please disconnect and reconnect with the correct account."
+      )
       return
     }
 
@@ -106,32 +131,30 @@ export function UnifiedFileExplorer({
 
   return (
     <div className="min-h-screen p-6 lg:p-10">
-      {isWrongWallet && (
+      <FanWalletConnectModal
+        isOpen={showFanConnectModal}
+        onClose={() => setShowFanConnectModal(false)}
+      />
+
+      {!fanSmartAccountAddress && (
         <motion.div
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: "auto", opacity: 1 }}
           className="mb-8 overflow-hidden"
         >
-          <div className="flex items-center justify-between rounded-2xl border border-border/70 bg-background/50 p-4 shadow-sm">
+          <div className="flex items-center justify-between rounded-2xl border border-border/70 bg-background/50 p-4">
             <div className="flex items-center gap-3">
               <div className="rounded-full p-2">
-                <IconStar className="h-5 w-5" />
+                <HugeiconsIcon icon={StarAward01FreeIcons} />
               </div>
               <div>
-                <p className="text-sm font-semibold">Wrong Wallet Connected</p>
-                <p className="text-xs text-amber-700">
-                  This content was purchased by{" "}
-                  <span className="font-mono">
-                    {fanWalletAddress.slice(0, 6)}...
-                    {fanWalletAddress.slice(-4)}
-                  </span>
-                  . Please switch accounts to view.
+                <p className="text-sm font-semibold">Connect Fan Wallet</p>
+                <p className="text-xs text-muted-foreground">
+                  Connect your wallet to verify ownership and access this
+                  content
                 </p>
               </div>
             </div>
-            <Button size="sm" variant="outline" className="rounded-xl">
-              Switch Account
-            </Button>
           </div>
         </motion.div>
       )}

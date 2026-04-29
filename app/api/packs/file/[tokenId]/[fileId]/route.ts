@@ -21,7 +21,8 @@ export async function POST(
 ) {
   const supabase = createAdminClient()
   const { tokenId, fileId } = await params
-  const { walletAddress, signature } = await request.json()
+  const { walletAddress, signingWalletAddress, signature } =
+    await request.json()
 
   const cached = await redis.get(`access:${tokenId}`)
   if (!cached) {
@@ -40,8 +41,11 @@ export async function POST(
     return Response.json({ error: "not_found" }, { status: 404 })
   }
 
+  const verificationAddress = (signingWalletAddress ??
+    walletAddress) as `0x${string}`
+
   const isValidSignature = await verifyMessage({
-    address: walletAddress as `0x${string}`,
+    address: verificationAddress,
     message: `xpesa-open:${tokenId}`,
     signature: signature as `0x${string}`,
   })

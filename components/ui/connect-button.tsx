@@ -28,7 +28,7 @@ function UIConnectButton() {
           disconnect(wallet)
         } else {
           connect(async () => {
-            const metamask = createWallet("io.metamask") // autocomplete the wallet id
+            const metamask = createWallet("io.metamask")
             await metamask.connect({ client })
             return metamask
           })

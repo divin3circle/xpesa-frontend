@@ -38,11 +38,11 @@ export function HeaderActions({
         </p>
       </div>
       <div className="flex gap-3">
-        {!isAuthorized && !isWrongWallet && (
+        {!isAuthorized && (
           <Button
             onClick={onConfirm}
             className="rounded-xl shadow-none"
-            disabled={isAuthorizing}
+            disabled={isAuthorizing || isWrongWallet}
           >
             <HugeiconsIcon icon={CheckmarkBadge01Icon} />
             {isAuthorizing ? "Confirming..." : "Confirm Access"}

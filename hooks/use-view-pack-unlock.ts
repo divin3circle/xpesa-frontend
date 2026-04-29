@@ -35,6 +35,7 @@ export function useViewPackUnlock(tokenId?: string) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           walletAddress: signed.walletAddress,
+          signingWalletAddress: signed.signingWalletAddress,
           signature: signed.signature,
         }),
       })
