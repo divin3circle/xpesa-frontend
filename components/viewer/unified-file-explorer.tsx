@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion"
 import { IconStar } from "@tabler/icons-react"
+import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   useUnifiedFileExplorer,
@@ -43,14 +44,20 @@ export function UnifiedFileExplorer({
   const { storeContent } = useUnlockedContent()
 
   async function handleConfirm() {
+    if (isWrongWallet) {
+      toast.error("Please switch to the correct wallet to continue")
+      return
+    }
+
     try {
       const response = await unlock.mutateAsync()
       storeContent(response)
       setIsAuthorized(true)
+      toast.success("Access granted!")
     } catch (err: unknown) {
       console.error("unlock error", err)
       const msg = err instanceof Error ? err.message : String(err)
-      alert(msg || "Failed to confirm access")
+      toast.error(msg || "Failed to confirm access")
     }
   }
 
@@ -60,12 +67,12 @@ export function UnifiedFileExplorer({
   function onOpen(file: FileItem) {
     if (!unlockedContent) {
       console.warn("Content not unlocked yet")
+      toast.warning("Please confirm access to view this file")
       return
     }
 
     let signedUrl: string | null = null
 
-    // Check if it's document content (has signedUrl directly)
     if ("pageCount" in unlockedContent) {
       signedUrl = unlockedContent.signedUrl
     }
@@ -89,7 +96,6 @@ export function UnifiedFileExplorer({
       return
     }
 
-    // Create a temporary link and trigger download
     const link = document.createElement("a")
     link.href = packUrl
     link.download = `${unlockedContent.title}.zip` || "pack.zip"
@@ -140,36 +146,31 @@ export function UnifiedFileExplorer({
         isAuthorizing={unlock.isAuthorizing}
       />
 
-      <section className="mb-12">
+      <FileList
+        files={files}
+        onFileClick={(file) => handleFileClick({ file, tokenId, onOpen })}
+        isAuthorized={isAuthorized}
+      />
+
+      <section className="my-12">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-heading text-sm font-bold tracking-wider text-muted-foreground uppercase">
-            {linkType === "pack" ? "Folder Contents" : "Asset Preview"}
+          <h2 className="font-sans text-xl font-semibold">
+            {linkType === "pack" ? "Folder Contents" : "Included Assets"}
           </h2>
         </div>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {files.map((file) => (
-            <motion.div
-              key={file.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ y: -4 }}
-            >
+            <div key={file.id}>
               <FileCard
                 file={file}
                 onClick={(clickedFile) =>
                   handleFileClick({ file: clickedFile, tokenId, onOpen })
                 }
               />
-            </motion.div>
+            </div>
           ))}
         </div>
       </section>
-
-      <FileList
-        files={files}
-        onFileClick={(file) => handleFileClick({ file, tokenId, onOpen })}
-        isAuthorized={isAuthorized}
-      />
 
       {viewingFileUrl && selectedFile && (
         <PdfOverlay

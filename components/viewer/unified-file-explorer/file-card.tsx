@@ -1,10 +1,8 @@
 "use client"
 
-import React from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { IconFolder, IconPdf, IconFile, IconPhoto } from "@tabler/icons-react"
-import { cn } from "@/lib/utils"
+import Image from "next/image"
 
 type FileItem = {
   id: string
@@ -18,29 +16,47 @@ interface Props {
   idx?: number
 }
 
-function getFileIcon(fileName: string) {
+function getFileIcon(fileName: string): string {
   const ext = fileName.split(".").pop()?.toLowerCase()
-  if (ext === "pdf")
-    return <IconPdf className={cn("h-5 w-5", "text-rose-500")} />
-  if (ext === "docx" || ext === "doc")
-    return <IconFile className={cn("h-5 w-5", "text-blue-500")} />
-  if (["jpg", "jpeg", "png", "webp"].includes(ext || ""))
-    return <IconPhoto className={cn("h-5 w-5", "text-emerald-500")} />
-  return <IconFolder className={cn("h-10 w-10", "text-chart-1")} />
+
+  switch (ext) {
+    case "pdf":
+      return "/pdf.avif"
+    case "docx":
+      return "/docx.avif"
+    case "jpg":
+    case "jpeg":
+    case "png":
+    case "gif":
+      return "/image.avif"
+    case "zip":
+      return "/zip.avif"
+    default:
+      return "/unknown.avif"
+  }
 }
 
-export function FileCard({ file, onClick, idx = 0 }: Props) {
+export function FileCard({ file, onClick }: Props) {
   return (
-    <div onClick={() => onClick(file)} className="group cursor-pointer">
-      <Card className="overflow-hidden border-none shadow-sm transition-shadow hover:shadow-md">
+    <div onClick={() => onClick(file)} className="group">
+      <Card className="cursor-pointer overflow-hidden border-none">
         <CardContent className="p-0">
-          <div className="flex aspect-square flex-col items-center justify-center p-10">
-            <div className="relative">{getFileIcon(file.name)}</div>
+          <div className="flex flex-col items-start justify-center px-4">
+            <Image
+              src={getFileIcon(file.type)}
+              alt={getFileIcon(file.name)}
+              width={64}
+              height={64}
+              className="rounded-md"
+            />
           </div>
-          <div className="flex items-center justify-between p-4">
+          <div className="-mt-2 flex flex-col items-start justify-between p-4">
             <span className="truncate font-medium">{file.name}</span>
-            <Badge variant="secondary" className="text-[#6B7280]">
-              {file.name.split(".").pop()?.toUpperCase()}
+            <Badge
+              variant="secondary"
+              className="text-xs text-muted-foreground"
+            >
+              {file.type}
             </Badge>
           </div>
         </CardContent>
