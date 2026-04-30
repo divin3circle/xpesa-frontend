@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react"
 import { useActiveAccount } from "thirdweb/react"
 import { toast } from "sonner"
+import { getErrorMessage } from "@/lib/utils"
 
 export type FileItem = {
   id: string
@@ -46,12 +47,14 @@ export function useUnifiedFileExplorer(fanWalletAddress: string) {
     setIsAuthenticating(true)
 
     try {
-      const msg = `xpesa-open:${tokenId}`
       toast.info(`Opening ${file.name}...`)
       onOpen?.(file)
     } catch (err) {
-      toast.error("Failed to open file")
+      toast.error("Failed to open file", {
+        description: getErrorMessage(err),
+      })
     } finally {
+      console.log(tokenId)
       setIsAuthenticating(false)
     }
   }

@@ -1,16 +1,20 @@
 "use client"
 
 import React, { useEffect } from "react"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { UnifiedFileExplorer } from "@/components/viewer/unified-file-explorer"
 import { Skeleton } from "@/components/ui/skeleton"
 import { toast } from "sonner"
 import { getErrorMessage } from "@/lib/utils"
 import { useTokenDetails } from "@/hooks/use-token-details"
+import { Button } from "@/components/ui/button"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { ArrowLeft01FreeIcons } from "@hugeicons/core-free-icons"
 
 export default function ViewTokenPage() {
   const params = useParams<{ tokenId: string }>()
   const tokenId = params?.tokenId
+  const router = useRouter()
 
   const { data, isLoading, error } = useTokenDetails(tokenId)
 
@@ -23,8 +27,8 @@ export default function ViewTokenPage() {
     return (
       <div className="min-h-screen space-y-8 p-10">
         <div className="space-y-2">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-4 w-48" />
+          <Skeleton className="h-4 w-64" />
+          <Skeleton className="h-3 w-48" />
         </div>
         <div className="grid grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
@@ -46,6 +50,14 @@ export default function ViewTokenPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold">Access Denied</h1>
           <p className="text-red-500">{errorMessage}</p>
+          <Button
+            variant="outline"
+            className="mt-4 flex items-center gap-1"
+            onClick={() => router.back()}
+          >
+            <HugeiconsIcon icon={ArrowLeft01FreeIcons} />
+            Go Back
+          </Button>
         </div>
       </div>
     )

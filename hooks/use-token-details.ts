@@ -1,7 +1,6 @@
 "use client"
 
 import { useQuery } from "@tanstack/react-query"
-import { getErrorMessage } from "@/lib/utils"
 import type { TokenResponse } from "@/app/api/tokens/[tokenId]/route"
 
 async function getTokenDetails(tokenId: string): Promise<TokenResponse> {

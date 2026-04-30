@@ -63,7 +63,7 @@ export async function GET(
     {
       id: link.id,
       name: link.title,
-      type: "zip",
+      type: link.type === "document" ? "pdf" : "zip",
       size: link.document_file_size_bytes
         ? `${(link.document_file_size_bytes / 1024 / 1024).toFixed(1)} MB`
         : "Unknown",
