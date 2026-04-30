@@ -70,7 +70,7 @@ export const audienceContent = {
       imageSrc: coachesImage.src,
       imageAlt: "Coach consulting a client",
       bgColor: "transparent",
-      text: "background",
+      text: "foreground",
     },
   ] as AudienceArchetype[],
 }

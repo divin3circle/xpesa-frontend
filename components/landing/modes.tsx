@@ -89,16 +89,16 @@ export function ModesSection() {
           transition={{ duration: 0.45, ease: "easeOut" }}
           className="mb-10 flex flex-col items-start gap-4 md:max-w-2xl"
         >
-          <Badge variant="outline" className="font-sans text-background/90">
+          <Badge variant="outline" className="font-sans text-foreground/90">
             Two modes
           </Badge>
           <AsteriskRevealHeading
             as="h2"
             delayMs={800}
             text="Gate a link or accept tips"
-            className="font-heading text-3xl font-bold tracking-tight text-background md:text-5xl"
+            className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-5xl"
           />
-          <p className="font-sans text-base leading-relaxed text-background/75 md:text-lg">
+          <p className="font-sans text-base leading-relaxed text-foreground/75 md:text-lg">
             Keep it simple for fans: they either pay to open something specific,
             or they send appreciation directly to you.
           </p>
@@ -130,13 +130,13 @@ export function ModesSection() {
                 <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
                   {gateMode.eyebrow}
                 </p>
-                <h3 className="font-heading text-2xl font-semibold text-background">
+                <h3 className="font-heading text-2xl font-semibold text-foreground">
                   {gateMode.label}
                 </h3>
               </div>
             </div>
 
-            <p className="max-w-xl font-sans text-base leading-relaxed text-background/75">
+            <p className="max-w-xl font-sans text-base leading-relaxed text-foreground/75">
               {gateMode.title}
             </p>
 
@@ -146,14 +146,14 @@ export function ModesSection() {
                   {gateMode.bullets.map((bullet) => (
                     <li
                       key={bullet}
-                      className="flex items-start gap-2 text-sm text-background/75"
+                      className="flex items-start gap-2 text-sm text-foreground/75"
                     >
                       <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-chart-1" />
                       <span>{bullet}</span>
                     </li>
                   ))}
                 </ul>
-                <p className="mt-5 text-sm leading-relaxed text-background/55">
+                <p className="mt-5 text-sm leading-relaxed text-foreground/55">
                   {gateMode.description}
                 </p>
               </div>
@@ -186,13 +186,13 @@ export function ModesSection() {
                 <p className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
                   {tipMode.eyebrow}
                 </p>
-                <h3 className="font-heading text-2xl font-semibold text-background">
+                <h3 className="font-heading text-2xl font-semibold text-foreground">
                   {tipMode.label}
                 </h3>
               </div>
             </div>
 
-            <p className="max-w-xl font-sans text-base leading-relaxed text-background/75">
+            <p className="max-w-xl font-sans text-base leading-relaxed text-foreground/75">
               {tipMode.title}
             </p>
 
@@ -202,14 +202,14 @@ export function ModesSection() {
                   {tipMode.bullets.map((bullet) => (
                     <li
                       key={bullet}
-                      className="flex items-start gap-2 text-sm text-background/75"
+                      className="flex items-start gap-2 text-sm text-foreground/75"
                     >
                       <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-chart-1" />
                       <span>{bullet}</span>
                     </li>
                   ))}
                 </ul>
-                <p className="mt-5 text-sm leading-relaxed text-background/55">
+                <p className="mt-5 text-sm leading-relaxed text-foreground/55">
                   {tipMode.description}
                 </p>
               </div>

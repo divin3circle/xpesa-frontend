@@ -61,7 +61,7 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
       >
         <div
           className={cn(
-            "relative z-10 flex h-64 flex-col rounded-2xl border border-background/10 p-6",
+            "relative z-10 flex h-64 flex-col rounded-2xl border border-foreground/10 p-6",
             `bg-${bgColor}`
           )}
         >

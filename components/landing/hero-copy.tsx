@@ -19,10 +19,10 @@ export function HeroCopyBlock() {
         as="h1"
         delayMs={540}
         text={`${heroCopy.headingLead} ${heroCopy.headingAccent} ${heroCopy.headingTail}`}
-        className="text-center font-heading text-3xl leading-[0.95] font-extrabold tracking-tight text-background md:text-6xl"
+        className="text-center font-heading text-3xl leading-[0.95] font-extrabold tracking-tight md:text-6xl"
       />
 
-      <p className="mt-6 max-w-3xl text-center text-base leading-relaxed text-background/70 md:text-lg">
+      <p className="mt-6 max-w-3xl text-center text-base leading-relaxed md:text-lg">
         {heroCopy.description}
       </p>
 
@@ -34,7 +34,7 @@ export function HeroCopyBlock() {
           size="lg"
           onClick={() => onNavigate("/signup", router)}
           variant="secondary"
-          className="border border-muted-foreground bg-white/10 text-background hover:bg-white/15"
+          className="border border-muted-foreground/50 bg-transparent text-muted-foreground hover:bg-muted-foreground/10"
         >
           <PlayIcon className="mr-2" />
           Start Earning Today
@@ -45,12 +45,12 @@ export function HeroCopyBlock() {
         {heroStats.map((stat) => (
           <div
             key={stat.label}
-            className="cursor-pointer rounded-2xl border-2 border-foreground p-4 shadow-chart-1 transition-all duration-150 ease-in hover:bg-chart-1/30 hover:shadow-sm"
+            className="cursor-pointer rounded-2xl border-2 border-foreground/10 p-4 shadow-chart-1 transition-all duration-150 ease-in hover:bg-chart-1/30 hover:shadow-sm"
           >
-            <dt className="text-xs tracking-wider text-background/50 uppercase">
+            <dt className="text-xs tracking-wider text-foreground/50 uppercase">
               {stat.label}
             </dt>
-            <dd className="mt-2 text-sm font-medium text-background/90">
+            <dd className="mt-2 text-sm font-medium text-foreground/90">
               {stat.value}
             </dd>
           </div>

@@ -20,12 +20,7 @@ export function BrandLogo({ tone = "light" }: BrandLogoProps) {
         className="size-7 animate-[spin_3s_linear_infinite] rounded-md group-hover:animate-none"
       />
 
-      <span
-        className={cn(
-          "font-heading text-2xl font-extrabold tracking-tight",
-          tone === "light" ? "text-background" : "text-foreground"
-        )}
-      >
+      <span className="font-heading text-2xl font-extrabold tracking-tight">
         xpesa
       </span>
     </Link>

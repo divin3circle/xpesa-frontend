@@ -30,10 +30,10 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
               <div className="absolute top-0 left-0 h-80 w-80 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,oklch(0.845_0.143_164.978/.2),transparent_70%)]" />
               <div className="absolute right-0 bottom-0 h-72 w-72 translate-y-1/3 rounded-full bg-[radial-gradient(circle,oklch(0.508_0.118_165.612/.14),transparent_70%)]" />
               <div className="absolute bottom-1 z-10 flex w-full flex-col items-center justify-between gap-2 p-2 pt-3 text-sm text-muted-foreground md:flex-row">
-                <p className="font-heading text-xs font-semibold text-background/50">
+                <p className="font-heading text-xs font-semibold text-foreground/50">
                   © 2026 xpesa. All rights reserved.
                 </p>
-                <p className="font-heading text-xs font-semibold text-background/50">
+                <p className="font-heading text-xs font-semibold text-foreground/50">
                   Creator monetization in Africa.
                 </p>
               </div>
@@ -42,7 +42,7 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
             <div className="z-10 mt-8 flex flex-col gap-8 md:flex-row xl:mt-0">
               <AnimatedContainer className="w-full max-w-sm min-w-2xs space-y-4">
                 <BrandLogo />
-                <p className="mt-8 text-sm text-background/75 md:mt-0">
+                <p className="mt-8 text-sm text-foreground/75 md:mt-0">
                   xpesa helps creators in Africa monetize links and tips, then
                   withdraw earnings to local mobile money rails like M-Pesa.
                 </p>
@@ -60,7 +60,7 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
                         <a
                           href={link.href}
                           aria-label={link.title}
-                          className="text-background/75 transition-all duration-300 hover:text-background"
+                          className="text-foreground/75 transition-all duration-300 hover:text-background"
                         >
                           <Icon className="size-6d" />
                         </a>
@@ -78,7 +78,7 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
                     className="w-full flex-1 sm:max-w-sm md:max-w-none"
                   >
                     <div className="mb-10 md:mb-0">
-                      <h3 className="text-sm font-semibold text-background uppercase">
+                      <h3 className="text-sm font-semibold text-foreground uppercase">
                         {group.label}
                       </h3>
                       <ul className="mt-4 space-y-2 text-sm text-muted-foreground md:text-xs lg:text-sm">
@@ -88,7 +88,7 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
                             <li key={link.title}>
                               <a
                                 href={link.href}
-                                className="inline-flex items-center text-background/50 transition-all duration-300 hover:text-background"
+                                className="inline-flex items-center text-foreground/50 transition-all duration-300 hover:text-background"
                               >
                                 {Icon && <Icon className="me-1 size-4" />}
                                 {link.title}

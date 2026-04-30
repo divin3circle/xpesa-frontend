@@ -28,7 +28,7 @@ export default function Testimonial1({ className }: Testimonial1Props) {
           <div className="mb-6 flex items-center justify-between gap-4">
             <Badge
               variant="outline"
-              className="border-none font-sans text-background/90"
+              className="border-none font-sans text-foreground/90"
             >
               {ctaContent.badge}
             </Badge>
@@ -38,10 +38,10 @@ export default function Testimonial1({ className }: Testimonial1Props) {
             as="h2"
             delayMs={820}
             text={ctaContent.heading}
-            className="max-w-4xl font-heading text-3xl font-bold tracking-tight text-background md:text-5xl"
+            className="max-w-4xl font-heading text-3xl font-bold tracking-tight text-foreground md:text-5xl"
           />
 
-          <p className="mt-4 max-w-2xl font-sans text-base leading-relaxed text-background/75 md:text-lg">
+          <p className="mt-4 max-w-2xl font-sans text-base leading-relaxed text-foreground/75 md:text-lg">
             {ctaContent.description}
           </p>
 
@@ -50,11 +50,11 @@ export default function Testimonial1({ className }: Testimonial1Props) {
               <Tooltip.Provider key={point.label} delayDuration={120}>
                 <Tooltip.Root>
                   <Tooltip.Trigger asChild>
-                    <div className="cursor-pointer rounded-2xl border-2 border-foreground p-4 shadow-chart-1 transition-all duration-150 ease-in hover:bg-chart-1/30 hover:shadow-sm">
+                    <div className="cursor-pointer rounded-2xl border-2 border-foreground/10 p-4 shadow-chart-1 transition-all duration-150 ease-in hover:bg-chart-1/30 hover:shadow-sm">
                       <p className="text-xs tracking-[0.14em] text-muted-foreground uppercase">
                         {point.label}
                       </p>
-                      <p className="mt-2 text-sm font-medium text-background">
+                      <p className="mt-2 text-sm font-medium text-foreground">
                         {point.value}
                       </p>
                     </div>
@@ -76,10 +76,13 @@ export default function Testimonial1({ className }: Testimonial1Props) {
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <Button size="lg">{ctaContent.primaryCta}</Button>
-            <button className="flex items-center gap-1 rounded-4xl border border-muted-foreground px-4 py-2 text-background">
+            <Button
+              variant={"link"}
+              className="flex items-center gap-1 rounded-4xl px-4 py-2 transition-colors"
+            >
               {ctaContent.secondaryCta}
               <ArrowUpRight className="size-4" />
-            </button>
+            </Button>
           </div>
         </motion.div>
       </div>

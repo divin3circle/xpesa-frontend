@@ -20,7 +20,7 @@ export function PricingSection() {
         >
           <div className="mb-4 inline-flex items-center gap-1">
             <CreditCard className="size-3.5 text-primary" />
-            <p className="font-sans text-xs font-semibold text-background">
+            <p className="font-sans text-xs font-semibold text-foreground">
               Pricing
             </p>
           </div>
@@ -28,9 +28,9 @@ export function PricingSection() {
             as="h2"
             delayMs={880}
             text={pricingContent.heading}
-            className="mx-auto max-w-3xl font-heading text-3xl font-bold tracking-tight text-background md:text-5xl"
+            className="mx-auto max-w-3xl font-heading text-3xl font-bold tracking-tight text-foreground md:text-5xl"
           />
-          <p className="mx-auto mt-4 max-w-2xl text-background/75">
+          <p className="mx-auto mt-4 max-w-2xl text-foreground/75">
             {pricingContent.subtitle}
           </p>
         </motion.div>

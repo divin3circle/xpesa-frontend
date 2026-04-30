@@ -27,7 +27,7 @@ export function HeroNav({ navItems }: HeroNavProps) {
           <Link
             key={item.label}
             href={item.href}
-            className="text-sm font-medium text-background/75 transition-colors hover:text-background"
+            className="text-sm font-medium text-foreground/75 transition-colors hover:text-foreground"
           >
             {item.label}
           </Link>

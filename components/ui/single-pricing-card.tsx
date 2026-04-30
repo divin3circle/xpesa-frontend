@@ -175,17 +175,17 @@ function SinglePricingCardContent({
         <div className="flex flex-col p-6 md:w-1/2 md:p-8">
           {badge && (
             <div className="mb-4 flex items-center">
-              <Badge className="border-primary/10 bg-primary/10 px-3 py-1 text-primary hover:bg-primary/15">
+              <Badge className="border-primary/10 bg-transparent px-3 py-1 text-primary hover:bg-primary/15">
                 {BadgeIcon && <BadgeIcon className="mr-1 size-3.5" />}
                 <span>{badge.text}</span>
               </Badge>
             </div>
           )}
 
-          <h3 className="mb-2 font-heading text-2xl font-bold text-background">
+          <h3 className="mb-2 font-heading text-2xl font-bold text-foreground">
             {title}
           </h3>
-          <p className="mb-4 text-background/75">{subtitle}</p>
+          <p className="mb-4 text-foreground/75">{subtitle}</p>
 
           <div className="mb-6 flex items-baseline">
             <span className="font-heading text-4xl font-bold text-chart-1">
@@ -193,7 +193,7 @@ function SinglePricingCardContent({
             </span>
             <div className="flex flex-col md:flex-row">
               {price.original && (
-                <span className="ml-2 text-background/75">
+                <span className="ml-2 text-foreground/75">
                   {price.original}
                 </span>
               )}
@@ -214,7 +214,7 @@ function SinglePricingCardContent({
               return (
                 <div key={benefit.text} className="flex items-center gap-2">
                   <BenefitIcon className="size-4 text-primary" />
-                  <span className="text-sm text-background/75">
+                  <span className="text-sm text-foreground/75">
                     {benefit.text}
                   </span>
                 </div>
@@ -251,7 +251,7 @@ function SinglePricingCardContent({
             {secondaryButton && (
               <Button
                 variant="outline"
-                className="w-full gap-2 border-background/20 bg-transparent text-background hover:text-background/90"
+                className="w-full gap-2 border-background/20 bg-transparent text-foreground hover:text-foreground/90"
                 size="lg"
                 onClick={secondaryButton.onClick}
                 asChild={!!secondaryButton.href}
@@ -297,7 +297,7 @@ function SinglePricingCardContent({
                 <div className="flex size-5 items-center justify-center rounded-full bg-primary/10">
                   <FeaturesIcon className="size-3 text-primary" />
                 </div>
-                <span className="text-sm text-background/75">
+                <span className="text-sm text-foreground/75">
                   {feature.text}
                 </span>
               </motion.div>
@@ -326,10 +326,10 @@ function SinglePricingCardContent({
                               {testimonial.name.charAt(0)}
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-background">
+                              <p className="text-sm font-medium text-foreground">
                                 {testimonial.name}
                               </p>
-                              <p className="text-xs text-background/75">
+                              <p className="text-xs text-foreground/75">
                                 {testimonial.role}
                               </p>
                             </div>
@@ -344,7 +344,7 @@ function SinglePricingCardContent({
                               )}
                             </div>
                           </div>
-                          <p className="text-sm text-background/75">
+                          <p className="text-sm text-foreground/75">
                             {testimonial.content}
                           </p>
                         </motion.div>

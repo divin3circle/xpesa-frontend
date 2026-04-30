@@ -97,16 +97,14 @@ export function Feature108({
     <section id="how-it-works" className="py-24">
       <div className="mx-auto w-full max-w-6xl px-6 lg:px-10">
         <div className="flex flex-col items-center gap-4 text-center">
-          <p className="font-sans text-xs font-semibold text-background">
-            {badge}
-          </p>
+          <p className="font-sans text-xs font-semibold">{badge}</p>
           <AsteriskRevealHeading
             as="h2"
             delayMs={760}
             text={heading}
-            className="max-w-2xl font-heading text-3xl font-bold tracking-tight text-background md:text-5xl"
+            className="max-w-2xl font-heading text-3xl font-bold tracking-tight md:text-5xl"
           />
-          <p className="max-w-2xl font-sans text-background/70">
+          <p className="max-w-2xl font-sans text-foreground/70">
             {description}
           </p>
         </div>
@@ -124,22 +122,22 @@ export function Feature108({
                   key={tab.value}
                   value={tab.value}
                   className={cn(
-                    "group rounded-2xl border border-muted-foreground p-5 text-left transition-all outline-none",
-                    "data-[state=active]:border-chart-1 data-[state=active]:bg-primary/10"
+                    "group cursor-pointer rounded-2xl border border-muted-foreground/50 p-5 text-left transition-all outline-none",
+                    "data-[state=active]:border-chart-1 data-[state=active]:bg-chart-1/10"
                   )}
                 >
                   <div className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-foreground">
-                    <span className="grid size-8 place-items-center text-gray-400 group-data-[state=active]/trigger:text-chart-1">
+                    <span className="grid size-8 place-items-center group-data-[state=active]/trigger:text-chart-1">
                       {tab.icon}
                     </span>
-                    <span className="font-mono text-xs tracking-wider text-muted-foreground uppercase">
+                    <span className="font-sans text-xs text-foreground/70 uppercase">
                       Step {index + 1}
                     </span>
                   </div>
-                  <p className="font-heading text-lg font-semibold text-background group-data-[state=active]/trigger:text-chart-1">
+                  <p className="font-heading text-lg font-semibold text-foreground group-data-[state=active]/trigger:text-chart-1">
                     {tab.label}
                   </p>
-                  <p className="mt-2 font-sans text-sm leading-relaxed text-background/70 group-data-[state=active]/trigger:text-background">
+                  <p className="mt-2 font-sans text-sm leading-relaxed text-foreground/70 group-data-[state=active]/trigger:text-background">
                     {tab.shortDescription}
                   </p>
                 </Tabs.Trigger>
@@ -161,16 +159,19 @@ export function Feature108({
                 className="grid items-center gap-8 data-[state=inactive]:hidden lg:grid-cols-2"
               >
                 <div className="flex flex-col gap-5">
-                  <Badge variant="outline" className="w-fit bg-background/70">
+                  <Badge
+                    variant="outline"
+                    className="w-fit bg-background/70 text-xs uppercase"
+                  >
                     {tab.content.badge}
                   </Badge>
                   <AsteriskRevealHeading
                     as="h3"
                     delayMs={900}
                     text={tab.content.title}
-                    className="font-heading text-3xl font-semibold tracking-tight text-background md:text-4xl"
+                    className="font-heading text-3xl font-semibold md:text-4xl"
                   />
-                  <p className="font-sans text-background/70 lg:text-lg">
+                  <p className="font-sans text-foreground/70 lg:text-lg">
                     {tab.content.description}
                   </p>
                   <Button className="mt-1 w-fit" size="lg">

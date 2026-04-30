@@ -18,16 +18,16 @@ export function WhoIsThisForSection() {
           transition={{ duration: 0.45, ease: "easeOut" }}
           className="mb-10 flex max-w-3xl flex-col items-start gap-4"
         >
-          <Badge variant="outline" className="font-sans text-background/90">
+          <Badge variant="outline" className="font-sans text-foreground/90">
             {audienceContent.badge}
           </Badge>
           <AsteriskRevealHeading
             as="h2"
             delayMs={820}
             text={audienceContent.heading}
-            className="font-heading text-3xl font-bold tracking-tight text-background md:text-5xl"
+            className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-5xl"
           />
-          <p className="font-sans text-base leading-relaxed text-background/75 md:text-lg">
+          <p className="font-sans text-base leading-relaxed text-foreground/75 md:text-lg">
             {audienceContent.description}
           </p>
         </motion.div>

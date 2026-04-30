@@ -28,8 +28,7 @@ export function MobileMenu({ navItems }: MobileMenuProps) {
         <Button
           type="button"
           size="icon"
-          variant="secondary"
-          className="border border-white/20 bg-white/10 text-background hover:bg-white/20"
+          variant="ghost"
           aria-label="Open menu"
         >
           <MenuIcon className="size-5" aria-hidden="true" />

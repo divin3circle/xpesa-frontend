@@ -13,14 +13,14 @@ import { heroNavItems } from "@/lib/landing/hero-content"
 
 export default function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-foreground px-2 md:px-0">
+    <section className="relative overflow-hidden px-2 md:px-0">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0"
       />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[72px_72px] opacity-20"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(0,0,0,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(0,0,0,0.06)_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,rgba(255,255,255,0.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.08)_1px,transparent_1px)] bg-size-[72px_72px] opacity-20"
       />
 
       <HeroNav navItems={heroNavItems} />
