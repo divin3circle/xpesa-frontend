@@ -38,6 +38,17 @@ export const envConfig = {
   R2_BUCKET_NAME: process.env.R2_BUCKET_NAME || "",
   ENV: process.env.ENV || "DEV",
   FEE: process.env.FEE || "5",
+  PREVIEW_RATE_LIMIT: Number(process.env.PREVIEW_RATE_LIMIT || 2),
+  PREVIEW_RATE_LIMIT_WINDOW_SECONDS: Number(
+    process.env.PREVIEW_RATE_LIMIT_WINDOW_SECONDS || 60
+  ),
+  DOWNLOAD_RATE_LIMIT: Number(process.env.DOWNLOAD_RATE_LIMIT || 1),
+  DOWNLOAD_RATE_LIMIT_WINDOW_SECONDS: Number(
+    process.env.DOWNLOAD_RATE_LIMIT_WINDOW_SECONDS || 60
+  ),
+  PREVIEW_SESSION_MAX_AGE_SECONDS: Number(
+    process.env.PREVIEW_SESSION_MAX_AGE_SECONDS || 60 * 60
+  ),
   RPC_URL:
     process.env.ENV === "DEV"
       ? process.env.HEDERA_TESTNET_RPC_URL
@@ -45,11 +56,11 @@ export const envConfig = {
   USDC_CONTRACT_ADDRESS:
     process.env.ENV === "DEV"
       ? process.env.TESTNET_USDC_CONTRACT_ADDRESS
-      : process.env.MAINNET_USDC_CONTRACT_ADDRESS || "0x00000000000000000000000000000000006E4dc3",
+      : process.env.MAINNET_USDC_CONTRACT_ADDRESS ||
+        "0x00000000000000000000000000000000006E4dc3",
 }
 
-export const HEDERA_HTS_ADDR = "0x0000000000000000000000000000000000000167";
-
+export const HEDERA_HTS_ADDR = "0x0000000000000000000000000000000000000167"
 
 export const client = createThirdwebClient({
   clientId: envConfig.THIRDWEB_CLIENT_ID,

@@ -6,6 +6,7 @@ import { IconSearch, IconFilter } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import { FileItem } from "@/hooks/use-unified-file-explorer"
 import Image from "next/image"
+import { Loader2 } from "lucide-react"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Download01FreeIcons } from "@hugeicons/core-free-icons"
 import { getFileIcon } from "./file-card"
@@ -13,10 +14,18 @@ import { getFileIcon } from "./file-card"
 interface Props {
   files: FileItem[]
   onFileClick: (file: FileItem) => void
+  onDownload?: (file: FileItem) => void
   isAuthorized: boolean
+  isDownloading?: boolean
 }
 
-export function FileList({ files, onFileClick, isAuthorized }: Props) {
+export function FileList({
+  files,
+  onFileClick,
+  onDownload,
+  isAuthorized,
+  isDownloading = false,
+}: Props) {
   if (!isAuthorized) {
     return (
       <div className="flex flex-col items-center rounded-2xl border border-dashed border-border/70 bg-background/50 p-8 text-center">
@@ -101,8 +110,17 @@ export function FileList({ files, onFileClick, isAuthorized }: Props) {
                     variant="ghost"
                     size="icon"
                     className="h-8 w-8 rounded-lg opacity-100 group-hover:opacity-100 md:opacity-0"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onDownload?.(file)
+                    }}
+                    disabled={!onDownload || isDownloading}
                   >
-                    <HugeiconsIcon icon={Download01FreeIcons} />
+                    {isDownloading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <HugeiconsIcon icon={Download01FreeIcons} />
+                    )}
                   </Button>
                 </td>
               </tr>

@@ -1,10 +1,12 @@
 "use client"
 
-import React from "react"
 import { Button } from "@/components/ui/button"
-import { IconDownload } from "@tabler/icons-react"
+import { Loader2 } from "lucide-react"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { CheckmarkBadge01Icon } from "@hugeicons/core-free-icons"
+import {
+  CheckmarkBadge01Icon,
+  Download01FreeIcons,
+} from "@hugeicons/core-free-icons"
 
 interface Props {
   title: string
@@ -14,6 +16,7 @@ interface Props {
   onConfirm: () => void
   onDownload?: () => void
   isAuthorizing?: boolean
+  isDownloading?: boolean
 }
 
 export function HeaderActions({
@@ -24,6 +27,7 @@ export function HeaderActions({
   onConfirm,
   onDownload,
   isAuthorizing = false,
+  isDownloading = false,
 }: Props) {
   return (
     <div className="mb-10 flex flex-wrap items-center justify-between gap-4">
@@ -51,12 +55,17 @@ export function HeaderActions({
         {isAuthorized && onDownload && (
           <Button
             size="sm"
-            variant={"outline"}
+            variant={"ghost"}
             onClick={onDownload}
-            disabled={isAuthorizing}
-            className="rounded-xl border-border/50 shadow-sm"
+            disabled={isAuthorizing || isDownloading}
+            className="flex items-center gap-2 rounded-xl border-border/50 shadow-none"
           >
-            {isAuthorizing ? "Downloading..." : "Download All"}
+            {isDownloading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <HugeiconsIcon icon={Download01FreeIcons} />
+            )}
+            {isDownloading ? "Downloading..." : "Download All"}
           </Button>
         )}
       </div>

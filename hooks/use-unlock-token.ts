@@ -12,7 +12,8 @@ export type PageAccessResponse = {
   requiredWallet: string
   viewsRemaining: number | null
   expiresIn: number | null
-  signedUrl: string
+  previewSessionExpiresAt: string
+  previewUrl: string
 }
 
 export type PackAccessResponse = {
@@ -26,7 +27,8 @@ export type PackAccessResponse = {
   watermarkEnabled: boolean
   expiresAt: string | null
   viewsRemaining: number | null
-  signedUrl: string
+  previewSessionExpiresAt: string
+  previewUrl: string
 }
 
 type UnlockResult = PageAccessResponse | PackAccessResponse

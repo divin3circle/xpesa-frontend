@@ -9,6 +9,7 @@ import {
 } from "@/hooks/use-unified-file-explorer"
 import { useViewingFile } from "@/hooks/use-viewing-file"
 import { useUnlockedContent } from "@/hooks/use-unlocked-content"
+import { useDownload } from "@/hooks/use-download"
 import { HeaderActions } from "./unified-file-explorer/header-actions"
 import { FileCard } from "./unified-file-explorer/file-card"
 import { FileList } from "./unified-file-explorer/file-list"
@@ -59,7 +60,12 @@ export function UnifiedFileExplorer({
   const effectiveFanAddress = fanSmartAccountAddress || fanWalletAddress
 
   const unlock = useUnlockToken(tokenId, linkType, effectiveFanAddress)
-  const { storeContent } = useUnlockedContent()
+  const download = useDownload()
+  const {
+    content: unlockedContent,
+    hydrated,
+    storeContent,
+  } = useUnlockedContent(tokenId)
 
   async function handleConfirm() {
     if (!fanSmartAccountAddress) {
@@ -87,7 +93,12 @@ export function UnifiedFileExplorer({
   }
 
   const { viewingFileUrl, openViewer, closeViewer } = useViewingFile()
-  const { content: unlockedContent } = useUnlockedContent()
+
+  useEffect(() => {
+    if (unlockedContent) {
+      setIsAuthorized(true)
+    }
+  }, [setIsAuthorized, unlockedContent])
 
   function onOpen(file: FileItem) {
     if (!unlockedContent) {
@@ -96,37 +107,45 @@ export function UnifiedFileExplorer({
       return
     }
 
-    let signedUrl: string | null = null
+    let previewUrl: string | null = null
 
     if ("pageCount" in unlockedContent) {
-      signedUrl = unlockedContent.signedUrl
+      previewUrl = unlockedContent.previewUrl
     }
 
-    if (signedUrl) {
-      openViewer(signedUrl)
+    if (previewUrl) {
+      openViewer(previewUrl)
     } else {
-      console.error("No signed URL available for file", file.id)
+      console.error("No preview URL available for file", file.id)
     }
   }
 
-  function handleDownloadPack() {
-    if (!unlockedContent || !("files" in unlockedContent)) {
-      console.warn("Pack content not available")
+  function handlePreviewLoadError(error: unknown) {
+    const message = error instanceof Error ? error.message : String(error)
+
+    if (/429|too many requests/i.test(message)) {
+      toast.error("Too many preview requests", {
+        description: "Try again in a minute.",
+      })
       return
     }
 
-    const packUrl = unlockedContent.signedUrl
-    if (!packUrl) {
-      console.error("No download URL available")
-      return
-    }
+    toast.error("Failed to load preview", {
+      description: message || "Please try again.",
+    })
+  }
 
-    const link = document.createElement("a")
-    link.href = packUrl
-    link.download = `${unlockedContent.title}.zip` || "pack.zip"
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  function handleDownloadFile(file: FileItem) {
+    void download
+      .mutateAsync({
+        tokenId,
+        filename: linkType === "pack" ? `${title}.zip` : file.name || title,
+      })
+      .catch((err: unknown) => {
+        console.error("download error", err)
+        const message = err instanceof Error ? err.message : String(err)
+        toast.error(message || "Failed to download content")
+      })
   }
 
   return (
@@ -165,20 +184,28 @@ export function UnifiedFileExplorer({
         isAuthorized={isAuthorized}
         isWrongWallet={isWrongWallet}
         onConfirm={handleConfirm}
-        onDownload={linkType === "pack" ? handleDownloadPack : undefined}
+        onDownload={() => {
+          void download.mutateAsync({
+            tokenId,
+            filename: linkType === "pack" ? `${title}.zip` : title,
+          })
+        }}
         isAuthorizing={unlock.isAuthorizing}
+        isDownloading={download.isDownloading}
       />
 
       <FileList
         files={files}
         onFileClick={(file) => handleFileClick({ file, tokenId, onOpen })}
+        onDownload={handleDownloadFile}
         isAuthorized={isAuthorized}
+        isDownloading={download.isDownloading}
       />
 
-      {isAuthorized && files.length === 0 && (
+      {hydrated && !isAuthorized && files.length > 0 && (
         <section className="my-12">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-sans text-xl font-semibold">
+            <h2 className="mt-4 font-sans text-xl font-semibold">
               {linkType === "pack" ? "Folder Contents" : "Included Assets"}
             </h2>
           </div>
@@ -203,6 +230,7 @@ export function UnifiedFileExplorer({
           fileName={selectedFile.name}
           onClose={closeViewer}
           watermark={account?.address || "Locked"}
+          onLoadError={handlePreviewLoadError}
         />
       )}
     </div>

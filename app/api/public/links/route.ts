@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 
 import { createAdminClient } from "@/lib/supabase/admin"
-import { TABLENAMES } from "@/lib/supabase/utilities";
 
 export interface PublicLinkDetails {
   id: string
@@ -151,15 +150,16 @@ export async function GET(
       total_earned_usdc: toNumber(data.total_earned_usdc) ?? 0,
     }
 
-    const { data: updatedData, error: updateError } = await supabase
-      .rpc('increment', { link_id: linkId, by: 1 })
+    const { data: updatedData, error: updateError } = await supabase.rpc(
+      "increment",
+      { link_id: linkId, by: 1 }
+    )
 
     if (updateError) {
       console.warn("Failed to update view count: ", error)
     } else {
       console.log("View count updated successfully!: ", updatedData)
     }
-
 
     return NextResponse.json({ link: response })
   } catch (error) {

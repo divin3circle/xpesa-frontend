@@ -1,10 +1,6 @@
-import { GetObjectCommand } from "@aws-sdk/client-s3"
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { Redis } from "@upstash/redis"
 import { verifyMessage } from "viem"
-
-import { r2, R2_BUCKET } from "@/lib/r2"
 import {
   getRequestIp,
   hashIp,
@@ -87,7 +83,6 @@ export async function POST(
     return Response.json({ error: "not_found" }, { status: 404 })
   }
 
-  const documentKey = link.document_r2_key
   const requestedPages =
     Array.isArray(pageNums) && pageNums.length > 0
       ? pageNums
@@ -96,16 +91,9 @@ export async function POST(
           (_, index) => index + 1
         )
 
-  const pages = await Promise.all(
-    requestedPages.map(async (pageNum: number) => {
-      const command = new GetObjectCommand({
-        Bucket: R2_BUCKET,
-        Key: `${documentKey}/page-${pageNum}.pdf`,
-      })
-      const signedUrl = await getSignedUrl(r2, command, { expiresIn: 30 })
-      return signedUrl
-    })
-  )
+  const pages = requestedPages.map((pageNum: number) => {
+    return `/api/previews/${tokenId}?page=${pageNum}`
+  })
 
   return Response.json({ pages })
 }

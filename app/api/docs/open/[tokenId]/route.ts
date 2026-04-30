@@ -1,13 +1,15 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { Redis } from "@upstash/redis"
 import { verifyMessage } from "viem"
-import { GetObjectCommand } from "@aws-sdk/client-s3"
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import { NextResponse } from "next/server"
+import { randomUUID } from "node:crypto"
 
-import { r2, R2_BUCKET } from "@/lib/r2"
+import { envConfig } from "@/lib/utils"
 import { normalizeAddress } from "@/lib/view-access"
 
 const redis = Redis.fromEnv()
+const PREVIEW_COOKIE_NAME = "xpesa_preview_session"
+const PREVIEW_SESSION_PREFIX = "preview-session:"
 
 export interface PageAccessResponse {
   title: string
@@ -18,7 +20,19 @@ export interface PageAccessResponse {
   requiredWallet: string
   viewsRemaining: number | null
   expiresIn: number | null
-  signedUrl: string
+  previewSessionExpiresAt: string
+  previewUrl: string
+}
+
+function buildResponse(body: PageAccessResponse, sessionId: string) {
+  const response = NextResponse.json(body)
+  response.cookies.set(PREVIEW_COOKIE_NAME, sessionId, {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: envConfig.PREVIEW_SESSION_MAX_AGE_SECONDS,
+  })
+  return response
 }
 
 export async function POST(
@@ -27,7 +41,8 @@ export async function POST(
 ) {
   const supabase = createAdminClient()
   const { tokenId } = await params
-  const { walletAddress, signingWalletAddress, signature } = await request.json()
+  const { walletAddress, signingWalletAddress, signature } =
+    await request.json()
 
   if (!walletAddress || !signature) {
     return Response.json(
@@ -77,8 +92,8 @@ export async function POST(
     )
   }
 
-  const verificationAddress =
-    (signingWalletAddress ?? walletAddress) as `0x${string}`
+  const verificationAddress = (signingWalletAddress ??
+    walletAddress) as `0x${string}`
 
   const isValidSignature = await verifyMessage({
     address: verificationAddress,
@@ -120,35 +135,36 @@ export async function POST(
     })
     .eq("id", tokenId)
 
-  let signedUrl = ""
-  if (link.document_r2_key) {
-    try {
-      const command = new GetObjectCommand({
-        Bucket: R2_BUCKET,
-        Key: link.document_r2_key,
-      })
-      signedUrl = await getSignedUrl(r2, command, { expiresIn: 3600 })
-    } catch (err) {
-      console.error("Failed to generate signed URL", err)
-      return Response.json(
-        { error: "signed_url_generation_failed" },
-        { status: 500 }
-      )
-    }
+  if (!link.document_r2_key) {
+    return NextResponse.json(
+      { error: "signed_url_generation_failed" },
+      { status: 500 }
+    )
   }
 
-  return Response.json({
-    title: link.title,
-    pageCount: link.document_page_count,
-    watermarkEnabled: Boolean(link.doc_watermark_enabled),
-    downloadBlocked: Boolean(link.doc_download_blocked),
-    linkId: token.link_id,
-    requiredWallet: token.fan_wallet_address,
-    viewsRemaining:
-      typeof token.max_views === "number"
-        ? Math.max(token.max_views - (token.view_count ?? 0) - 1, 0)
-        : null,
-    expiresIn: null,
-    signedUrl,
+  const sessionId = randomUUID()
+  await redis.set(`${PREVIEW_SESSION_PREFIX}${sessionId}`, tokenId, {
+    ex: envConfig.PREVIEW_SESSION_MAX_AGE_SECONDS,
   })
+
+  return buildResponse(
+    {
+      title: link.title,
+      pageCount: link.document_page_count,
+      watermarkEnabled: Boolean(link.doc_watermark_enabled),
+      downloadBlocked: Boolean(link.doc_download_blocked),
+      linkId: token.link_id,
+      requiredWallet: token.fan_wallet_address,
+      viewsRemaining:
+        typeof token.max_views === "number"
+          ? Math.max(token.max_views - (token.view_count ?? 0) - 1, 0)
+          : null,
+      expiresIn: null,
+      previewSessionExpiresAt: new Date(
+        Date.now() + envConfig.PREVIEW_SESSION_MAX_AGE_SECONDS * 1000
+      ).toISOString(),
+      previewUrl: `/api/previews/${tokenId}`,
+    },
+    sessionId
+  )
 }

@@ -10,11 +10,13 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 type SecurePdfViewerProps = {
   fileUrl: string
   walletWatermark: string
+  onLoadError?: (error: unknown) => void
 }
 
 export function SecurePdfViewer({
   fileUrl,
   walletWatermark,
+  onLoadError,
 }: SecurePdfViewerProps) {
   const [numPages, setNumPages] = useState(0)
   const [pageNumber, setPageNumber] = useState(1)
@@ -87,6 +89,10 @@ export function SecurePdfViewer({
           }}
           onLoadError={() => {
             setNumPages(0)
+          }}
+          onSourceError={(error) => {
+            setNumPages(0)
+            onLoadError?.(error)
           }}
         >
           <Page

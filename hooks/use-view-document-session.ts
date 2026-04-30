@@ -103,11 +103,9 @@ export function useViewDocumentSession(tokenId?: string) {
 
       const pagesData = (await pagesRes.json()) as {
         pages?: string[]
-        signedUrl?: string
       }
 
-      const pages =
-        pagesData.pages ?? (pagesData.signedUrl ? [pagesData.signedUrl] : [])
+      const pages = pagesData.pages ?? []
 
       return { openData, pages }
     },

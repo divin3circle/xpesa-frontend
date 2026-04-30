@@ -47,8 +47,6 @@ export function useUnifiedFileExplorer(fanWalletAddress: string) {
 
     try {
       const msg = `xpesa-open:${tokenId}`
-      // Real implementation: sign message + POST to /api/... to get signed URL
-      // For now show progress and call onOpen if provided
       toast.info(`Opening ${file.name}...`)
       onOpen?.(file)
     } catch (err) {
