@@ -12,7 +12,7 @@ import { PAYMENT_CHAIN, USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains"
 import { PublicLinkDetails } from "@/app/api/public/links/route"
 import { Account } from "thirdweb/wallets"
 import { client } from "@/lib/utils"
-import { usePublicCreator } from "@/hooks/use-public"
+import { usePublicCreatorHandleById } from "@/hooks/use-public"
 import { toast } from "sonner"
 import LoadingSpinner from "../ui/loading-spinner"
 import { useMyBalance } from "@/hooks/use-balance"
@@ -21,24 +21,32 @@ const PLATFORM_WALLET = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS!
 
 export function PayButton({
   link,
-  handle,
   account,
   amount,
   isPaying,
   setIsPaying,
 }: {
   link: PublicLinkDetails
-  handle: string
   account: Account
   amount: number
   isPaying: boolean
   setIsPaying: (isPaying: boolean) => void
 }) {
   const router = useRouter()
-  const { data, isLoading, error } = usePublicCreator(handle)
-  const { data:balance, isLoading:balanceIsLoading, error:balanceError } = useMyBalance(account)
+  const {
+    data: creatorHandleData,
+    isLoading,
+    error: creatorHandleError,
+  } = usePublicCreatorHandleById(link.creatorId)
+  const {
+    data: balance,
+    isLoading: balanceIsLoading,
+    error: balanceError,
+  } = useMyBalance(account)
 
-  const creatorWalletAddress = data?.creator.wallet_address ?? ""
+  const error = creatorHandleError
+
+  const creatorWalletAddress = creatorHandleData?.creator.wallet_address ?? ""
 
   if (isLoading) {
     return (
@@ -51,19 +59,24 @@ export function PayButton({
     )
   }
 
-  if (error || !data) {
+  if (error || !creatorHandleData) {
     return (
       <button
         disabled
         className="w-full rounded-2xl bg-red-500 py-3 font-medium text-white"
       >
-        Error loading creator
+        Error loading creator profile
       </button>
     )
   }
 
   async function handlePay() {
     if (!account || amount <= 0) return
+    if (!creatorWalletAddress) {
+      toast.error("Creator wallet is unavailable")
+      return
+    }
+
     setIsPaying(true)
 
     try {
@@ -137,17 +150,20 @@ export function PayButton({
   }
 
   return (
-   <>
-    <button
-      onClick={handlePay}
-      disabled={isPaying || amount <= 0}
-      className="w-full rounded-2xl bg-primary py-3 font-medium text-primary-foreground disabled:opacity-50"
-    >
-      {isPaying ? "Processing..." : `Pay ${amount} USDC`}
-    </button>
-    <p className="text-xs text-muted-foreground">My balance:{" "}
-      <span className="underline font-semibold cursor-pointer">{balanceIsLoading ? "*.**" : balanceError ? balance : balance} USDC</span>
-       </p>
-   </>
+    <>
+      <button
+        onClick={handlePay}
+        disabled={isPaying || amount <= 0}
+        className="w-full rounded-2xl bg-primary py-3 font-medium text-primary-foreground disabled:opacity-50"
+      >
+        {isPaying ? "Processing..." : `Pay ${amount} USDC`}
+      </button>
+      <p className="text-xs text-muted-foreground">
+        My balance:{" "}
+        <span className="cursor-pointer font-semibold underline">
+          {balanceIsLoading ? "*.**" : balanceError ? "*.**" : balance} USDC
+        </span>
+      </p>
+    </>
   )
 }

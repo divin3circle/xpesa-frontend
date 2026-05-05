@@ -2,7 +2,6 @@
 
 import { CreatorProfileView } from "@/components/creator-public/creator-profile-view"
 import LoadingSpinner from "@/components/ui/loading-spinner"
-import { useCreatorAnalytics } from "@/hooks/use-creator-analytics"
 import { usePublicCreator } from "@/hooks/use-public"
 import { use } from "react"
 import Image from "next/image"
@@ -14,8 +13,6 @@ interface CreatorPageProps {
 export default function CreatorPage({ params }: CreatorPageProps) {
   const { id: creatorHandle } = use(params)
   const { data, isLoading, error } = usePublicCreator(creatorHandle)
-  const { data: analytics, isLoading: isAnalyticsLoading } =
-    useCreatorAnalytics(creatorHandle, data?.links ?? [])
 
   if (isLoading)
     return (
@@ -41,12 +38,5 @@ export default function CreatorPage({ params }: CreatorPageProps) {
     )
   if (!data) return null
 
-  return (
-    <CreatorProfileView
-      creator={data.creator}
-      links={data.links}
-      analytics={analytics}
-      isAnalyticsLoading={isAnalyticsLoading}
-    />
-  )
+  return <CreatorProfileView creator={data.creator} links={data.links} />
 }

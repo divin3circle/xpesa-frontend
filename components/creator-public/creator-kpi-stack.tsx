@@ -1,10 +1,12 @@
-import { Eye, HandCoins, WalletCards, BlocksIcon } from "lucide-react"
+import { BlocksIcon, Eye, HandCoins, WalletCards } from "lucide-react"
 
 import { Card, CardContent } from "@/components/ui/card"
-import type { CreatorAnalytics } from "@/lib/mock/creator-analytics"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useCreatorInsights } from "@/hooks/analytics/use-creator-insights"
+import { envConfig } from "@/lib/utils"
 
 type CreatorKpiStackProps = {
-  analytics: CreatorAnalytics
+  handle: string | null
 }
 
 function formatCompact(value: number) {
@@ -21,50 +23,74 @@ function formatUsdc(value: number) {
   })}`
 }
 
-export function CreatorKpiStack({ analytics }: CreatorKpiStackProps) {
-  const cards = [
-    {
-      label: "Total Profile Views",
-      value: `${formatCompact(analytics.totalProfileViews)} Views`,
-      icon: Eye,
-    },
-    {
-      label: "Confirmed Sales",
-      value: `${analytics.confirmedSales.toLocaleString()} Purchases`,
-      icon: HandCoins,
-    },
-    {
-      label: "Net Earnings",
-      value: `${formatUsdc(analytics.netEarningsUsdc)} USDC`,
-      icon: WalletCards,
-    },
-    {
-      label: "Settlement Network",
-      value: "Stellar Network",
-      icon: BlocksIcon,
-    },
-  ]
+function KpiSkeleton() {
+  return (
+    <Card className="border-border/70">
+      <CardContent className="flex min-h-28 items-center justify-between p-5">
+        <div className="space-y-2">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-6 w-36" />
+        </div>
+        <Skeleton className="size-8 rounded-full" />
+      </CardContent>
+    </Card>
+  )
+}
+
+export function CreatorKpiStack({ handle }: CreatorKpiStackProps) {
+  const { data, isLoading } = useCreatorInsights(handle)
+
+  const cards = data
+    ? [
+        {
+          label: "Total Profile Views",
+          value: `${formatCompact(data.kpis.totalProfileViews)} Views`,
+          icon: Eye,
+        },
+        {
+          label: "Confirmed Sales",
+          value: `${data.kpis.confirmedSales.toLocaleString()} Purchases`,
+          icon: HandCoins,
+        },
+        {
+          label: "Net Earnings",
+          value: `${formatUsdc(data.kpis.netEarningsUsdc)} USDC`,
+          icon: WalletCards,
+        },
+        {
+          label: "Settlement Network",
+          value: envConfig.PAYMENT_NETWORK.toUpperCase(),
+          icon: BlocksIcon,
+        },
+      ]
+    : []
 
   return (
     <div className="space-y-3">
-      {cards.map((card) => {
-        const Icon = card.icon
+      {isLoading || !data
+        ? Array.from({ length: 4 }).map((_, index) => (
+            <KpiSkeleton key={index} />
+          ))
+        : cards.map((card) => {
+            const Icon = card.icon
 
-        return (
-          <Card key={card.label} className="border-border/70">
-            <CardContent className="flex items-center justify-between p-4">
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">{card.label}</p>
-                <p className="text-xl font-semibold">{card.value}</p>
-              </div>
+            return (
+              <Card key={card.label} className="border-border/70">
+                <CardContent className="flex min-h-28 items-center justify-between p-5">
+                  <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">
+                      {card.label}
+                    </p>
+                    <p className="text-xl font-semibold">{card.value}</p>
+                  </div>
 
-              <div className="rounded-full border border-border/70 p-2 text-muted-foreground">
-                <Icon className="size-4" />
-              </div>
-            </CardContent>
-          </Card>
-        )
-      })}
+                  <div className="rounded-full border border-border/70 p-2 text-muted-foreground">
+                    <Icon className="size-4" />
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
     </div>
   )
 }

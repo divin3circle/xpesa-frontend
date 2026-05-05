@@ -7,6 +7,10 @@ import type {
   GetCreatorResponse,
   ErrorResponse,
 } from "@/app/api/public/creator/[handle]/route"
+import type {
+  CreatorHandleByIdErrorResponse,
+  GetCreatorHandleByIdResponse,
+} from "@/app/api/public/creator-id/[id]/route"
 
 async function getPublicCreator(handle: string): Promise<GetCreatorResponse> {
   try {
@@ -35,6 +39,41 @@ export function usePublicCreator(handle: string | null | undefined) {
     queryKey: ["public-creator", handle],
     queryFn: () => getPublicCreator(handle!),
     enabled: !!handle && handle.length > 0,
+    staleTime: 1000 * 60 * 5,
+  })
+}
+
+async function getPublicCreatorHandleById(
+  creatorId: string
+): Promise<GetCreatorHandleByIdResponse> {
+  try {
+    if (!creatorId || creatorId.trim().length === 0) {
+      throw new Error("Creator id is required")
+    }
+
+    const response = await fetch(
+      `/api/public/creator-id/${encodeURIComponent(creatorId)}`
+    )
+
+    if (!response.ok) {
+      const error: CreatorHandleByIdErrorResponse = await response.json()
+      throw new Error(error.error || "Failed to fetch creator handle")
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error("Error fetching creator handle by id:", error)
+    throw error
+  }
+}
+
+export function usePublicCreatorHandleById(
+  creatorId: string | null | undefined
+) {
+  return useQuery({
+    queryKey: ["public-creator-handle", creatorId],
+    queryFn: () => getPublicCreatorHandleById(creatorId!),
+    enabled: !!creatorId && creatorId.trim().length > 0,
     staleTime: 1000 * 60 * 5,
   })
 }

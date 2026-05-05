@@ -1,27 +1,20 @@
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
-import { client, envConfig, getErrorMessage } from "@/lib/utils"
+import { useMemo, useState } from "react"
+import { client, envConfig } from "@/lib/utils"
 import { useParams } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import {
-  ConnectButton,
-  useActiveAccount,
-  useActiveWallet,
-} from "thirdweb/react"
+import { ConnectButton } from "thirdweb/react"
 
 import { PAYMENT_CHAIN } from "@/lib/thirdweb/chains"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { usePublicLink } from "@/hooks/use-public"
-import Image from "next/image"
 import { smartAccountConfig } from "@/lib/thirdweb/account-abstraction"
 import { PayButton } from "./pay-button"
 import { useTheme } from "next-themes"
-import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -31,38 +24,30 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-
-function formatUsdc(value: number | null) {
-  if (!value || value <= 0) return "0.00"
-
-  return value.toLocaleString(undefined, {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
-}
+import { usePaymentChainGuard } from "@/hooks/use-payment-chain-guard"
+import { usePaymentAmount } from "@/hooks/use-payment-amount"
+import { PaymentMethodsBadges } from "./payment-methods-badges"
 
 export function PayPurchaseCard() {
   const params = useParams<{ linkId: string }>()
   const linkId = params?.linkId
-  const account = useActiveAccount()
-  const wallet = useActiveWallet()
   const [isPaying, setIsPaying] = useState(false)
-  const [isSwitchingChain, setIsSwitchingChain] = useState(false)
-  const [showChainSwitchDialog, setShowChainSwitchDialog] = useState(false)
   const { theme } = useTheme()
+  const {
+    account,
+    connectedChainLabel,
+    hasChainMismatch,
+    isSwitchingChain,
+    showChainSwitchDialog,
+    setShowChainSwitchDialog,
+    openChainSwitchDialog,
+    handleSwitchNetwork,
+  } = usePaymentChainGuard()
 
   const { data, isLoading, error } = usePublicLink(linkId)
 
-  const [amount, setAmount] = useState("")
-  const expectedChainId = Number(PAYMENT_CHAIN.id)
-  const connectedChainId = wallet?.getChain()?.id
-  const hasChainMismatch =
-    Boolean(account) &&
-    Boolean(wallet) &&
-    connectedChainId !== undefined &&
-    Number(connectedChainId) !== expectedChainId
-
   const link = data?.link
+  const { displayAmount, setAmount } = usePaymentAmount(link)
 
   const accessPills = useMemo(() => {
     if (!link) return []
@@ -74,31 +59,6 @@ export function PayPurchaseCard() {
     if (link.access_max_views) pills.push(`Max opens: ${link.access_max_views}`)
     return pills
   }, [link])
-
-  useEffect(() => {
-    if (!link) return
-    if (amount) return
-    setAmount(formatUsdc(link.suggested_amount_usdc ?? link.price_usdc))
-  }, [amount, link])
-
-  useEffect(() => {
-    setShowChainSwitchDialog(hasChainMismatch)
-  }, [hasChainMismatch])
-
-  const handleSwitchNetwork = async () => {
-    if (!wallet) return
-
-    setIsSwitchingChain(true)
-    try {
-      await wallet.switchChain(PAYMENT_CHAIN)
-      toast.success(`Switched to ${envConfig.PAYMENT_NETWORK_LABEL}`)
-      setShowChainSwitchDialog(false)
-    } catch (error) {
-      toast.error(getErrorMessage(error) || "Failed to switch network")
-    } finally {
-      setIsSwitchingChain(false)
-    }
-  }
 
   if (isLoading) {
     return (
@@ -145,12 +105,18 @@ export function PayPurchaseCard() {
           </label>
           <Input
             id="amount"
-            value={amount}
+            value={displayAmount}
             onChange={(event) => setAmount(event.target.value)}
             placeholder="0.00"
             readOnly={link.type !== "tip"}
           />
         </div>
+        <PaymentMethodsBadges
+          showConnectedBadge={Boolean(account)}
+          hasChainMismatch={hasChainMismatch}
+          connectedChainLabel={connectedChainLabel}
+          onOpenChainSwitchDialog={openChainSwitchDialog}
+        />
         <>
           {!account ? (
             <ConnectButton
@@ -196,42 +162,12 @@ export function PayPurchaseCard() {
           ) : (
             <PayButton
               link={link}
-              handle="sylus77"
               account={account}
               amount={(link.suggested_amount_usdc ?? link.price_usdc) || 1}
               isPaying={isPaying}
               setIsPaying={setIsPaying}
             />
           )}
-          <h1 className="font-heading font-semibold text-muted-foreground">
-            Supported Methods
-          </h1>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 rounded-full border border-border/70 px-3 py-1">
-              <Image src="/usdc.svg" alt="USDC" width={16} height={16} />
-              <span className="text-sm font-semibold text-muted-foreground">
-                USDC
-              </span>
-            </div>
-            <div className="flex items-center gap-1 rounded-full border border-border/70 px-3 py-1">
-              <Image src="/usdt.svg" alt="USDC" width={16} height={16} />
-              <span className="text-sm font-semibold text-muted-foreground">
-                USDT
-              </span>
-            </div>
-            <div className="flex items-center gap-1 rounded-full border border-border/70 px-3 py-1">
-              <Image
-                src="/mpesa.png"
-                alt="USDC"
-                className="size-5 rounded"
-                width={100}
-                height={100}
-              />
-              <span className="text-sm font-semibold text-muted-foreground">
-                Mobile
-              </span>
-            </div>
-          </div>
         </>
       </CardContent>
       <Dialog

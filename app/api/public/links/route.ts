@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 
 export interface PublicLinkDetails {
   id: string
+  creatorId: string
   created_at: string
   type: string
   title: string
@@ -76,6 +77,7 @@ export async function GET(
       .select(
         `
         id,
+        creator_id,
         created_at,
         type,
         title,
@@ -127,6 +129,7 @@ export async function GET(
 
     const response: PublicLinkDetails = {
       id: data.id,
+      creatorId: data.creator_id,
       created_at: data.created_at,
       type: data.type,
       title: data.title,
