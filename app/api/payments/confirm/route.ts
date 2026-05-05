@@ -1,28 +1,41 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { createPublicClient, http, parseAbi, decodeEventLog } from "viem"
-import { hederaTestnet, hedera } from "viem/chains"
+import { avalanche, avalancheFuji, hedera, hederaTestnet } from "viem/chains"
 import { NextRequest } from "next/server"
 import { Redis } from "@upstash/redis"
 import { randomUUID } from "crypto"
-import { envConfig } from "@/lib/utils"
+import {
+  envConfig,
+  getPaymentNetworkLabel,
+  isAvalanchePaymentChain,
+} from "@/lib/utils"
 import crypto from "crypto"
 import { USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains"
 
 const redis = Redis.fromEnv()
 const PLATFORM_WALLET_ADDRESS = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS
 
-const network = envConfig.ENV === "DEV" ? hederaTestnet : hedera
-const networkLabel =
-  envConfig.ENV === "DEV" ? "hedera-testnet" : "hedera-mainnet"
-const expectedChainId = network.id
+const isDevelopment = envConfig.ENV === "DEV"
+const isAvalanche = isAvalanchePaymentChain()
+
+const network = isAvalanche
+  ? isDevelopment
+    ? avalancheFuji
+    : avalanche
+  : isDevelopment
+    ? hederaTestnet
+    : hedera
+
+const networkLabel = getPaymentNetworkLabel()
+
+const expectedChainId = envConfig.CHAIN_ID
 
 const viemClient = createPublicClient({
   chain: network,
   transport: http(envConfig.RPC_URL),
 })
 
-const USDC_ADDRESS =
-  USDC_CONTRACT_ADDRESS || "0x0000000000000000000000000000000000068cda"
+const USDC_ADDRESS = USDC_CONTRACT_ADDRESS
 const USDC_ABI = parseAbi([
   "event Transfer(address indexed from, address indexed to, uint256 value)",
 ])

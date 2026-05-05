@@ -1,13 +1,22 @@
 import { defineChain } from "thirdweb"
-import { envConfig } from "../utils"
+import { envConfig, isAvalanchePaymentChain } from "../utils"
 
 const hederaMainnet = defineChain(295)
 const hederaTestnet = defineChain(296)
+const avalancheMainnet = defineChain(43114)
+const avalancheFuji = defineChain(43113)
 
-export const defaultChain =
-  envConfig.ENV === "DEV" ? hederaTestnet : hederaMainnet
+function resolveDefaultChain() {
+  if (isAvalanchePaymentChain()) {
+    return envConfig.ENV === "DEV" ? avalancheFuji : avalancheMainnet
+  }
+
+  return envConfig.ENV === "DEV" ? hederaTestnet : hederaMainnet
+}
+
+export const defaultChain = resolveDefaultChain()
 
 export const smartAccountConfig = {
-  chain: envConfig.ENV === "DEV" ? hederaTestnet : hederaMainnet,
+  chain: defaultChain,
   sponsorGas: true,
 }

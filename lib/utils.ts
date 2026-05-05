@@ -22,6 +22,98 @@ export const imageAssets = {
   TIPS: tipsImage,
 }
 
+type SupportedPaymentChain = "H" | "A"
+type PaymentNetworkFamily = "hedera" | "avalanche"
+
+const DEFAULT_PAYMENT_CHAIN: SupportedPaymentChain = "A"
+const DEFAULT_HEDERA_TESTNET_RPC_URL = "https://testnet.hashio.io/api"
+const DEFAULT_AVAX_TESTNET_RPC_URL =
+  "https://api.avax-test.network/ext/bc/C/rpc"
+const DEFAULT_HEDERA_TESTNET_USDC = "0x00000000000000000000000000000000006E4dc3"
+const DEFAULT_AVAX_TESTNET_USDC = "0x5425890298aed601595a70AB815c96711a31Bc65"
+
+function normalizePaymentChain(
+  chain: string | undefined
+): SupportedPaymentChain {
+  const normalized = chain?.trim().toUpperCase()
+  if (normalized === "A" || normalized === "H") return normalized
+  return DEFAULT_PAYMENT_CHAIN
+}
+
+function isDevEnvironment(env: string | undefined): boolean {
+  return (env || "DEV").toUpperCase() === "DEV"
+}
+
+export function getActivePaymentChain(): SupportedPaymentChain {
+  return normalizePaymentChain(process.env.CHAIN)
+}
+
+export function isAvalanchePaymentChain(): boolean {
+  return getActivePaymentChain() === "A"
+}
+
+export function resolvePaymentNetworkFamily(): PaymentNetworkFamily {
+  return isAvalanchePaymentChain() ? "avalanche" : "hedera"
+}
+
+export function getPaymentNetworkLabel(): string {
+  const networkFamily = resolvePaymentNetworkFamily()
+  const isDev = isDevEnvironment(process.env.ENV)
+
+  if (networkFamily === "avalanche") {
+    return isDev ? "Avalanche Fuji" : "Avalanche Mainnet"
+  }
+
+  return isDev ? "Hedera Testnet" : "Hedera Mainnet"
+}
+
+export function resolvePaymentRpcUrl(): string {
+  const chain = getActivePaymentChain()
+  const isDev = isDevEnvironment(process.env.ENV)
+
+  if (chain === "A") {
+    return isDev
+      ? process.env.AVAX_TESTNET_RPC_URL || DEFAULT_AVAX_TESTNET_RPC_URL
+      : process.env.AVAX_MAINNET_RPC_URL || DEFAULT_AVAX_TESTNET_RPC_URL
+  }
+
+  return isDev
+    ? process.env.HEDERA_TESTNET_RPC_URL || DEFAULT_HEDERA_TESTNET_RPC_URL
+    : process.env.HEDERA_MAINNET_RPC_URL || DEFAULT_HEDERA_TESTNET_RPC_URL
+}
+
+export function resolvePaymentUsdcContractAddress(): string {
+  const chain = getActivePaymentChain()
+  const isDev = isDevEnvironment(process.env.ENV)
+
+  if (chain === "A") {
+    return isDev
+      ? process.env.AVAX_TESTNET_USDC_CONTRACT_ADDRESS ||
+          DEFAULT_AVAX_TESTNET_USDC
+      : process.env.AVAX_MAINNET_USDC_CONTRACT_ADDRESS ||
+          DEFAULT_AVAX_TESTNET_USDC
+  }
+
+  return isDev
+    ? process.env.TESTNET_USDC_CONTRACT_ADDRESS || DEFAULT_HEDERA_TESTNET_USDC
+    : process.env.MAINNET_USDC_CONTRACT_ADDRESS || DEFAULT_HEDERA_TESTNET_USDC
+}
+
+export function resolvePaymentChainId(): number {
+  const chain = getActivePaymentChain()
+  const isDev = isDevEnvironment(process.env.ENV)
+
+  if (chain === "A") {
+    return Number(
+      isDev
+        ? process.env.AVAX_TESTNET_CHAIN_ID || 43113
+        : process.env.AVAX_MAINNET_CHAIN_ID || 43114
+    )
+  }
+
+  return Number(isDev ? 296 : 295)
+}
+
 export const envConfig = {
   THIRDWEB_CLIENT_ID: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID || "",
   SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -49,15 +141,12 @@ export const envConfig = {
   PREVIEW_SESSION_MAX_AGE_SECONDS: Number(
     process.env.PREVIEW_SESSION_MAX_AGE_SECONDS || 60 * 60
   ),
-  RPC_URL:
-    process.env.ENV === "DEV"
-      ? process.env.HEDERA_TESTNET_RPC_URL
-      : process.env.HEDERA_MAINNET_RPC_URL || "https://testnet.hashio.io/api",
-  USDC_CONTRACT_ADDRESS:
-    process.env.ENV === "DEV"
-      ? process.env.TESTNET_USDC_CONTRACT_ADDRESS
-      : process.env.MAINNET_USDC_CONTRACT_ADDRESS ||
-        "0x00000000000000000000000000000000006E4dc3",
+  CHAIN: getActivePaymentChain(),
+  PAYMENT_NETWORK: resolvePaymentNetworkFamily(),
+  PAYMENT_NETWORK_LABEL: getPaymentNetworkLabel(),
+  RPC_URL: resolvePaymentRpcUrl(),
+  USDC_CONTRACT_ADDRESS: resolvePaymentUsdcContractAddress(),
+  CHAIN_ID: resolvePaymentChainId(),
 }
 
 export const HEDERA_HTS_ADDR = "0x0000000000000000000000000000000000000167"

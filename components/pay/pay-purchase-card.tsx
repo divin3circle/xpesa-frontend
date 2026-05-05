@@ -2,12 +2,16 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { client } from "@/lib/utils"
+import { client, envConfig, getErrorMessage } from "@/lib/utils"
 import { useParams } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ConnectButton, useActiveAccount } from "thirdweb/react"
+import {
+  ConnectButton,
+  useActiveAccount,
+  useActiveWallet,
+} from "thirdweb/react"
 
 import { PAYMENT_CHAIN } from "@/lib/thirdweb/chains"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,6 +21,16 @@ import Image from "next/image"
 import { smartAccountConfig } from "@/lib/thirdweb/account-abstraction"
 import { PayButton } from "./pay-button"
 import { useTheme } from "next-themes"
+import { toast } from "sonner"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 
 function formatUsdc(value: number | null) {
   if (!value || value <= 0) return "0.00"
@@ -31,12 +45,22 @@ export function PayPurchaseCard() {
   const params = useParams<{ linkId: string }>()
   const linkId = params?.linkId
   const account = useActiveAccount()
+  const wallet = useActiveWallet()
   const [isPaying, setIsPaying] = useState(false)
-  const { theme } = useTheme();
+  const [isSwitchingChain, setIsSwitchingChain] = useState(false)
+  const [showChainSwitchDialog, setShowChainSwitchDialog] = useState(false)
+  const { theme } = useTheme()
 
   const { data, isLoading, error } = usePublicLink(linkId)
 
   const [amount, setAmount] = useState("")
+  const expectedChainId = Number(PAYMENT_CHAIN.id)
+  const connectedChainId = wallet?.getChain()?.id
+  const hasChainMismatch =
+    Boolean(account) &&
+    Boolean(wallet) &&
+    connectedChainId !== undefined &&
+    Number(connectedChainId) !== expectedChainId
 
   const link = data?.link
 
@@ -56,6 +80,25 @@ export function PayPurchaseCard() {
     if (amount) return
     setAmount(formatUsdc(link.suggested_amount_usdc ?? link.price_usdc))
   }, [amount, link])
+
+  useEffect(() => {
+    setShowChainSwitchDialog(hasChainMismatch)
+  }, [hasChainMismatch])
+
+  const handleSwitchNetwork = async () => {
+    if (!wallet) return
+
+    setIsSwitchingChain(true)
+    try {
+      await wallet.switchChain(PAYMENT_CHAIN)
+      toast.success(`Switched to ${envConfig.PAYMENT_NETWORK_LABEL}`)
+      setShowChainSwitchDialog(false)
+    } catch (error) {
+      toast.error(getErrorMessage(error) || "Failed to switch network")
+    } finally {
+      setIsSwitchingChain(false)
+    }
+  }
 
   if (isLoading) {
     return (
@@ -123,14 +166,33 @@ export function PayPurchaseCard() {
                   width: "100%",
                   marginBottom: "1rem",
                   borderRadius: "20px",
-                }
+                },
               }}
               connectModal={{
                 title: "Connect to pay",
-                titleIcon:
-                  "/logo.png",
+                titleIcon: "/logo.png",
               }}
             />
+          ) : hasChainMismatch ? (
+            <div className="space-y-3 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4">
+              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                Your wallet is on the wrong network.
+              </p>
+              <p className="text-sm text-amber-700 dark:text-amber-300">
+                Switch to {envConfig.PAYMENT_NETWORK_LABEL} to continue with
+                payment.
+              </p>
+              <Button
+                type="button"
+                onClick={handleSwitchNetwork}
+                disabled={isSwitchingChain}
+                className="w-full"
+              >
+                {isSwitchingChain
+                  ? "Switching network..."
+                  : `Switch to ${envConfig.PAYMENT_NETWORK_LABEL}`}
+              </Button>
+            </div>
           ) : (
             <PayButton
               link={link}
@@ -172,6 +234,33 @@ export function PayPurchaseCard() {
           </div>
         </>
       </CardContent>
+      <Dialog
+        open={showChainSwitchDialog}
+        onOpenChange={setShowChainSwitchDialog}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Switch Network to Continue</DialogTitle>
+            <DialogDescription>
+              Payments for this link are processed on{" "}
+              {envConfig.PAYMENT_NETWORK_LABEL}. Please switch your wallet
+              network to continue.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              onClick={handleSwitchNetwork}
+              disabled={isSwitchingChain}
+              className="w-full"
+            >
+              {isSwitchingChain
+                ? "Switching network..."
+                : `Switch to ${envConfig.PAYMENT_NETWORK_LABEL}`}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }
