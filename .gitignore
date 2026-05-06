@@ -35,4 +35,3 @@ pnpm-debug.log*
 *.tsbuildinfo
 next-env.d.ts
 .env
-components/viewer/unified-file-explorer.tsx

@@ -1,15 +1,14 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useState } from "react"
 import Link from "next/link"
-import Image from "next/image"
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion"
-import { CircleCheckBig, Copy, ExternalLink, X } from "lucide-react"
-
+import { motion, useReducedMotion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { supportedNetworks, supportedTokens } from "@/lib/dashboard"
 import { cn } from "@/lib/utils"
 import { More01Icon } from "hugeicons-react"
+import TransactionDetailsModal from "@/components/ui/transaction-details-modal"
+import { AssetLogoBadge } from "./transaction-management-table-utils"
 
 export interface TransactionRecord {
   hash: string
@@ -44,11 +43,11 @@ const tokenLogoMap = new Map(
   supportedTokens.map((token) => [token.symbol.toLowerCase(), token.icon])
 )
 
-function getNetworkLogo(network: string) {
+export function getNetworkLogo(network: string) {
   return networkLogoMap.get(network.toLowerCase()) ?? null
 }
 
-function getTokenLogo(token: string) {
+export function getTokenLogo(token: string) {
   return tokenLogoMap.get(token.toLowerCase()) ?? null
 }
 
@@ -107,44 +106,6 @@ function StatusBadge({ status }: { status: TransactionRecord["status"] }) {
   )
 }
 
-function AssetLogoBadge({
-  src,
-  label,
-  size = 20,
-  className,
-}: {
-  src: string | null
-  label: string
-  size?: number
-  className?: string
-}) {
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center justify-center overflow-hidden rounded-full border border-border/60 bg-background",
-        className
-      )}
-      style={{ width: size, height: size }}
-      aria-label={label}
-      title={label}
-    >
-      {src ? (
-        <Image
-          src={src}
-          alt={label}
-          width={size}
-          height={size}
-          className="h-full w-full object-cover"
-        />
-      ) : (
-        <span className="text-[10px] font-semibold text-muted-foreground">
-          {label.slice(0, 1).toUpperCase()}
-        </span>
-      )}
-    </span>
-  )
-}
-
 export function TransactionManagementTable({
   title = "Recent transactions",
   description = "Last 10 confirmed payments from your audience",
@@ -154,14 +115,6 @@ export function TransactionManagementTable({
 }: TransactionManagementTableProps) {
   const [selectedTx, setSelectedTx] = useState<TransactionRecord | null>(null)
   const shouldReduceMotion = useReducedMotion()
-
-  const summary = useMemo(() => {
-    const total = transactions.length
-    const confirmed = transactions.filter(
-      (item) => item.status === "confirmed"
-    ).length
-    return { total, confirmed }
-  }, [transactions])
 
   return (
     <div
@@ -176,9 +129,6 @@ export function TransactionManagementTable({
             {title}
           </h2>
           <p className="text-sm text-muted-foreground">{description}</p>
-        </div>
-        <div className="text-xs text-muted-foreground">
-          {summary.confirmed}/{summary.total} confirmed
         </div>
       </div>
 
@@ -226,9 +176,6 @@ export function TransactionManagementTable({
             <div className="flex flex-col items-start gap-2">
               <div className="min-w-0">
                 <p className="text-sm text-foreground">{tx.date}</p>
-                <p className="text-xs text-muted-foreground">
-                  {tx.confirmations} confirmations
-                </p>
               </div>
               <StatusBadge status={tx.status} />
             </div>
@@ -252,142 +199,12 @@ export function TransactionManagementTable({
         </Button>
       </div>
 
-      <AnimatePresence>
-        {selectedTx ? (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-background/60 p-4 backdrop-blur-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="w-full max-w-2xl rounded-3xl border border-border/70 bg-card p-5 shadow-2xl"
-              initial={shouldReduceMotion ? false : { scale: 0.96, y: 6 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={shouldReduceMotion ? {} : { scale: 0.98, y: 4 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="mb-4 flex items-start justify-between gap-3">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <AssetLogoBadge
-                      src={getTokenLogo(selectedTx.token)}
-                      label={selectedTx.token}
-                      size={22}
-                    />
-                    <p className="text-xs tracking-[0.18em] text-muted-foreground uppercase">
-                      Transaction details
-                    </p>
-                  </div>
-                  <h3 className="font-heading text-2xl font-semibold tracking-tight">
-                    {selectedTx.link}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedTx.wallet} · {selectedTx.network}
-                  </p>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  onClick={() => setSelectedTx(null)}
-                >
-                  <X className="size-4" />
-                </Button>
-              </div>
-
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                <div className="rounded-2xl border border-border/60 bg-linear-to-br from-muted/30 to-background p-3">
-                  <p className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
-                    Amount
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <AssetLogoBadge
-                      src={getTokenLogo(selectedTx.token)}
-                      label={selectedTx.token}
-                      size={18}
-                    />
-                    <p className="text-sm font-medium">
-                      {selectedTx.amount} · {selectedTx.token}
-                    </p>
-                  </div>
-                </div>
-                <div className="rounded-2xl border border-border/60 bg-linear-to-br from-muted/30 to-background p-3">
-                  <p className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
-                    Network
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <AssetLogoBadge
-                      src={getNetworkLogo(selectedTx.network)}
-                      label={selectedTx.network}
-                      size={22}
-                    />
-                    <p className="font-medium">{selectedTx.network}</p>
-                  </div>
-                </div>
-                <div className="rounded-2xl border border-border/60 bg-linear-to-br from-muted/30 to-background p-3">
-                  <p className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
-                    Block Number
-                  </p>
-                  <p className="font-medium">{selectedTx.blockNumber}</p>
-                </div>
-                <div className="rounded-2xl border border-border/60 bg-linear-to-br from-muted/30 to-background p-3">
-                  <p className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
-                    Gas Fee
-                  </p>
-                  <p className="font-medium">{selectedTx.gasFee}</p>
-                </div>
-                <div className="rounded-2xl border border-border/60 bg-linear-to-br from-muted/30 to-background p-3">
-                  <p className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
-                    Confirmations
-                  </p>
-                  <p className="font-medium">{selectedTx.confirmations}</p>
-                </div>
-                <div className="rounded-2xl border border-border/60 bg-linear-to-br from-muted/30 to-background p-3">
-                  <p className="mb-1 text-xs tracking-wide text-muted-foreground uppercase">
-                    Status
-                  </p>
-                  <StatusBadge status={selectedTx.status} />
-                </div>
-              </div>
-
-              <div className="mt-5 flex flex-wrap items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    if (typeof navigator !== "undefined") {
-                      void navigator.clipboard.writeText(selectedTx.hash)
-                    }
-                  }}
-                >
-                  <Copy className="size-4" />
-                  Copy hash
-                </Button>
-                {selectedTx.explorerUrl ? (
-                  <Button variant="secondary" size="sm" asChild>
-                    <Link
-                      href={selectedTx.explorerUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      <ExternalLink className="size-4" />
-                      Open block explorer
-                    </Link>
-                  </Button>
-                ) : null}
-                <Button
-                  size="sm"
-                  className="ml-auto"
-                  onClick={() => setSelectedTx(null)}
-                >
-                  <CircleCheckBig className="size-4" />
-                  Done
-                </Button>
-              </div>
-            </motion.div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      {selectedTx ? (
+        <TransactionDetailsModal
+          tx={selectedTx}
+          onClose={() => setSelectedTx(null)}
+        />
+      ) : null}
     </div>
   )
 }

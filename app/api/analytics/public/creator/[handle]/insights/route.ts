@@ -257,8 +257,11 @@ function computeMetrics(
 
   const txByTypeCounter = transactions.reduce<Record<string, number>>(
     (acc, tx) => {
-      const type = (tx.link?.[0]?.type ?? "unknown").toLowerCase()
-      acc[type] = (acc[type] ?? 0) + 1
+      // Only count if link data exists and has content
+      if (tx.link && tx.link.length > 0 && tx.link[0]?.type) {
+        const type = tx.link[0].type.toLowerCase()
+        acc[type] = (acc[type] ?? 0) + 1
+      }
       return acc
     },
     {}

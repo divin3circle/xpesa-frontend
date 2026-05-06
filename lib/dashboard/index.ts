@@ -27,7 +27,7 @@ export const supportedNetworks = [
   { name: "Hedera", symbol: "Hedera", icon: hbar.src },
   { name: "hedera-mainnet", symbol: "Hedera", icon: hbar.src },
   { name: "hedera-testnet", symbol: "Hedera", icon: hbar.src },
-  { name: "Avalanche", symbol: "Avalanche", icon: avax.src },
+  { name: "Avalanche Fuji", symbol: "Avalanche", icon: avax.src },
   { name: "Solana", symbol: "Solana", icon: sol.src },
   { name: "Polygon", symbol: "Polygon", icon: pol.src },
 ]

@@ -11,10 +11,10 @@ import placeholderBanner from "@/public/placeholderBanner.jpg"
 import {
   Comment01Icon,
   Share01Icon,
-  ThumbsDown,
   ThumbsUp,
 } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
+import { toast } from "sonner"
 
 function formatUsdc(value: number | null) {
   if (!value || value <= 0) return "Free"
@@ -34,16 +34,19 @@ const engagementItems = [
     id: "like",
     title: "Like",
     icon: ThumbsUp,
+    action: () => toast.info("Engagement actions coming soon"),
   },
   {
     id: "comment",
     title: "Comment",
     icon: Comment01Icon,
+    action: () => toast.info("Engagement actions coming soon"),
   },
   {
     id: "share",
     title: "Share",
     icon: Share01Icon,
+    action: () => toast.info("Engagement actions coming soon"),
   },
 ]
 
@@ -113,7 +116,8 @@ export function PayLinkPreviewCard() {
               {engagementItems.map((item) => (
                 <div
                   key={item.id}
-                  className="group w-24 flex cursor-pointer items-center justify-center gap-1 rounded-2xl bg-background/10 p-2 text-sm text-muted-foreground backdrop-blur-sm"
+                  onClick={item.action}
+                  className="group flex w-24 cursor-pointer items-center justify-center gap-1 rounded-2xl bg-background/10 p-2 text-sm text-muted-foreground backdrop-blur-sm"
                 >
                   <HugeiconsIcon
                     icon={item.icon}

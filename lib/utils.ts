@@ -114,6 +114,22 @@ export function resolvePaymentChainId(): number {
   return Number(isDev ? 296 : 295)
 }
 
+export function resolveExplorerUrl(txHash: string): string {
+  const chain = getActivePaymentChain()
+  const isDev = isDevEnvironment(envConfig.ENV)
+
+  if (chain === "A") {
+    return isDev
+      ? `${process.env.AVAX_TESTNET_EXPLORER_URL || "https://testnet.snowtrace.io/tx/"}${txHash}`
+      : `${process.env.AVAX_MAINNET_EXPLORER_URL || "https://snowtrace.io/tx/"}${txHash}`
+  }
+
+  const baseUrl = isDev
+    ? "https://testnet.hashio.io/transaction/"
+    : "https://mainnet.hashio.io/transaction/"
+  return `${baseUrl}${txHash}`
+}
+
 export const envConfig = {
   THIRDWEB_CLIENT_ID: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID || "",
   SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
