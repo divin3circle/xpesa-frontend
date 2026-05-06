@@ -22,7 +22,7 @@ type TransactionRow = {
   creator_net_usdc: NumericInput
   fan_wallet_address: string | null
   network: string | null
-  link?: { type: string | null } | null
+  link?: Array<{ type: string | null }> | null
 }
 
 type InsightPoint = {
@@ -257,7 +257,7 @@ function computeMetrics(
 
   const txByTypeCounter = transactions.reduce<Record<string, number>>(
     (acc, tx) => {
-      const type = (tx.link?.type ?? "unknown").toLowerCase()
+      const type = (tx.link?.[0]?.type ?? "unknown").toLowerCase()
       acc[type] = (acc[type] ?? 0) + 1
       return acc
     },
