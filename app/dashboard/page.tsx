@@ -1,7 +1,5 @@
 "use client"
-import Link from "next/link"
 
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
@@ -9,21 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { TransactionManagementTable } from "@/components/ui/transaction-management-table"
-import { HugeiconsIcon } from "@hugeicons/react"
-import {
-  Copy01Icon,
-  LinkSquare01Icon,
-  SmartPhone02Icon,
-} from "@hugeicons/core-free-icons"
-import Image from "next/image"
-import { AvatarDisplay } from "@/components/ui/avatar-group-display"
-import {
-  SupportedNetwork,
-  supportedNetworks,
-  SupportedToken,
-  supportedTokens,
-} from "@/lib/dashboard"
+import { CreatorTransactionsTable } from "@/components/ui/creator-transactions-table"
+
 import { useUserDetails } from "@/hooks/use-user"
 import LoadingSpinner from "@/components/ui/loading-spinner"
 import {
@@ -45,7 +30,7 @@ export default function Page() {
     error: allTimeEarningsError,
   } = useGetAllTimeEarnings()
   const { data: creatorTxns, isLoading: isTxnsLoading } =
-    useTransactionsByCreatorId(data?.creator?.id)
+    useTransactionsByCreatorId(data?.creator?.id, 7)
 
   if (isLoading) {
     return (
@@ -172,93 +157,13 @@ export default function Page() {
         </Card>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-5">
-        <TransactionManagementTable
+      <section className="mt-4 grid gap-4 overflow-scroll">
+        <CreatorTransactionsTable
+          title="Your Transactions"
           className="lg:col-span-3"
-          transactions={creatorTxns.transactions || []}
-          description="Showing recent transactions on your links"
-          historyHref="/dashboard/wallet/history"
+          transactions={creatorTxns?.transactions ?? []}
           isLoading={isTxnsLoading}
         />
-
-        <Card className="rounded-2xl border-none bg-transparent shadow-none lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="text-xl">Quick actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <>
-              <div className="rounded-2xl border">
-                <Image
-                  src="/icon.png"
-                  alt="Wallet"
-                  width={200}
-                  height={100}
-                  className="w-full rounded-t-2xl"
-                />
-                <div className="">
-                  <div className="flex items-center justify-between px-3 pt-3 pb-5">
-                    <p className="text-sm font-medium">Wallet Address</p>
-                    <div className="flex items-center gap-1">
-                      <p className="font-heading text-sm text-muted-foreground">
-                        {data?.creator?.wallet_address
-                          ? `${data.creator.wallet_address.slice(
-                              0,
-                              6
-                            )}...${data.creator.wallet_address.slice(-4)}`
-                          : "Not connected"}
-                      </p>
-                      <HugeiconsIcon
-                        icon={Copy01Icon}
-                        className="size-4 cursor-pointer text-muted-foreground transition-colors duration-200 ease-in hover:text-chart-1"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between px-3 pb-3">
-                    <p className="text-sm font-medium">Supported Tokens</p>
-                    <AvatarDisplay
-                      items={supportedTokens}
-                      showGroupRemaining={false}
-                      getAvatarSrc={(token: SupportedToken) => token.icon}
-                      getAvatarAlt={(token: SupportedToken) =>
-                        token.name.charAt(0)
-                      }
-                      getAvatarFallback={(token: SupportedToken) =>
-                        token.symbol
-                      }
-                    />
-                  </div>
-                  <div className="flex items-center justify-between px-3 pb-3">
-                    <p className="text-sm font-medium">Networks</p>
-                    <AvatarDisplay
-                      items={supportedNetworks}
-                      showGroupRemaining
-                      getAvatarSrc={(token: SupportedNetwork) => token.icon}
-                      getAvatarAlt={(token: SupportedNetwork) =>
-                        token.name.charAt(0)
-                      }
-                      getAvatarFallback={(token: SupportedNetwork) =>
-                        token.symbol.charAt(0)
-                      }
-                    />
-                  </div>
-                </div>
-              </div>
-              <Button className="flex h-10 w-full max-w-sm items-center justify-between px-4">
-                <Link href="/dashboard/links/create">Create new link</Link>
-                <HugeiconsIcon icon={LinkSquare01Icon} />
-              </Button>
-              <Button
-                variant="secondary"
-                className="flex h-10 w-full max-w-sm items-center justify-between px-4"
-              >
-                <Link href="/dashboard/wallet/withdraw">
-                  Withdraw to Mobile Money
-                </Link>
-                <HugeiconsIcon icon={SmartPhone02Icon} />
-              </Button>
-            </>
-          </CardContent>
-        </Card>
       </section>
     </div>
   )

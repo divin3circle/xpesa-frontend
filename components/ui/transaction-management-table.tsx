@@ -28,10 +28,10 @@ export interface TransactionRecord {
   explorerUrl?: string
 }
 
-interface TransactionManagementTableProps<Transactions> {
+interface TransactionManagementTableProps {
   title?: string
   description?: string
-  transactions?: Transactions[]
+  transactions?: TransactionRecord[]
   historyHref?: string
   className?: string
   isLoading?: boolean
@@ -45,12 +45,22 @@ const tokenLogoMap = new Map(
   supportedTokens.map((token) => [token.symbol.toLowerCase(), token.icon])
 )
 
-export function getNetworkLogo(network: string) {
-  return networkLogoMap.get(network.toLowerCase()) ?? null
+export function getNetworkLogo(network?: string | null) {
+  if (!network) return null
+  try {
+    return networkLogoMap.get(network.toLowerCase()) ?? null
+  } catch {
+    return null
+  }
 }
 
-export function getTokenLogo(token: string) {
-  return tokenLogoMap.get(token.toLowerCase()) ?? null
+export function getTokenLogo(token?: string | null) {
+  if (!token) return null
+  try {
+    return tokenLogoMap.get(token.toLowerCase()) ?? null
+  } catch {
+    return null
+  }
 }
 
 function StatusBadge({ status }: { status: TransactionRecord["status"] }) {
@@ -73,17 +83,15 @@ function StatusBadge({ status }: { status: TransactionRecord["status"] }) {
   )
 }
 
-export function TransactionManagementTable<
-  Transactions extends TransactionRecord,
->({
+export function TransactionManagementTable({
   title = "Recent transactions",
   description = "Showing confirmed transactions",
   transactions = [],
   historyHref = "/dashboard/wallet/history",
   className,
   isLoading,
-}: TransactionManagementTableProps<Transactions>) {
-  const [selectedTx, setSelectedTx] = useState<Transactions | null>(null)
+}: TransactionManagementTableProps) {
+  const [selectedTx, setSelectedTx] = useState<TransactionRecord | null>(null)
   const shouldReduceMotion = useReducedMotion()
 
   if (isLoading) {
