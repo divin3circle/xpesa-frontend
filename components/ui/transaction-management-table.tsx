@@ -51,41 +51,6 @@ export function getTokenLogo(token: string) {
   return tokenLogoMap.get(token.toLowerCase()) ?? null
 }
 
-const defaultTransactions: TransactionRecord[] = [
-  {
-    hash: "0x9f...e2b",
-    link: "React Native Crash Course",
-    wallet: "0x4D2B...A91e",
-    amount: "$12.00",
-    date: "Today, 11:42",
-    network: "Base",
-    token: "USDC",
-    blockNumber: 24561219,
-    gasFee: "$0.03",
-    confirmations: 48,
-    status: "confirmed",
-    fromAddress: "0x5A7B...F329",
-    toAddress: "0x4D2B...A91e",
-    explorerUrl: "https://basescan.org",
-  },
-  {
-    hash: "0x7a...119",
-    link: "Product Design Teardown",
-    wallet: "0x91Aa...f2B0",
-    amount: "$5.00",
-    date: "Today, 09:18",
-    network: "Polygon",
-    token: "USDT",
-    blockNumber: 61488221,
-    gasFee: "$0.02",
-    confirmations: 32,
-    status: "confirmed",
-    fromAddress: "0x2f11...9c66",
-    toAddress: "0x91Aa...f2B0",
-    explorerUrl: "https://polygonscan.com",
-  },
-]
-
 function StatusBadge({ status }: { status: TransactionRecord["status"] }) {
   const styles =
     status === "confirmed"
@@ -108,8 +73,8 @@ function StatusBadge({ status }: { status: TransactionRecord["status"] }) {
 
 export function TransactionManagementTable({
   title = "Recent transactions",
-  description = "Last 10 confirmed payments from your audience",
-  transactions = defaultTransactions,
+  description = "Showing confirmed transactions",
+  transactions = [],
   historyHref = "/dashboard/wallet/history",
   className,
 }: TransactionManagementTableProps) {
@@ -133,7 +98,7 @@ export function TransactionManagementTable({
       </div>
 
       <div className="space-y-2">
-        {transactions.map((tx, index) => (
+        {transactions.length !== 0 && transactions.map((tx, index) => (
           <motion.div
             key={tx.hash}
             initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
@@ -191,13 +156,19 @@ export function TransactionManagementTable({
             </div>
           </motion.div>
         ))}
-      </div>
 
-      <div className="mt-4">
-        <Button variant="outline" asChild>
-          <Link href={historyHref}>View More</Link>
-        </Button>
+        {transactions.length === 0 && (
+          <div className="flex items-center justify-center flex-col p-2 w-full">
+            <p className="text-xs font-semibold text-muted-foreground">No transactions to show.</p>
+          </div>
+        )}
       </div>
+      {transactions.length !== 0 && (
+        <div className="mt-4">
+          <Button variant="outline" asChild>
+            <Link href={historyHref}>View More</Link>
+          </Button>
+        </div>)}
 
       {selectedTx ? (
         <TransactionDetailsModal

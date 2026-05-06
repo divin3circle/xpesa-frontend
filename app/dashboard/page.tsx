@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card"
 import {
   TransactionManagementTable,
-  type TransactionRecord,
 } from "@/components/ui/transaction-management-table"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
@@ -37,57 +36,7 @@ import {
 import { useGetAllTimeEarnings } from "@/hooks/use-stats"
 import { redirect } from "next/navigation"
 import { useMyLinks } from "@/hooks/use-links"
-
-const recentTransactions: TransactionRecord[] = [
-  {
-    link: "React Native Crash Course",
-    wallet: "0x4D2B...A91e",
-    amount: "$12.00",
-    date: "Today, 11:42",
-    hash: "0x9f...e2b",
-    network: "Hedera",
-    token: "USDC",
-    blockNumber: 24561219,
-    gasFee: "$0.03",
-    confirmations: 48,
-    status: "confirmed",
-    fromAddress: "0x5A7B...F329",
-    toAddress: "0x4D2B...A91e",
-    explorerUrl: "https://hashscan.io/mainnet",
-  },
-  {
-    link: "Product Design Teardown",
-    wallet: "0x91Aa...f2B0",
-    amount: "$5.00",
-    date: "Today, 09:18",
-    hash: "0x7a...119",
-    network: "Polygon",
-    token: "USDT",
-    blockNumber: 61488221,
-    gasFee: "$0.02",
-    confirmations: 32,
-    status: "confirmed",
-    fromAddress: "0x2f11...9c66",
-    toAddress: "0x91Aa...f2B0",
-    explorerUrl: "https://polygonscan.com",
-  },
-  {
-    link: "Buy me chai",
-    wallet: "0x8Fe1...c44b",
-    amount: "$3.50",
-    date: "Yesterday",
-    hash: "0x8d...413",
-    network: "Solana",
-    token: "USDC",
-    blockNumber: 27644155,
-    gasFee: "$0.01",
-    confirmations: 210,
-    status: "confirmed",
-    fromAddress: "0xB36D...b188",
-    toAddress: "0x8Fe1...c44b",
-    explorerUrl: "https://solscan.io",
-  },
-]
+import { useTransactionsByCreatorId } from "@/hooks/use-transactions";
 
 export default function Page() {
   const { data, isLoading, error } = useUserDetails()
@@ -97,6 +46,8 @@ export default function Page() {
     isLoading: isAllTimeEarningsLoading,
     error: allTimeEarningsError,
   } = useGetAllTimeEarnings()
+  const { data: creatorTxns, isLoading: isTxnsLoading, isError: isTxnsErrors } = useTransactionsByCreatorId(data?.creator?.id)
+
 
   if (isLoading) {
     return (
@@ -226,7 +177,8 @@ export default function Page() {
       <section className="grid gap-4 lg:grid-cols-5">
         <TransactionManagementTable
           className="lg:col-span-3"
-          transactions={recentTransactions}
+          transactions={[]}
+          description="Showing recent transactions on your links"
           historyHref="/dashboard/wallet/history"
         />
 
@@ -251,9 +203,9 @@ export default function Page() {
                       <p className="font-heading text-sm text-muted-foreground">
                         {data?.creator?.wallet_address
                           ? `${data.creator.wallet_address.slice(
-                              0,
-                              6
-                            )}...${data.creator.wallet_address.slice(-4)}`
+                            0,
+                            6
+                          )}...${data.creator.wallet_address.slice(-4)}`
                           : "Not connected"}
                       </p>
                       <HugeiconsIcon
