@@ -30,6 +30,12 @@ type InsightPoint = {
   value: number
 }
 
+export type InsightDelta = {
+  value: number
+  label: string
+  direction: "up" | "down" | "neutral"
+}
+
 export interface CreatorInsightsResponse {
   creator: {
     id: string
@@ -44,12 +50,25 @@ export interface CreatorInsightsResponse {
     totalPlatformFeesUsdc: number
     conversionRate: number
   }
+  summaryDeltas: {
+    activeLinks: InsightDelta
+    averagePriceUsdc: InsightDelta
+    uniqueSupporters: InsightDelta
+    totalPlatformFeesUsdc: InsightDelta
+    conversionRate: InsightDelta
+  }
   kpis: {
     totalProfileViews: number
     confirmedSales: number
     netEarningsUsdc: number
     totalRevenueUsdc: number
     primaryNetwork: string
+  }
+  kpisDeltas: {
+    totalProfileViews: InsightDelta
+    confirmedSales: InsightDelta
+    netEarningsUsdc: InsightDelta
+    totalRevenueUsdc: InsightDelta
   }
   series: {
     activeLinksByType: InsightPoint[]
@@ -110,6 +129,227 @@ function getTopEntryLabel(counter: Record<string, number>): string {
   return getTypeLabel(top[0])
 }
 
+function calculateDelta(current: number, prior: number): InsightDelta {
+  if (prior === 0) {
+    return {
+      value: current > 0 ? 100 : 0,
+      label: current > 0 ? "+∞" : "0%",
+      direction: current > prior ? "up" : current < prior ? "down" : "neutral",
+    }
+  }
+  const percentChange = ((current - prior) / prior) * 100
+  const direction =
+    percentChange > 0.5
+      ? ("up" as const)
+      : percentChange < -0.5
+        ? ("down" as const)
+        : ("neutral" as const)
+  return {
+    value: Math.round(percentChange * 10) / 10,
+    label: `${direction === "up" ? "+" : ""}${(Math.round(percentChange * 10) / 10).toFixed(1)}%`,
+    direction,
+  }
+}
+
+type ComputedMetrics = {
+  activeLinksCount: number
+  totalProfileViews: number
+  totalPaymentsFromLinks: number
+  confirmedSales: number
+  totalRevenueUsdc: number
+  totalPlatformFeesUsdc: number
+  netEarningsUsdc: number
+  averagePriceUsdc: number
+  uniqueSupporters: number
+  conversionRate: number
+  primaryNetwork: string
+  primaryContent: string
+  activeLinksByType: InsightPoint[]
+  primaryContentBreakdown: InsightPoint[]
+  averagePriceTrend?: InsightPoint[]
+  totalFeesTrend?: InsightPoint[]
+  uniqueSupportersTrend?: InsightPoint[]
+}
+
+function computeMetrics(
+  links: LinkRow[],
+  transactions: TransactionRow[],
+  includeTimeSeries: boolean = true
+): ComputedMetrics {
+  const activeLinks = links.filter((link) => Boolean(link.is_active))
+  const activeLinksCount = activeLinks.length
+
+  const totalProfileViews = activeLinks.reduce(
+    (sum, link) => sum + toNumber(link.view_count),
+    0
+  )
+  const totalPaymentsFromLinks = activeLinks.reduce(
+    (sum, link) => sum + toNumber(link.payment_count),
+    0
+  )
+
+  const confirmedSales = transactions.length
+  const totalRevenueUsdc = transactions.reduce(
+    (sum, tx) => sum + toNumber(tx.amount_usdc),
+    0
+  )
+  const totalPlatformFeesUsdc = transactions.reduce(
+    (sum, tx) => sum + toNumber(tx.platform_fee_usdc),
+    0
+  )
+  const netEarningsUsdc = transactions.reduce(
+    (sum, tx) => sum + toNumber(tx.creator_net_usdc),
+    0
+  )
+
+  const transactionAveragePrice =
+    confirmedSales > 0 ? totalRevenueUsdc / confirmedSales : 0
+  const fallbackPricedLinks = activeLinks.filter(
+    (link) =>
+      toNumber(link.suggested_amount_usdc) > 0 || toNumber(link.price_usdc) > 0
+  )
+  const fallbackAveragePrice =
+    fallbackPricedLinks.length > 0
+      ? fallbackPricedLinks.reduce(
+          (sum, link) =>
+            sum +
+            Math.max(
+              toNumber(link.suggested_amount_usdc),
+              toNumber(link.price_usdc)
+            ),
+          0
+        ) / fallbackPricedLinks.length
+      : 0
+  const averagePriceUsdc =
+    transactionAveragePrice > 0 ? transactionAveragePrice : fallbackAveragePrice
+
+  const uniqueSupporters = new Set(
+    transactions
+      .map((tx) => tx.fan_wallet_address?.trim().toLowerCase())
+      .filter(Boolean)
+  ).size
+
+  const conversionRate =
+    totalProfileViews > 0
+      ? (totalPaymentsFromLinks / totalProfileViews) * 100
+      : 0
+
+  const networkCounter = transactions.reduce<Record<string, number>>(
+    (acc, tx) => {
+      const network = tx.network?.trim()
+      if (!network) return acc
+      acc[network] = (acc[network] ?? 0) + 1
+      return acc
+    },
+    {}
+  )
+  const primaryNetwork =
+    Object.entries(networkCounter).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "N/A"
+
+  const activeLinksByTypeCounter = activeLinks.reduce<Record<string, number>>(
+    (acc, link) => {
+      const type = (link.type ?? "unknown").toLowerCase()
+      acc[type] = (acc[type] ?? 0) + 1
+      return acc
+    },
+    {}
+  )
+
+  const txByTypeCounter = transactions.reduce<Record<string, number>>(
+    (acc, tx) => {
+      const type = (tx.link?.type ?? "unknown").toLowerCase()
+      acc[type] = (acc[type] ?? 0) + 1
+      return acc
+    },
+    {}
+  )
+
+  const primaryContent = getTopEntryLabel(
+    Object.keys(txByTypeCounter).length > 0
+      ? txByTypeCounter
+      : activeLinksByTypeCounter
+  )
+
+  const activeLinksByType = Object.entries(activeLinksByTypeCounter)
+    .map(([type, value]) => ({ label: getTypeLabel(type), value }))
+    .sort((a, b) => b.value - a.value)
+
+  const primaryContentBreakdown = Object.entries(
+    Object.keys(txByTypeCounter).length > 0
+      ? txByTypeCounter
+      : activeLinksByTypeCounter
+  )
+    .map(([type, value]) => ({ label: getTypeLabel(type), value }))
+    .sort((a, b) => b.value - a.value)
+
+  const metrics: ComputedMetrics = {
+    activeLinksCount,
+    totalProfileViews,
+    totalPaymentsFromLinks,
+    confirmedSales,
+    totalRevenueUsdc,
+    totalPlatformFeesUsdc,
+    netEarningsUsdc,
+    averagePriceUsdc,
+    uniqueSupporters,
+    conversionRate,
+    primaryNetwork,
+    primaryContent,
+    activeLinksByType,
+    primaryContentBreakdown,
+  }
+
+  if (includeTimeSeries) {
+    const dailyRollup = transactions.reduce<
+      Record<
+        string,
+        { amount: number; fees: number; supporters: Set<string>; count: number }
+      >
+    >((acc, tx) => {
+      const key = tx.created_at.slice(0, 10)
+      if (!acc[key]) {
+        acc[key] = {
+          amount: 0,
+          fees: 0,
+          supporters: new Set<string>(),
+          count: 0,
+        }
+      }
+
+      acc[key].amount += toNumber(tx.amount_usdc)
+      acc[key].fees += toNumber(tx.platform_fee_usdc)
+      acc[key].count += 1
+
+      const wallet = tx.fan_wallet_address?.trim().toLowerCase()
+      if (wallet) acc[key].supporters.add(wallet)
+
+      return acc
+    }, {})
+
+    const sortedDayKeys = Object.keys(dailyRollup).sort().slice(-7)
+
+    metrics.averagePriceTrend = sortedDayKeys.map((dayKey) => {
+      const day = dailyRollup[dayKey]
+      return {
+        label: getDayLabel(dayKey),
+        value: day.count > 0 ? day.amount / day.count : 0,
+      }
+    })
+
+    metrics.totalFeesTrend = sortedDayKeys.map((dayKey) => ({
+      label: getDayLabel(dayKey),
+      value: dailyRollup[dayKey].fees,
+    }))
+
+    metrics.uniqueSupportersTrend = sortedDayKeys.map((dayKey) => ({
+      label: getDayLabel(dayKey),
+      value: dailyRollup[dayKey].supporters.size,
+    }))
+  }
+
+  return metrics
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ handle: string }> }
@@ -167,8 +407,12 @@ export async function GET(
       )
     }
 
+    const links: LinkRow[] = linksData ?? []
     const txRangeStart = getRangeStart(range)
+    const priorRangeStart = getRangeStart(range)
+    const priorRangeEnd = txRangeStart
 
+    // Fetch current period transactions
     let txQuery = supabase
       .from("transactions")
       .select(
@@ -194,166 +438,85 @@ export async function GET(
       )
     }
 
-    const links: LinkRow[] = linksData ?? []
     const transactions: TransactionRow[] = (txData ?? []) as TransactionRow[]
+    const currentMetrics = computeMetrics(links, transactions, true)
 
-    const activeLinks = links.filter((link) => Boolean(link.is_active))
-    const activeLinksCount = activeLinks.length
+    // Fetch prior period transactions for deltas
+    let priorTxQuery = supabase
+      .from("transactions")
+      .select(
+        "created_at, amount_usdc, platform_fee_usdc, creator_net_usdc, fan_wallet_address, network, link:links(type)"
+      )
+      .eq("creator_id", creator.id)
+      .eq("status", "confirmed")
 
-    const totalProfileViews = activeLinks.reduce(
-      (sum, link) => sum + toNumber(link.view_count),
-      0
-    )
-    const totalPaymentsFromLinks = activeLinks.reduce(
-      (sum, link) => sum + toNumber(link.payment_count),
-      0
-    )
+    if (priorRangeStart && priorRangeEnd) {
+      priorTxQuery = priorTxQuery.gte(
+        "created_at",
+        priorRangeStart.toISOString()
+      )
+      priorTxQuery = priorTxQuery.lt("created_at", priorRangeEnd.toISOString())
+    } else if (priorRangeStart && !priorRangeEnd) {
+      // For 'all' range, get prior period transactions from a year ago (or equivalent)
+      const priorDate = new Date(priorRangeStart)
+      priorDate.setFullYear(priorDate.getFullYear() - 1)
+      priorTxQuery = priorTxQuery.gte("created_at", priorDate.toISOString())
+      priorTxQuery = priorTxQuery.lt(
+        "created_at",
+        priorRangeStart.toISOString()
+      )
+    }
 
-    const confirmedSales = transactions.length
-    const totalRevenueUsdc = transactions.reduce(
-      (sum, tx) => sum + toNumber(tx.amount_usdc),
-      0
-    )
-    const totalPlatformFeesUsdc = transactions.reduce(
-      (sum, tx) => sum + toNumber(tx.platform_fee_usdc),
-      0
-    )
-    const netEarningsUsdc = transactions.reduce(
-      (sum, tx) => sum + toNumber(tx.creator_net_usdc),
-      0
-    )
+    const { data: priorTxData } = await priorTxQuery
+    const priorTransactions: TransactionRow[] = (priorTxData ??
+      []) as TransactionRow[]
+    const priorMetrics = computeMetrics(links, priorTransactions, false)
 
-    const transactionAveragePrice =
-      confirmedSales > 0 ? totalRevenueUsdc / confirmedSales : 0
-    const fallbackPricedLinks = activeLinks.filter(
-      (link) =>
-        toNumber(link.suggested_amount_usdc) > 0 ||
-        toNumber(link.price_usdc) > 0
-    )
-    const fallbackAveragePrice =
-      fallbackPricedLinks.length > 0
-        ? fallbackPricedLinks.reduce(
-            (sum, link) =>
-              sum +
-              Math.max(
-                toNumber(link.suggested_amount_usdc),
-                toNumber(link.price_usdc)
-              ),
-            0
-          ) / fallbackPricedLinks.length
-        : 0
-    const averagePriceUsdc =
-      transactionAveragePrice > 0
-        ? transactionAveragePrice
-        : fallbackAveragePrice
+    // Calculate deltas
+    const summaryDeltas = {
+      activeLinks: calculateDelta(
+        currentMetrics.activeLinksCount,
+        priorMetrics.activeLinksCount
+      ),
+      averagePriceUsdc: calculateDelta(
+        currentMetrics.averagePriceUsdc,
+        priorMetrics.averagePriceUsdc
+      ),
+      uniqueSupporters: calculateDelta(
+        currentMetrics.uniqueSupporters,
+        priorMetrics.uniqueSupporters
+      ),
+      totalPlatformFeesUsdc: calculateDelta(
+        currentMetrics.totalPlatformFeesUsdc,
+        priorMetrics.totalPlatformFeesUsdc
+      ),
+      conversionRate: calculateDelta(
+        currentMetrics.conversionRate,
+        priorMetrics.conversionRate
+      ),
+    }
 
-    const uniqueSupporters = new Set(
-      transactions
-        .map((tx) => tx.fan_wallet_address?.trim().toLowerCase())
-        .filter(Boolean)
-    ).size
+    const kpisDeltas = {
+      totalProfileViews: calculateDelta(
+        currentMetrics.totalProfileViews,
+        priorMetrics.totalProfileViews
+      ),
+      confirmedSales: calculateDelta(
+        currentMetrics.confirmedSales,
+        priorMetrics.confirmedSales
+      ),
+      netEarningsUsdc: calculateDelta(
+        currentMetrics.netEarningsUsdc,
+        priorMetrics.netEarningsUsdc
+      ),
+      totalRevenueUsdc: calculateDelta(
+        currentMetrics.totalRevenueUsdc,
+        priorMetrics.totalRevenueUsdc
+      ),
+    }
 
-    const conversionRate =
-      totalProfileViews > 0
-        ? (totalPaymentsFromLinks / totalProfileViews) * 100
-        : 0
-
-    const networkCounter = transactions.reduce<Record<string, number>>(
-      (acc, tx) => {
-        const network = tx.network?.trim()
-        if (!network) return acc
-        acc[network] = (acc[network] ?? 0) + 1
-        return acc
-      },
-      {}
-    )
-    const primaryNetwork =
-      Object.entries(networkCounter).sort((a, b) => b[1] - a[1])[0]?.[0] ??
-      "N/A"
-
-    const activeLinksByTypeCounter = activeLinks.reduce<Record<string, number>>(
-      (acc, link) => {
-        const type = (link.type ?? "unknown").toLowerCase()
-        acc[type] = (acc[type] ?? 0) + 1
-        return acc
-      },
-      {}
-    )
-
-    const txByTypeCounter = transactions.reduce<Record<string, number>>(
-      (acc, tx) => {
-        const type = (tx.link?.type ?? "unknown").toLowerCase()
-        acc[type] = (acc[type] ?? 0) + 1
-        return acc
-      },
-      {}
-    )
-
-    const primaryContent = getTopEntryLabel(
-      Object.keys(txByTypeCounter).length > 0
-        ? txByTypeCounter
-        : activeLinksByTypeCounter
-    )
-
-    const activeLinksByType = Object.entries(activeLinksByTypeCounter)
-      .map(([type, value]) => ({ label: getTypeLabel(type), value }))
-      .sort((a, b) => b.value - a.value)
-
-    const primaryContentBreakdown = Object.entries(
-      Object.keys(txByTypeCounter).length > 0
-        ? txByTypeCounter
-        : activeLinksByTypeCounter
-    )
-      .map(([type, value]) => ({ label: getTypeLabel(type), value }))
-      .sort((a, b) => b.value - a.value)
-
-    const dailyRollup = transactions.reduce<
-      Record<
-        string,
-        { amount: number; fees: number; supporters: Set<string>; count: number }
-      >
-    >((acc, tx) => {
-      const key = tx.created_at.slice(0, 10)
-      if (!acc[key]) {
-        acc[key] = {
-          amount: 0,
-          fees: 0,
-          supporters: new Set<string>(),
-          count: 0,
-        }
-      }
-
-      acc[key].amount += toNumber(tx.amount_usdc)
-      acc[key].fees += toNumber(tx.platform_fee_usdc)
-      acc[key].count += 1
-
-      const wallet = tx.fan_wallet_address?.trim().toLowerCase()
-      if (wallet) acc[key].supporters.add(wallet)
-
-      return acc
-    }, {})
-
-    const sortedDayKeys = Object.keys(dailyRollup).sort().slice(-7)
-
-    const averagePriceTrend = sortedDayKeys.map((dayKey) => {
-      const day = dailyRollup[dayKey]
-      return {
-        label: getDayLabel(dayKey),
-        value: day.count > 0 ? day.amount / day.count : 0,
-      }
-    })
-
-    const totalFeesTrend = sortedDayKeys.map((dayKey) => ({
-      label: getDayLabel(dayKey),
-      value: dailyRollup[dayKey].fees,
-    }))
-
-    const uniqueSupportersTrend = sortedDayKeys.map((dayKey) => ({
-      label: getDayLabel(dayKey),
-      value: dailyRollup[dayKey].supporters.size,
-    }))
-
-    const conversionByTypeAccumulator = activeLinks.reduce<
+    // Compute conversionRateByType from current metrics
+    const conversionByTypeAccumulator = links.reduce<
       Record<string, { views: number; payments: number }>
     >((acc, link) => {
       const type = (link.type ?? "unknown").toLowerCase()
@@ -379,26 +542,28 @@ export async function GET(
       },
       range,
       summary: {
-        activeLinks: activeLinksCount,
-        averagePriceUsdc,
-        primaryContent,
-        uniqueSupporters,
-        totalPlatformFeesUsdc,
-        conversionRate,
+        activeLinks: currentMetrics.activeLinksCount,
+        averagePriceUsdc: currentMetrics.averagePriceUsdc,
+        primaryContent: currentMetrics.primaryContent,
+        uniqueSupporters: currentMetrics.uniqueSupporters,
+        totalPlatformFeesUsdc: currentMetrics.totalPlatformFeesUsdc,
+        conversionRate: currentMetrics.conversionRate,
       },
+      summaryDeltas,
       kpis: {
-        totalProfileViews,
-        confirmedSales,
-        netEarningsUsdc,
-        totalRevenueUsdc,
-        primaryNetwork,
+        totalProfileViews: currentMetrics.totalProfileViews,
+        confirmedSales: currentMetrics.confirmedSales,
+        netEarningsUsdc: currentMetrics.netEarningsUsdc,
+        totalRevenueUsdc: currentMetrics.totalRevenueUsdc,
+        primaryNetwork: currentMetrics.primaryNetwork,
       },
+      kpisDeltas,
       series: {
-        activeLinksByType,
-        averagePriceTrend,
-        primaryContentBreakdown,
-        uniqueSupportersTrend,
-        totalFeesTrend,
+        activeLinksByType: currentMetrics.activeLinksByType,
+        averagePriceTrend: currentMetrics.averagePriceTrend ?? [],
+        primaryContentBreakdown: currentMetrics.primaryContentBreakdown,
+        uniqueSupportersTrend: currentMetrics.uniqueSupportersTrend ?? [],
+        totalFeesTrend: currentMetrics.totalFeesTrend ?? [],
         conversionRateByType,
       },
     })

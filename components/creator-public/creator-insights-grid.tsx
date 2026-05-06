@@ -1,3 +1,7 @@
+"use client"
+
+import { useState } from "react"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CreatorInsightChart } from "@/components/creator-public/creator-insight-chart"
@@ -17,6 +21,8 @@ type InsightPlaceholderCard = {
   label: string
 }
 
+type RangeOption = "7d" | "30d" | "90d" | "all"
+
 const PLACEHOLDER_CARDS: InsightPlaceholderCard[] = [
   { id: "active-links", label: "Active Links" },
   { id: "average-price", label: "Average Price" },
@@ -25,6 +31,37 @@ const PLACEHOLDER_CARDS: InsightPlaceholderCard[] = [
   { id: "total-fees", label: "Total Platform Fees" },
   { id: "conversion-rate", label: "Conversion Rate" },
 ]
+
+const RANGE_OPTIONS: { value: RangeOption; label: string }[] = [
+  { value: "7d", label: "7 Days" },
+  { value: "30d", label: "30 Days" },
+  { value: "90d", label: "90 Days" },
+  { value: "all", label: "All Time" },
+]
+
+function DeltaBadge({
+  delta,
+}: {
+  delta: { value: number; label: string; direction: "up" | "down" | "neutral" }
+}) {
+  const bgColor =
+    delta.direction === "up"
+      ? "bg-green-100 text-green-700"
+      : delta.direction === "down"
+        ? "bg-red-100 text-red-700"
+        : "bg-gray-100 text-gray-700"
+
+  const symbol =
+    delta.direction === "up" ? "↑" : delta.direction === "down" ? "↓" : "→"
+
+  return (
+    <span
+      className={`${bgColor} inline-block rounded px-2 py-1 text-xs font-medium`}
+    >
+      {symbol} {delta.label}
+    </span>
+  )
+}
 
 function InsightCardSkeleton({ label }: { label: string }) {
   return (
@@ -47,7 +84,10 @@ function InsightCardView({ card }: { card: InsightCard }) {
     <Card className="border-border/70">
       <CardContent className="flex h-80 min-h-72 flex-col justify-between space-y-2 py-5">
         <div className="mt-2 px-5">
-          <p className="text-xs text-muted-foreground">{card.label}</p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-muted-foreground">{card.label}</p>
+            {card.delta && <DeltaBadge delta={card.delta} />}
+          </div>
           <p className="font-heading text-3xl font-semibold tracking-tight">
             {card.value}
           </p>
@@ -59,25 +99,56 @@ function InsightCardView({ card }: { card: InsightCard }) {
 }
 
 export function CreatorInsightsGrid({ handle }: CreatorInsightsGridProps) {
-  const { data, isLoading } = useCreatorInsights(handle)
+  const [range, setRange] = useState<RangeOption>("30d")
+  const { data, isLoading } = useCreatorInsights(handle, range)
 
   if (isLoading || !data) {
     return (
-      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {PLACEHOLDER_CARDS.map((card) => (
-          <InsightCardSkeleton key={card.id} label={card.label} />
-        ))}
-      </section>
+      <div className="space-y-6">
+        <div className="flex gap-2">
+          {RANGE_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              disabled
+              className="rounded px-3 py-1 text-sm font-medium opacity-50"
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+        <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {PLACEHOLDER_CARDS.map((card) => (
+            <InsightCardSkeleton key={card.id} label={card.label} />
+          ))}
+        </section>
+      </div>
     )
   }
 
   const cards = buildInsightCards(data)
 
   return (
-    <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {cards.map((card) => (
-        <InsightCardView key={card.id} card={card} />
-      ))}
-    </section>
+    <div className="space-y-6">
+      <div className="flex flex-wrap gap-2">
+        {RANGE_OPTIONS.map((option) => (
+          <button
+            key={option.value}
+            onClick={() => setRange(option.value)}
+            className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
+              range === option.value
+                ? "bg-primary text-primary-foreground"
+                : "border border-border bg-background hover:bg-muted"
+            }`}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+      <section className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {cards.map((card) => (
+          <InsightCardView key={card.id} card={card} />
+        ))}
+      </section>
+    </div>
   )
 }
