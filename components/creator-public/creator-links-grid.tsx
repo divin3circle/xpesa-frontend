@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { getLinkImageURL } from "@/lib/utils"
 import { Button } from "../ui/button"
 import { ArrowRight01Icon } from "hugeicons-react"
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"
 
 type CreatorLinksGridProps = {
   links: LinkPublic[]
@@ -77,10 +77,7 @@ export function CreatorLinksGrid({ links }: CreatorLinksGridProps) {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredLinks.map((link) => (
-            <Card
-              key={link.id}
-              className="overflow-hidden border-border/70 backdrop-blur-2xl"
-            >
+            <Card key={link.id} className="overflow-hidden border-border/70">
               <div className="relative h-56 w-full overflow-hidden">
                 <Image
                   src={getLinkImageURL(link.type)}

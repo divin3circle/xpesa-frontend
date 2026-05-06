@@ -6,16 +6,14 @@ import { Card } from "@/components/ui/card"
 import type { CreatorPublicProfile } from "@/app/api/public/creator/[handle]/route"
 import creatorBanner from "@/public/dashboard.avif"
 import { getUserAvatarURL } from "@/lib/utils"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { BadgeCheck } from "@hugeicons/core-free-icons"
 
 type CreatorHeroCardProps = {
   creator: CreatorPublicProfile
-  primaryNetwork: string
 }
 
-export function CreatorHeroCard({
-  creator,
-  primaryNetwork,
-}: CreatorHeroCardProps) {
+export function CreatorHeroCard({ creator }: CreatorHeroCardProps) {
   return (
     <Card className="relative min-h-90 overflow-hidden border-border/70">
       <div className="absolute inset-0">
@@ -61,7 +59,14 @@ export function CreatorHeroCard({
             </p>
 
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="secondary">{primaryNetwork}</Badge>
+              <Badge variant="secondary">
+                Verified
+                <HugeiconsIcon
+                  icon={BadgeCheck}
+                  size={14}
+                  className="ml-0.5 text-chart-1"
+                />
+              </Badge>
               <Badge variant="outline">Active Creator</Badge>
               <Badge variant="outline">Wallet Ready</Badge>
             </div>

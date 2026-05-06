@@ -68,7 +68,7 @@ function toTransactionRecord(tx: PublicTransaction): TransactionRecord {
   }
 }
 
-function TxnsLoadingSkeleton() {
+export function TxnsLoadingSkeleton() {
   return (
     <div className="flex flex-col justify-between gap-4 rounded-4xl border border-border/70 bg-transparent p-4 md:flex-row md:items-center md:gap-0 md:p-6">
       <div className="flex flex-col gap-2">

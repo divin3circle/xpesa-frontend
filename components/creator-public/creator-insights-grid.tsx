@@ -46,10 +46,10 @@ function DeltaBadge({
 }) {
   const bgColor =
     delta.direction === "up"
-      ? "bg-green-100 text-green-700"
+      ? "bg-chart-1/10 text-green-700"
       : delta.direction === "down"
-        ? "bg-red-100 text-red-700"
-        : "bg-gray-100 text-gray-700"
+        ? "bg-destructive/10 text-red-700"
+        : "bg-gray-100/60 text-gray-900"
 
   const symbol =
     delta.direction === "up" ? "↑" : delta.direction === "down" ? "↓" : "→"
@@ -82,15 +82,13 @@ function InsightCardSkeleton({ label }: { label: string }) {
 function InsightCardView({ card }: { card: InsightCard }) {
   return (
     <Card className="border-border/70">
-      <CardContent className="flex h-80 min-h-72 flex-col justify-between space-y-2 py-5">
+      <CardContent className="flex min-h-80 flex-col justify-between space-y-2 py-5">
         <div className="mt-2 px-5">
           <div className="flex items-center justify-between">
             <p className="text-xs text-muted-foreground">{card.label}</p>
             {card.delta && <DeltaBadge delta={card.delta} />}
           </div>
-          <p className="font-heading text-3xl font-semibold tracking-tight">
-            {card.value}
-          </p>
+          <p className="font-heading text-3xl font-semibold">{card.value}</p>
         </div>
         <CreatorInsightChart id={card.id} data={card.chartData} />
       </CardContent>
@@ -105,7 +103,7 @@ export function CreatorInsightsGrid({ handle }: CreatorInsightsGridProps) {
   if (isLoading || !data) {
     return (
       <div className="space-y-6">
-        <div className="flex gap-2">
+        <div className="mt-4 flex gap-2">
           {RANGE_OPTIONS.map((option) => (
             <button
               key={option.value}

@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { More01Icon } from "hugeicons-react"
 import TransactionDetailsModal from "@/components/ui/transaction-details-modal"
 import { AssetLogoBadge } from "./transaction-management-table-utils"
+import { TxnsLoadingSkeleton } from "@/components/pay/pay-link-transactions"
 
 export interface TransactionRecord {
   hash: string
@@ -27,12 +28,13 @@ export interface TransactionRecord {
   explorerUrl?: string
 }
 
-interface TransactionManagementTableProps {
+interface TransactionManagementTableProps<Transactions> {
   title?: string
   description?: string
-  transactions?: TransactionRecord[]
+  transactions?: Transactions[]
   historyHref?: string
   className?: string
+  isLoading?: boolean
 }
 
 const networkLogoMap = new Map(
@@ -71,15 +73,28 @@ function StatusBadge({ status }: { status: TransactionRecord["status"] }) {
   )
 }
 
-export function TransactionManagementTable({
+export function TransactionManagementTable<
+  Transactions extends TransactionRecord,
+>({
   title = "Recent transactions",
   description = "Showing confirmed transactions",
   transactions = [],
   historyHref = "/dashboard/wallet/history",
   className,
-}: TransactionManagementTableProps) {
-  const [selectedTx, setSelectedTx] = useState<TransactionRecord | null>(null)
+  isLoading,
+}: TransactionManagementTableProps<Transactions>) {
+  const [selectedTx, setSelectedTx] = useState<Transactions | null>(null)
   const shouldReduceMotion = useReducedMotion()
+
+  if (isLoading) {
+    return (
+      <>
+        <TxnsLoadingSkeleton />
+        <TxnsLoadingSkeleton />
+        <TxnsLoadingSkeleton />
+      </>
+    )
+  }
 
   return (
     <div
@@ -98,68 +113,71 @@ export function TransactionManagementTable({
       </div>
 
       <div className="space-y-2">
-        {transactions.length !== 0 && transactions.map((tx, index) => (
-          <motion.div
-            key={tx.hash}
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.25, delay: index * 0.04 }}
-            className="grid gap-3 rounded-2xl border border-border/70 bg-transparent p-3 md:grid-cols-[minmax(0,2.2fr)_minmax(110px,1fr)_minmax(88px,auto)_minmax(110px,0.95fr)_auto] md:items-center"
-          >
-            <div className="min-w-0">
-              <p className="truncate leading-tight font-medium">{tx.link}</p>
-              <p className="mt-1 truncate text-xs text-muted-foreground">
-                {tx.wallet}
-              </p>
-            </div>
-            <div className="flex min-w-0 items-center gap-2">
+        {transactions.length !== 0 &&
+          transactions.map((tx, index) => (
+            <motion.div
+              key={tx.hash}
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25, delay: index * 0.04 }}
+              className="grid gap-3 rounded-2xl border border-border/70 bg-transparent p-3 md:grid-cols-[minmax(0,2.2fr)_minmax(110px,1fr)_minmax(88px,auto)_minmax(110px,0.95fr)_auto] md:items-center"
+            >
               <div className="min-w-0">
+                <p className="truncate leading-tight font-medium">{tx.link}</p>
+                <p className="mt-1 truncate text-xs text-muted-foreground">
+                  {tx.wallet}
+                </p>
+              </div>
+              <div className="flex min-w-0 items-center gap-2">
+                <div className="min-w-0">
+                  <AssetLogoBadge
+                    src={getTokenLogo(tx.token)}
+                    label={tx.token}
+                    size={22}
+                  />
+                  <p className="truncate text-sm leading-tight font-medium">
+                    {tx.amount}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {tx.token}
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col items-start gap-2 md:justify-center">
                 <AssetLogoBadge
-                  src={getTokenLogo(tx.token)}
-                  label={tx.token}
-                  size={22}
+                  src={getNetworkLogo(tx.network)}
+                  label={tx.network}
+                  size={24}
+                  className="border-none bg-transparent shadow-none"
                 />
-                <p className="truncate text-sm leading-tight font-medium">
-                  {tx.amount}
-                </p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {tx.token}
-                </p>
+                <span className="font-heading text-xs text-muted-foreground">
+                  {tx.network}
+                </span>
               </div>
-            </div>
-            <div className="flex flex-col items-start gap-2 md:justify-center">
-              <AssetLogoBadge
-                src={getNetworkLogo(tx.network)}
-                label={tx.network}
-                size={24}
-                className="border-none bg-transparent shadow-none"
-              />
-              <span className="font-heading text-xs text-muted-foreground">
-                {tx.network}
-              </span>
-            </div>
-            <div className="flex flex-col items-start gap-2">
-              <div className="min-w-0">
-                <p className="text-sm text-foreground">{tx.date}</p>
+              <div className="flex flex-col items-start gap-2">
+                <div className="min-w-0">
+                  <p className="text-sm text-foreground">{tx.date}</p>
+                </div>
+                <StatusBadge status={tx.status} />
               </div>
-              <StatusBadge status={tx.status} />
-            </div>
-            <div className="md:text-right">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => setSelectedTx(tx)}
-                className="text-muted-foreground underline"
-              >
-                <More01Icon />
-              </Button>
-            </div>
-          </motion.div>
-        ))}
+              <div className="md:text-right">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setSelectedTx(tx)}
+                  className="text-muted-foreground underline"
+                >
+                  <More01Icon />
+                </Button>
+              </div>
+            </motion.div>
+          ))}
 
         {transactions.length === 0 && (
-          <div className="flex items-center justify-center flex-col p-2 w-full">
-            <p className="text-xs font-semibold text-muted-foreground">No transactions to show.</p>
+          <div className="flex w-full flex-col items-center justify-center p-2">
+            <p className="text-xs font-semibold text-muted-foreground">
+              No transactions to show.
+            </p>
           </div>
         )}
       </div>
@@ -168,7 +186,8 @@ export function TransactionManagementTable({
           <Button variant="outline" asChild>
             <Link href={historyHref}>View More</Link>
           </Button>
-        </div>)}
+        </div>
+      )}
 
       {selectedTx ? (
         <TransactionDetailsModal

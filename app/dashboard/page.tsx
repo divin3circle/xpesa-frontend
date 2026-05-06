@@ -9,9 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import {
-  TransactionManagementTable,
-} from "@/components/ui/transaction-management-table"
+import { TransactionManagementTable } from "@/components/ui/transaction-management-table"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
   Copy01Icon,
@@ -36,7 +34,7 @@ import {
 import { useGetAllTimeEarnings } from "@/hooks/use-stats"
 import { redirect } from "next/navigation"
 import { useMyLinks } from "@/hooks/use-links"
-import { useTransactionsByCreatorId } from "@/hooks/use-transactions";
+import { useTransactionsByCreatorId } from "@/hooks/use-transactions"
 
 export default function Page() {
   const { data, isLoading, error } = useUserDetails()
@@ -46,8 +44,8 @@ export default function Page() {
     isLoading: isAllTimeEarningsLoading,
     error: allTimeEarningsError,
   } = useGetAllTimeEarnings()
-  const { data: creatorTxns, isLoading: isTxnsLoading, isError: isTxnsErrors } = useTransactionsByCreatorId(data?.creator?.id)
-
+  const { data: creatorTxns, isLoading: isTxnsLoading } =
+    useTransactionsByCreatorId(data?.creator?.id)
 
   if (isLoading) {
     return (
@@ -177,9 +175,10 @@ export default function Page() {
       <section className="grid gap-4 lg:grid-cols-5">
         <TransactionManagementTable
           className="lg:col-span-3"
-          transactions={[]}
+          transactions={creatorTxns.transactions || []}
           description="Showing recent transactions on your links"
           historyHref="/dashboard/wallet/history"
+          isLoading={isTxnsLoading}
         />
 
         <Card className="rounded-2xl border-none bg-transparent shadow-none lg:col-span-2">
@@ -203,9 +202,9 @@ export default function Page() {
                       <p className="font-heading text-sm text-muted-foreground">
                         {data?.creator?.wallet_address
                           ? `${data.creator.wallet_address.slice(
-                            0,
-                            6
-                          )}...${data.creator.wallet_address.slice(-4)}`
+                              0,
+                              6
+                            )}...${data.creator.wallet_address.slice(-4)}`
                           : "Not connected"}
                       </p>
                       <HugeiconsIcon
