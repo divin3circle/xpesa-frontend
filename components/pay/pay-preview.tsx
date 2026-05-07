@@ -11,7 +11,7 @@ export default function PayPreview() {
   const params = useParams<{ linkId: string }>()
   const linkId = params?.linkId
 
-  const { data, isLoading, error } = usePublicLink(linkId)
+  const { data, isLoading } = usePublicLink(linkId)
 
   if (isLoading) {
     return (

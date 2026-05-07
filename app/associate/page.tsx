@@ -6,7 +6,7 @@ import CustomConnectButton from "@/components/ui/connect-button";
 import { Button } from "@/components/ui/button";
 import { ChevronsRight, KeyRound, Loader2 } from "lucide-react";
 import { prepareContractCall } from "thirdweb";
-import { useActiveAccount, useActiveWallet, useSendTransaction } from "thirdweb/react";
+import { useActiveWallet, useSendTransaction } from "thirdweb/react";
 import { toast } from "sonner";
 import { useContracts } from "@/hooks/use-contracts";
 import { USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains";
@@ -40,11 +40,17 @@ function AssociatePage() {
       toast.error("Contract not found");
       return;
     }
+    const walletAddress = wallet.getAccount()?.address
+    if (!walletAddress) {
+      toast.error("Wallet account not found")
+      return
+    }
+
     const transaction = prepareContractCall({
       contract: contract.contract,
       method:
         "function associateToken(address account, address token) external returns (int64 responseCode)",
-      params: [wallet?.getAccount()?.address!, USDC_CONTRACT_ADDRESS!],
+      params: [walletAddress, USDC_CONTRACT_ADDRESS],
       value: BigInt(0),
     });
     sendTransaction(transaction);

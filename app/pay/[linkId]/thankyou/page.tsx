@@ -2,9 +2,9 @@
 
 import React from "react"
 import Link from "next/link"
-import { useParams, useSearchParams } from "next/navigation"
+import { useParams } from "next/navigation"
 import { motion } from "framer-motion"
-import { CheckCircle2, ChevronLeft, ExternalLink, Heart, Sparkles } from "lucide-react"
+import { ExternalLink, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { usePublicLink } from "@/hooks/use-public"
 import { Card, CardContent } from "@/components/ui/card"
@@ -14,9 +14,7 @@ import LottieComponent from "@/components/lottie-animation"
 
 export default function TipThankYouPage() {
   const params = useParams<{ linkId: string }>()
-  const searchParams = useSearchParams()
   const linkId = params?.linkId
-  const token = searchParams?.get("token")
 
   const { data, isLoading } = usePublicLink(linkId)
   const link = data?.link

@@ -170,7 +170,7 @@ export default function MyPagePage() {
               disabled={copied}
               onClick={() => {
                 setCopied(true)
-                navigator.clipboard.writeText(
+                void navigator.clipboard.writeText(
                   `${envConfig.APP_URL}/creator/${data?.creator?.handle || ""}`
                 )
               }}

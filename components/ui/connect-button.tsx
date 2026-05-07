@@ -25,9 +25,9 @@ function UIConnectButton() {
       onClick={() => {
         if (wallet) {
           toast.success("Wallet disconnected")
-          disconnect(wallet)
+          void disconnect(wallet)
         } else {
-          connect(async () => {
+          void connect(async () => {
             const metamask = createWallet("io.metamask")
             await metamask.connect({ client })
             return metamask

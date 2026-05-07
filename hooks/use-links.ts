@@ -283,7 +283,7 @@ export function useCreateLink() {
     },
     onSuccess: () => {
       toast.success("Link created successfully!")
-      queryClient.invalidateQueries({ queryKey: ["links"] })
+      void queryClient.invalidateQueries({ queryKey: ["links"] })
     },
     onError: (error) => {
       toast.error(getErrorMessage(error) || "Failed to create link")

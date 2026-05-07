@@ -140,7 +140,7 @@ export function LinkSession() {
                           const url =
                             destinationUrl ||
                             `https://${viewerLinkMock.destinationHost}/launch/secure`
-                          navigator.clipboard.writeText(url)
+                          void navigator.clipboard.writeText(url)
                           toast.success("Copied to clipboard")
                         }}
                       >

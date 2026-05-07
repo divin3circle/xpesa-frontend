@@ -14,11 +14,12 @@ import {
   IconBrandLinkedin,
   IconBrandYoutube,
 } from "@tabler/icons-react"
+import type { ComponentType } from "react"
 
 export type FooterLink = {
   title: string
   href: string
-  icon?: React.ComponentType<{ className?: string }>
+  icon?: ComponentType<{ className?: string }>
 }
 
 export type FooterLinkGroup = {

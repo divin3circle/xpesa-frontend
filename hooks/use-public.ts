@@ -13,25 +13,20 @@ import type {
 } from "@/app/api/public/creator-id/[id]/route"
 
 async function getPublicCreator(handle: string): Promise<GetCreatorResponse> {
-  try {
-    if (!handle || handle.trim().length === 0) {
-      throw new Error("Creator handle is required")
-    }
-
-    const response = await fetch(
-      `/api/public/creator/${encodeURIComponent(handle)}`
-    )
-
-    if (!response.ok) {
-      const error: ErrorResponse = await response.json()
-      throw new Error(error.error || "Failed to fetch creator")
-    }
-
-    return await response.json()
-  } catch (error) {
-    console.error("Error fetching public creator data:", error)
-    throw error
+  if (!handle || handle.trim().length === 0) {
+    throw new Error("Creator handle is required")
   }
+
+  const response = await fetch(
+    `/api/public/creator/${encodeURIComponent(handle)}`
+  )
+
+  if (!response.ok) {
+    const error: ErrorResponse = await response.json()
+    throw new Error(error.error || "Failed to fetch creator")
+  }
+
+  return await response.json()
 }
 
 export function usePublicCreator(handle: string | null | undefined) {
@@ -46,25 +41,20 @@ export function usePublicCreator(handle: string | null | undefined) {
 async function getPublicCreatorHandleById(
   creatorId: string
 ): Promise<GetCreatorHandleByIdResponse> {
-  try {
-    if (!creatorId || creatorId.trim().length === 0) {
-      throw new Error("Creator id is required")
-    }
-
-    const response = await fetch(
-      `/api/public/creator-id/${encodeURIComponent(creatorId)}`
-    )
-
-    if (!response.ok) {
-      const error: CreatorHandleByIdErrorResponse = await response.json()
-      throw new Error(error.error || "Failed to fetch creator handle")
-    }
-
-    return await response.json()
-  } catch (error) {
-    console.error("Error fetching creator handle by id:", error)
-    throw error
+  if (!creatorId || creatorId.trim().length === 0) {
+    throw new Error("Creator id is required")
   }
+
+  const response = await fetch(
+    `/api/public/creator-id/${encodeURIComponent(creatorId)}`
+  )
+
+  if (!response.ok) {
+    const error: CreatorHandleByIdErrorResponse = await response.json()
+    throw new Error(error.error || "Failed to fetch creator handle")
+  }
+
+  return await response.json()
 }
 
 export function usePublicCreatorHandleById(
