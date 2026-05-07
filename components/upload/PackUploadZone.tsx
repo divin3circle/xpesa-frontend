@@ -1,6 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
+import type { ChangeEvent, DragEventHandler } from "react"
 import {
   DndContext,
   PointerSensor,
@@ -36,7 +37,7 @@ export type PackFileState = {
 
 type PackUploadZoneProps = {
   files: PackFileState[]
-  onFilesChange: (files: PackFileState[]) => void
+  onFilesChangeAction: (files: PackFileState[]) => void
 }
 
 const MAX_PACK_FILES = 3
@@ -140,7 +141,10 @@ function SortablePackItem({
   )
 }
 
-export function PackUploadZone({ files, onFilesChange }: PackUploadZoneProps) {
+export function PackUploadZone({
+  files,
+  onFilesChangeAction,
+}: PackUploadZoneProps) {
   const [zoneError, setZoneError] = useState("")
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } })
@@ -160,7 +164,7 @@ export function PackUploadZone({ files, onFilesChange }: PackUploadZoneProps) {
   )
 
   const patchFile = (localId: string, patch: Partial<PackFileState>) => {
-    onFilesChange(
+    onFilesChangeAction(
       normalizeSort(
         files.map((file) =>
           (file.localId ??
@@ -249,7 +253,7 @@ export function PackUploadZone({ files, onFilesChange }: PackUploadZoneProps) {
       progress: 0,
     }
 
-    onFilesChange(normalizeSort([...files, nextItem]))
+    onFilesChangeAction(normalizeSort([...files, nextItem]))
 
     const formData = new FormData()
     formData.append("file", file)
@@ -324,7 +328,7 @@ export function PackUploadZone({ files, onFilesChange }: PackUploadZoneProps) {
     xhr.send(formData)
   }
 
-  const handleDrop: React.DragEventHandler<HTMLDivElement> = (event) => {
+  const handleDrop: DragEventHandler<HTMLDivElement> = (event) => {
     event.preventDefault()
     const incoming = Array.from(event.dataTransfer.files ?? []).slice(
       0,
@@ -333,7 +337,7 @@ export function PackUploadZone({ files, onFilesChange }: PackUploadZoneProps) {
     incoming.forEach((file) => startUpload(file))
   }
 
-  const handleSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSelect = (event: ChangeEvent<HTMLInputElement>) => {
     const incoming = Array.from(event.target.files ?? []).slice(0, slotCount)
     incoming.forEach((file) => startUpload(file))
     event.target.value = ""
@@ -341,7 +345,7 @@ export function PackUploadZone({ files, onFilesChange }: PackUploadZoneProps) {
 
   const handleRemove = async (file: PackFileState) => {
     const next = files.filter((item) => item.localId !== file.localId)
-    onFilesChange(normalizeSort(next))
+    onFilesChangeAction(normalizeSort(next))
 
     if (file.packFileId) {
       try {
@@ -362,7 +366,7 @@ export function PackUploadZone({ files, onFilesChange }: PackUploadZoneProps) {
     const newIndex = ids.findIndex((id) => id === over.id)
     if (oldIndex < 0 || newIndex < 0) return
 
-    onFilesChange(normalizeSort(arrayMove(files, oldIndex, newIndex)))
+    onFilesChangeAction(normalizeSort(arrayMove(files, oldIndex, newIndex)))
   }
 
   return (

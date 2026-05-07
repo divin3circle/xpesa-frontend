@@ -165,7 +165,7 @@ export function PayPurchaseCard() {
               account={account}
               amount={(link.suggested_amount_usdc ?? link.price_usdc) || 1}
               isPaying={isPaying}
-              setIsPaying={setIsPaying}
+              setIsPayingAction={setIsPaying}
             />
           )}
         </>

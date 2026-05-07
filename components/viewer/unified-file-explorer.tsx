@@ -152,7 +152,7 @@ export function UnifiedFileExplorer({
     <div className="min-h-screen p-6 lg:p-10">
       <FanWalletConnectModal
         isOpen={showFanConnectModal}
-        onClose={() => setShowFanConnectModal(false)}
+        onCloseAction={() => setShowFanConnectModal(false)}
       />
 
       {!fanSmartAccountAddress && (
@@ -228,9 +228,9 @@ export function UnifiedFileExplorer({
         <PdfOverlay
           fileUrl={viewingFileUrl}
           fileName={selectedFile.name}
-          onClose={closeViewer}
+          onCloseAction={closeViewer}
           watermark={account?.address || "Locked"}
-          onLoadError={handlePreviewLoadError}
+          onLoadErrorAction={handlePreviewLoadError}
         />
       )}
     </div>

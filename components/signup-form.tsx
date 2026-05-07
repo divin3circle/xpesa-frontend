@@ -12,20 +12,23 @@ import {
 import { Input } from "@/components/ui/input"
 import { IconBrandGoogle, IconBrandTwitter } from "@tabler/icons-react"
 import { useState } from "react"
-import { useSignUp } from "@/hooks/use-auth"
+import type { ComponentProps, FormEvent } from "react"
+import { useSignInWithProvider, useSignUp } from "@/hooks/use-auth"
 import LoadingSpinner from "./ui/loading-spinner"
 
 export function SignupForm({
   className,
   ...props
-}: React.ComponentProps<"form">) {
+}: ComponentProps<"form">) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
 
   const { mutate: signUp, isPending } = useSignUp()
+  const { mutate: loginWithProvider, isPending: isProviderPending } = useSignInWithProvider()
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     signUp({ email, password })
   }
@@ -96,14 +99,48 @@ export function SignupForm({
         </Field>
         <FieldSeparator>Or continue with</FieldSeparator>
         <Field>
-          <Button variant="outline" type="button">
-            <IconBrandGoogle className="size-4" aria-hidden="true" />
-            Signup with Google
-          </Button>
-          <Button variant="outline" type="button">
-            <IconBrandTwitter className="size-4" aria-hidden="true" />
-            Signup with Twitter
-          </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="flex items-center justify-center"
+              onClick={(event) => {
+                event.preventDefault()
+                loginWithProvider({
+                  provider: "google",
+                })
+              }}
+              disabled={isProviderPending}
+            >
+              {isProviderPending ? (
+                <LoadingSpinner />
+              ) : (
+                <>
+                  <IconBrandGoogle className="size-4" aria-hidden="true" />
+                  Signup with Google
+                </>
+              )}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              className="flex items-center justify-center"
+              onClick={(event) => {
+                event.preventDefault()
+                loginWithProvider({
+                  provider: "twitter",
+                })
+              }}
+              disabled={isProviderPending}
+            >
+              {isProviderPending ? (
+                <LoadingSpinner />
+              ) : (
+                <>
+                  <IconBrandTwitter className="size-4" aria-hidden="true" />
+                  Signup with Twitter
+                </>
+              )}
+            </Button>
           <FieldDescription className="px-6 text-center">
             Already have an account? <a href="/login">Sign in</a>
           </FieldDescription>

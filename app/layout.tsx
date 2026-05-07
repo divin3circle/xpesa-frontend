@@ -1,4 +1,5 @@
 import { Geist_Mono, Space_Grotesk, Oxanium } from "next/font/google"
+import type { Metadata } from "next"
 
 import "./globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
@@ -24,7 +25,7 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 })
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "X-Pesa",
   description: "A creator tools platform",
 }

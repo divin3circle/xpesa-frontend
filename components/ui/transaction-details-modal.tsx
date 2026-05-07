@@ -52,10 +52,10 @@ function formatGasPrice(gasPrice: bigint | null | undefined) {
 
 export default function TransactionDetailsModal({
   tx,
-  onClose,
+  onCloseAction,
 }: {
   tx: MinimalTx | null
-  onClose: () => void
+  onCloseAction: () => void
 }) {
   const shouldReduceMotion = useReducedMotion()
   const { data, isLoading, isError } = useTransactionDetails(tx?.hash ?? "")
@@ -76,7 +76,7 @@ export default function TransactionDetailsModal({
               <p className="text-xs font-semibold">
                 Failed to load transaction details. Please try again later.
               </p>
-              <Button variant="outline" onClick={onClose}>
+              <Button variant="outline" onClick={onCloseAction}>
                 Close
               </Button>
             </div>
@@ -86,7 +86,7 @@ export default function TransactionDetailsModal({
               <p className="text-xs text-muted-foreground">
                 This transaction could not be found on the connected RPC node.
               </p>
-              <Button variant="outline" onClick={onClose}>
+              <Button variant="outline" onClick={onCloseAction}>
                 Close
               </Button>
             </div>
@@ -118,7 +118,7 @@ export default function TransactionDetailsModal({
                     </span>
                   </p>
                 </div>
-                <Button variant="ghost" size="icon-sm" onClick={onClose}>
+                <Button variant="ghost" size="icon-sm" onClick={onCloseAction}>
                   <X className="size-4" />
                 </Button>
               </div>

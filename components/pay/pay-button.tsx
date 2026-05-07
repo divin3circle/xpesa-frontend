@@ -24,13 +24,13 @@ export function PayButton({
   account,
   amount,
   isPaying,
-  setIsPaying,
+  setIsPayingAction,
 }: {
   link: PublicLinkDetails
   account: Account
   amount: number
   isPaying: boolean
-  setIsPaying: (isPaying: boolean) => void
+  setIsPayingAction: (isPaying: boolean) => void
 }) {
   const router = useRouter()
   const {
@@ -77,7 +77,7 @@ export function PayButton({
       return
     }
 
-    setIsPaying(true)
+    setIsPayingAction(true)
 
     try {
       const PLATFORM_FEE = 0.05
@@ -119,7 +119,10 @@ export function PayButton({
         }),
       })
 
-      if (!res.ok) throw new Error("Payment confirmation failed")
+      if (!res.ok) {
+        toast.error("Payment confirmation failed")
+        return
+      }
 
       const { accessToken, linkType } = await res.json()
 
@@ -145,7 +148,7 @@ export function PayButton({
         description: (err as Error).message,
       })
     } finally {
-      setIsPaying(false)
+      setIsPayingAction(false)
     }
   }
 

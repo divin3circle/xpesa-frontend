@@ -11,18 +11,20 @@ import { Input } from "@/components/ui/input"
 import { IconBrandGoogle, IconBrandTwitter } from "@tabler/icons-react"
 import { toast } from "sonner"
 import { useState } from "react"
-import { useSignIn } from "@/hooks/use-auth";
+import type { ComponentProps, FormEvent } from "react"
+import { useSignIn, useSignInWithProvider } from "@/hooks/use-auth";
 import LoadingSpinner from "./ui/loading-spinner";
 
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<"form">) {
+}: ComponentProps<"form">) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const { mutate: loginInUser, isPending } = useSignIn()
+  const { mutate: loginWithProvider, isPending: isProviderPending } = useSignInWithProvider()
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     if (!email || !password) {
@@ -79,12 +81,6 @@ export function LoginForm({
         <Field>
           <div className="flex items-center">
             <FieldLabel htmlFor="password">Password</FieldLabel>
-            <a
-              href="/forgot-password"
-              className="ml-auto text-sm underline-offset-4 hover:underline"
-            >
-              Forgot your password?
-            </a>
           </div>
           <Input
             id="password"
@@ -96,19 +92,57 @@ export function LoginForm({
           />
         </Field>
         <Field>
-          <Button disabled={isPending || email === "" || password === ""} className="flex items-center justify-center" type="submit">
+          <Button
+            disabled={isPending || email === "" || password === ""}
+            className="flex items-center justify-center"
+            type="submit"
+          >
             {isPending ? <LoadingSpinner /> : "Login"}
           </Button>
         </Field>
         <FieldSeparator>Or continue with</FieldSeparator>
         <Field>
-          <Button variant="outline" type="button">
-            <IconBrandGoogle className="size-4" aria-hidden="true" />
-            Login with Google
+          <Button
+            type="button"
+            variant="outline"
+            className="flex items-center justify-center"
+            onClick={(event) => {
+              event.preventDefault()
+              loginWithProvider({
+                provider: "google",
+              })
+            }}
+            disabled={isProviderPending}
+          >
+            {isProviderPending ? (
+              <LoadingSpinner />
+            ) : (
+              <>
+                <IconBrandGoogle className="size-4" aria-hidden="true" />
+                Login with Google
+              </>
+            )}
           </Button>
-          <Button variant="outline" type="button">
-            <IconBrandTwitter className="size-4" aria-hidden="true" />
-            Login with Twitter
+          <Button
+            type="button"
+            variant="outline"
+            className="flex items-center justify-center"
+            onClick={(event) => {
+              event.preventDefault()
+              loginWithProvider({
+                provider: "twitter",
+              })
+            }}
+            disabled={isProviderPending}
+          >
+            {isProviderPending ? (
+              <LoadingSpinner />
+            ) : (
+              <>
+                <IconBrandTwitter className="size-4" aria-hidden="true" />
+                Login with Twitter
+              </>
+            )}
           </Button>
           <FieldDescription className="text-center">
             Don&apos;t have an account?{" "}

@@ -16,7 +16,8 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp"
-import React from "react"
+import { useState } from "react"
+import type { FormEvent } from "react"
 import { Input } from "./ui/input"
 
 export function InputOTPForm() {
@@ -79,9 +80,9 @@ export function InputOTPForm() {
 }
 
 export default function PasswordResetForm() {
-  const [showOTPInput, setShowOTPInput] = React.useState(false)
+  const [showOTPInput, setShowOTPInput] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     setShowOTPInput(true)
   }
@@ -93,7 +94,7 @@ export default function PasswordResetForm() {
           <div>
             <label
               htmlFor="email"
-              className="mb-1 block text-sm font-medium text-gray-700"
+              className="mb-1 block text-sm font-medium"
             >
               Email address
             </label>

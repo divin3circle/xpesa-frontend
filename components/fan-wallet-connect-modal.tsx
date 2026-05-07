@@ -16,12 +16,12 @@ import { Wallet01FreeIcons } from "@hugeicons/core-free-icons"
 
 interface FanWalletConnectModalProps {
   isOpen: boolean
-  onClose: () => void
+  onCloseAction: () => void
 }
 
 export function FanWalletConnectModal({
   isOpen,
-  onClose,
+  onCloseAction,
 }: FanWalletConnectModalProps) {
   const { connectAsSmartAccount, disconnectFanWallet } =
     useFanWalletConnection()
@@ -30,17 +30,17 @@ export function FanWalletConnectModal({
   const handleConnect = async () => {
     const result = await connectAsSmartAccount()
     if (result) {
-      onClose()
+      onCloseAction()
     }
   }
 
   const handleDisconnect = () => {
     disconnectFanWallet()
-    onClose()
+    onCloseAction()
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={onCloseAction}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">

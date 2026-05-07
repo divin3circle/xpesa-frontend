@@ -200,7 +200,7 @@ export function TransactionManagementTable({
       {selectedTx ? (
         <TransactionDetailsModal
           tx={selectedTx}
-          onClose={() => setSelectedTx(null)}
+          onCloseAction={() => setSelectedTx(null)}
         />
       ) : null}
     </div>

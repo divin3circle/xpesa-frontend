@@ -13,12 +13,34 @@ interface AuthResponse {
   error: AuthError | null
 }
 
+export type AvailableAuthProviders = 'twitter' | 'google';
+
+async function signInWithAProvider({ provider }: {
+  provider: AvailableAuthProviders
+}) {
+  try {
+    const supabase = createClient()
+    const { data, error } = await  supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${envConfig.APP_URL}/auth/callback?next=/auth/post-login`
+      }
+    })
+    if(error){
+      toast.error(error.message)
+    }
+    return data
+  }catch (error) {
+    console.error(error)
+  }
+}
+
 async function signOutUser() {
   try {
     const supabase = createClient()
     const { error } = await supabase.auth.signOut()
     if (error) {
-      throw error
+      toast.error(error.message)
     }
     toast.success("Signed out successfully")
   } catch (error) {
@@ -26,6 +48,7 @@ async function signOutUser() {
     toast.error("Failed to sign out. Please try again.")
   }
 }
+
 
 async function signUpNewUser({
   email,
@@ -121,7 +144,7 @@ export function useSignIn() {
       onNavigate("/auth/post-login", router)
     },
     onError: (error) => {
-      console.log("Error during signin in:", error)
+      console.log("Error during sign in:", error)
       toast.error("Couldn't sign you in", {
         description: error.message,
       })
@@ -140,5 +163,22 @@ export function useSignOut() {
       console.error("Error during sign out:", error)
       toast.error("Failed to sign out. Please try again.")
     },
+  })
+}
+
+export function useSignInWithProvider(){
+  return useMutation({
+    mutationFn: signInWithAProvider,
+    onSuccess: (response) => {
+      if (!response) {
+        toast.error("Couldn't sign in. Please try again.")
+      }
+    },
+    onError: (error) => {
+      console.error("Error during sign in:", error)
+      toast.error("Failed to sign in. Please try again.", {
+        description: error.message,
+      })
+    }
   })
 }

@@ -21,10 +21,10 @@ export type UploadedDoc = {
 }
 
 type DocumentUploadZoneProps = {
+  onRemoveAction: () => void
+  onUploadCompleteAction: (result: UploadedDoc) => void
+  onUploadErrorAction: (error: string) => void
   value: UploadedDoc | null
-  onUploadComplete: (result: UploadedDoc) => void
-  onUploadError: (error: string) => void
-  onRemove: () => void
 }
 
 const MAX_PDF_BYTES = 50 * 1024 * 1024
@@ -53,9 +53,9 @@ function validateDocument(file: File) {
 
 export function DocumentUploadZone({
   value,
-  onUploadComplete,
-  onUploadError,
-  onRemove,
+  onUploadCompleteAction,
+  onUploadErrorAction,
+  onRemoveAction,
 }: DocumentUploadZoneProps) {
   const [uploadState, setUploadState] = useState<UploadState>(
     value ? "ready" : "idle"
@@ -105,7 +105,7 @@ export function DocumentUploadZone({
           window.clearInterval(poll)
           setUploadState("error")
           setErrorMessage(statusData.error ?? "Document processing failed.")
-          onUploadError(statusData.error ?? "Document processing failed.")
+          onUploadErrorAction(statusData.error ?? "Document processing failed.")
           return
         }
 
@@ -119,13 +119,13 @@ export function DocumentUploadZone({
             filename,
           }
           setUploadState("ready")
-          onUploadComplete(nextValue)
+          onUploadCompleteAction(nextValue)
         }
       } catch {
         window.clearInterval(poll)
         setUploadState("error")
         setErrorMessage("Network error while polling upload status.")
-        onUploadError("Network error while polling upload status.")
+        onUploadErrorAction("Network error while polling upload status.")
       }
     }, 2000)
   }
@@ -135,7 +135,7 @@ export function DocumentUploadZone({
     if (validationError) {
       setUploadState("error")
       setErrorMessage(validationError)
-      onUploadError(validationError)
+      onUploadErrorAction(validationError)
       return
     }
 
@@ -161,7 +161,7 @@ export function DocumentUploadZone({
       if (xhr.status < 200 || xhr.status >= 300) {
         setUploadState("error")
         setErrorMessage("Failed to upload document.")
-        onUploadError("Failed to upload document.")
+        onUploadErrorAction("Failed to upload document.")
         return
       }
 
@@ -179,7 +179,7 @@ export function DocumentUploadZone({
         if (payload.error) {
           setUploadState("error")
           setErrorMessage(payload.error)
-          onUploadError(payload.error)
+          onUploadErrorAction(payload.error)
           return
         }
 
@@ -192,7 +192,7 @@ export function DocumentUploadZone({
             filename: file.name,
           }
           setUploadState("ready")
-          onUploadComplete(nextValue)
+          onUploadCompleteAction(nextValue)
           return
         }
 
@@ -206,11 +206,11 @@ export function DocumentUploadZone({
 
         setUploadState("error")
         setErrorMessage("Upload response was invalid.")
-        onUploadError("Upload response was invalid.")
+        onUploadErrorAction("Upload response was invalid.")
       } catch {
         setUploadState("error")
         setErrorMessage("Could not parse upload response.")
-        onUploadError("Could not parse upload response.")
+        onUploadErrorAction("Could not parse upload response.")
       }
     }
 
@@ -256,7 +256,7 @@ export function DocumentUploadZone({
           size="sm"
           className="mt-2"
           onClick={() => {
-            onRemove()
+            onRemoveAction()
             resetState()
           }}
         >

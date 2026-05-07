@@ -7,17 +7,17 @@ import { SecurePdfViewer } from "../SecurePdfViewer"
 interface Props {
   fileUrl: string
   fileName: string
-  onClose: () => void
+  onCloseAction: () => void
   watermark?: string
-  onLoadError?: (error: unknown) => void
+  onLoadErrorAction?: (error: unknown) => void
 }
 
 export function PdfOverlay({
   fileUrl,
   fileName,
-  onClose,
+  onCloseAction,
   watermark,
-  onLoadError,
+  onLoadErrorAction,
 }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm lg:p-10">
@@ -25,7 +25,8 @@ export function PdfOverlay({
         <Button
           variant="ghost"
           className="absolute top-4 right-4 z-10"
-          onClick={onClose}
+          onClick={onCloseAction}
+          aria-label={`Close ${fileName}`}
         >
           Close
         </Button>
@@ -33,7 +34,7 @@ export function PdfOverlay({
           <SecurePdfViewer
             fileUrl={fileUrl}
             walletWatermark={watermark || "Locked"}
-            onLoadError={onLoadError}
+            onLoadErrorAction={onLoadErrorAction}
           />
         </div>
       </div>
