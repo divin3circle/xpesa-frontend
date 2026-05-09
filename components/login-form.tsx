@@ -8,7 +8,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { IconBrandGoogle, IconBrandTwitter } from "@tabler/icons-react"
+import { IconBrandGoogle } from "@tabler/icons-react"
 import { toast } from "sonner"
 import { useState } from "react"
 import type { ComponentProps, FormEvent } from "react"
@@ -120,27 +120,6 @@ export function LoginForm({
               <>
                 <IconBrandGoogle className="size-4" aria-hidden="true" />
                 Login with Google
-              </>
-            )}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            className="flex items-center justify-center"
-            onClick={(event) => {
-              event.preventDefault()
-              loginWithProvider({
-                provider: "twitter",
-              })
-            }}
-            disabled={isProviderPending}
-          >
-            {isProviderPending ? (
-              <LoadingSpinner />
-            ) : (
-              <>
-                <IconBrandTwitter className="size-4" aria-hidden="true" />
-                Login with Twitter
               </>
             )}
           </Button>

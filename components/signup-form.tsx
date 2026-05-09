@@ -10,7 +10,7 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { IconBrandGoogle, IconBrandTwitter } from "@tabler/icons-react"
+import { IconBrandGoogle } from "@tabler/icons-react"
 import { useState } from "react"
 import type { ComponentProps, FormEvent } from "react"
 import { useSignInWithProvider, useSignUp } from "@/hooks/use-auth"
@@ -117,27 +117,6 @@ export function SignupForm({
                 <>
                   <IconBrandGoogle className="size-4" aria-hidden="true" />
                   Signup with Google
-                </>
-              )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="flex items-center justify-center"
-              onClick={(event) => {
-                event.preventDefault()
-                loginWithProvider({
-                  provider: "twitter",
-                })
-              }}
-              disabled={isProviderPending}
-            >
-              {isProviderPending ? (
-                <LoadingSpinner />
-              ) : (
-                <>
-                  <IconBrandTwitter className="size-4" aria-hidden="true" />
-                  Signup with Twitter
                 </>
               )}
             </Button>
