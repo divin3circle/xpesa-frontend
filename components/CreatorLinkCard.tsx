@@ -1,6 +1,6 @@
 import { LinkPublic } from "@/app/api/public/creator/[handle]/route"
 import Image from "next/image"
-import { getLinkImageURL } from "@/lib/utils"
+import { envConfig, getLinkImageURL } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ArrowRight01Icon } from "hugeicons-react"
 import { Badge } from "@/components/ui/badge"
@@ -27,14 +27,21 @@ export default function CreatorLinkCard({ link}: {
 }) {
   const { data, isLoading } = useTransactionsByLinkId(link.id, 10)
   const router = useRouter()
+
+  const thumbnailURL = !data
+    ? getLinkImageURL(link.type)
+    : envConfig.AVATARS_URL + link.thumbnail_url ||
+      getLinkImageURL(link.type)
+
   return (
     <Card key={link.id} className="overflow-hidden border-border/70">
       <div className="relative h-56 w-full overflow-hidden">
         <Image
-          src={getLinkImageURL(link.type)}
+          src={thumbnailURL}
           alt={link.title}
           fill
           className="object-cover"
+          unoptimized
         />
       </div>
 

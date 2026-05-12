@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { ChangeEvent, useMemo, useState } from "react"
 import Image from "next/image"
 
 import { Badge } from "@/components/ui/badge"
@@ -246,7 +246,8 @@ export default function CreateLinkPage() {
   const [title, setTitle] = useState("")
   const [documentUploadPending, setDocumentUploadPending] = useState(false)
   const [description, setDescription] = useState("")
-  const [destinationUrl, setDestinationUrl] = useState("")
+  const [thumbnailDataUrl, setThumbnailDataUrl] = useState("")
+  const [destinationUrl, setDestinationUrl] = useState<string | undefined>(undefined)
   const [gatePriceUsdc, setGatePriceUsdc] = useState("")
   const [documentPriceUsdc, setDocumentPriceUsdc] = useState("")
   const [packPriceUsdc, setPackPriceUsdc] = useState("")
@@ -325,7 +326,7 @@ export default function CreateLinkPage() {
     if (isPending || !title.trim()) return false
     if (mode === "document") return Boolean(selectedDocumentFile)
     if (mode === "pack") return selectedPackFiles.length > 0
-    if (mode === "gate") return Boolean(destinationUrl.trim())
+    if (mode === "gate") return Boolean(destinationUrl?.trim())
     return true
   }, [
     destinationUrl,
@@ -405,7 +406,7 @@ export default function CreateLinkPage() {
       mode,
       title,
       description,
-      destinationUrl,
+      destinationUrl: destinationUrl ? destinationUrl : "",
       gatePriceUsdc,
       documentPriceUsdc,
       packPriceUsdc,
@@ -415,7 +416,7 @@ export default function CreateLinkPage() {
       documentUpload: finalizedDocumentUpload,
       selectedPackFiles,
       finalizedPackSizeBytes: finalizedPackBytes,
-      finalizedPackR2Key: finalizedPackKey,
+      finalizedPackR2Key: finalizedPackKey
     })
 
     if (!params) {
@@ -426,7 +427,16 @@ export default function CreateLinkPage() {
     }
 
     setUploadError("")
+    params.thumbnailUrl = thumbnailDataUrl
     await createLink(params)
+  }
+
+  function handleThumbnailChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const objectUrl = URL.createObjectURL(file)
+    setThumbnailDataUrl(objectUrl)
   }
 
   return (
@@ -567,6 +577,7 @@ export default function CreateLinkPage() {
                       id="thumbnail-document"
                       type="file"
                       accept="image/*"
+                      onChange={handleThumbnailChange}
                     />
                   </div>
                 </div>
@@ -811,18 +822,18 @@ export default function CreateLinkPage() {
               className="group relative mb-2 cursor-pointer"
             >
               <Image
-                src="/icon.png"
+                src={thumbnailDataUrl ? thumbnailDataUrl : "/icon.png"}
                 alt="Wallet"
                 width={200}
                 height={100}
-                className="w-full rounded-2xl"
+                className="w-full rounded-2xl h-52"
               />
               <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-background/75 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                 <HugeiconsIcon
                   icon={Edit01FreeIcons}
                   className="size-5 text-chart-1"
                 />
-                <p className="mt-2 text-sm">Upload custom Thumbnail</p>
+                <p className="mt-2 text-sm">Custom Thumbnail</p>
               </div>
             </div>
             <div className="space-y-3 rounded-xl border p-4">
@@ -840,7 +851,7 @@ export default function CreateLinkPage() {
                       : "Complete practical guide with project files and implementation checklist."}
               </p>
               <div className="rounded-2xl bg-muted p-3 text-sm">
-                <p>Price: {mode === "tip" ? "Custom amount" : "12.00 USDC"}</p>
+                <p>Price: {mode === "tip" ? "Custom amount" : packPriceUsdc || documentPriceUsdc || gatePriceUsdc || "12.00"} USDC</p>
                 <p className="text-muted-foreground">
                   {mode === "pack"
                     ? `${formatBytes(packSummary.totalBytes)}`

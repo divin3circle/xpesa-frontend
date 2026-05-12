@@ -5,13 +5,17 @@ import { usePublicLink } from "@/hooks/use-public"
 import Image from "next/image"
 import dummyThumbnail from "@/public/dashboard.avif"
 import { Skeleton } from "../ui/skeleton"
-import { getReadableDateTime } from "@/lib/utils"
+import { envConfig, getReadableDateTime } from "@/lib/utils"
 
 export default function PayPreview() {
   const params = useParams<{ linkId: string }>()
   const linkId = params?.linkId
 
   const { data, isLoading } = usePublicLink(linkId)
+
+  const thumbnailURL = !data
+    ? dummyThumbnail
+    : envConfig.AVATARS_URL + data.link.thumbnail_url || dummyThumbnail
 
   if (isLoading) {
     return (
@@ -37,12 +41,13 @@ export default function PayPreview() {
       <div className="mt-2 flex w-full flex-col gap-4 md:flex-row md:items-start">
         <div className="rounded-3xl border border-foreground/5 bg-background/10 p-2 md:w-2/3">
           <Image
-            src={dummyThumbnail}
+            src={thumbnailURL}
             alt="content thumbnail"
             height={1000}
             width={1000}
             className="rounded-3xl"
             priority
+            unoptimized
           />
         </div>
         <div className="flex w-full flex-col gap-2 py-4 md:w-1/3">

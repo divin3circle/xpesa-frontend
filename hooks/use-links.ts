@@ -195,6 +195,18 @@ async function createLink(
         break
     }
 
+    if(params.thumbnailUrl){
+      const blob = await fetch(params.thumbnailUrl).then((res) => res.blob())
+      const fileName = `${Date.now()}.png`
+      const { data: thumbnailUploadData, error: thumbnailUploadError } = await supabase.storage
+        .from("xpesa-public")
+        .upload(`thumbnails/${creatorId}/${fileName}`, blob, {
+          cacheControl: "3600",
+        })
+      console.log("Image upload error", thumbnailUploadError)
+      baseInsert.thumbnail_url = thumbnailUploadData?.fullPath ?? null
+    }
+
     const { data, error } = await supabase
       .from("links")
       .insert({ ...baseInsert, ...typeInsert })
