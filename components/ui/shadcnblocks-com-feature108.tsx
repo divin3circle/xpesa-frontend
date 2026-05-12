@@ -47,7 +47,7 @@ const defaultTabs: Tab[] = [
       badge: "Step 1",
       title: "Create a link and set your price",
       description:
-        "Choose gate or tip mode, add your destination URL, and publish instantly with your custom xpesa link.",
+        "Choose gate or tip mode, add your destination URL, and publish instantly with your custom Xydra link.",
       buttonText: "Create first link",
       imageSrc: dashboardImage.src,
       imageAlt: "Creator dashboard setup",
@@ -58,7 +58,7 @@ const defaultTabs: Tab[] = [
     icon: <Pointer className="size-4 shrink-0" />,
     label: "Share with audience",
     shortDescription:
-      "Drop your xpesa URL in bio, X thread, WhatsApp, Telegram, or newsletter.",
+      "Drop your Xydra URL in bio, X thread, WhatsApp, Telegram, or newsletter.",
     content: {
       badge: "Step 2",
       title: "Share once, no manual follow-up",

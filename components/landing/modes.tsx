@@ -33,7 +33,7 @@ function FanMockup({
         <div>
           <div className="mb-2 inline-flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-background/55 uppercase">
             {icon}
-            xpesa/goodcreator77
+            xydra/goodcreator77
           </div>
           <h4 className="font-heading text-lg leading-tight font-semibold">
             {heading}

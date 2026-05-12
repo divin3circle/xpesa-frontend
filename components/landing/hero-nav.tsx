@@ -20,7 +20,7 @@ export function HeroNav({ navItems }: HeroNavProps) {
       className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-5 lg:px-10"
       aria-label="Primary navigation"
     >
-      <BrandLogo />
+      <BrandLogo tone={"default"} />
 
       <div className="hidden items-center gap-8 md:flex">
         {navItems.map((item) => (

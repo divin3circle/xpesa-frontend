@@ -16,6 +16,7 @@ import { usePublicCreatorHandleById } from "@/hooks/use-public"
 import { toast } from "sonner"
 import LoadingSpinner from "../ui/loading-spinner"
 import { useMyBalance } from "@/hooks/use-balance"
+import Link from "next/link"
 
 const PLATFORM_WALLET = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS!
 
@@ -161,12 +162,15 @@ export function PayButton({
       >
         {isPaying ? "Processing..." : `Pay ${amount} USDC`}
       </button>
-      <p className="text-xs text-muted-foreground">
-        My balance:{" "}
-        <span className="cursor-pointer font-semibold underline">
-          {balanceIsLoading ? "*.**" : balanceError ? "*.**" : balance} USDC
-        </span>
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">
+          My balance:{" "}
+          <span className="cursor-pointer font-semibold underline">
+            {balanceIsLoading ? "*.**" : balanceError ? "*.**" : balance} USDC
+          </span>
+        </p>
+        <Link href="/buy" className="underline text-xs text-muted-foreground font-semibold">Get USDC</Link>
+      </div>
     </>
   )
 }

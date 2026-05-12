@@ -30,7 +30,7 @@ export default function DocsPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 md:p-8">
       <section className="space-y-2">
-        <Badge variant="outline">xpesa reference</Badge>
+        <Badge variant="outline">Xydra reference</Badge>
         <h1 className="font-heading text-4xl font-semibold tracking-tight">
           Product documentation
         </h1>

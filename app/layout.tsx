@@ -26,7 +26,7 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "X-Pesa",
+  title: "Xydra",
   description: "A creator tools platform",
 }
 

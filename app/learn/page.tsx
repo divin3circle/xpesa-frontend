@@ -28,7 +28,7 @@ export default function LearnPage() {
               Getting Started Hub
             </Badge>
             <h1 className="max-w-3xl font-heading text-4xl font-semibold tracking-tight md:text-5xl">
-              Learn xpesa faster with practical tracks
+              Learn Xydra faster with practical tracks
             </h1>
             <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
               Start with quick, focused lessons you can complete in minutes. The{" "}
@@ -145,7 +145,7 @@ export default function LearnPage() {
                 <iframe
                   className="h-full w-full"
                   src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                  title="XPesa Errors Track Introduction"
+                  title="Xydra Errors Track Introduction"
                   loading="lazy"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   referrerPolicy="strict-origin-when-cross-origin"

@@ -72,7 +72,7 @@ export function AveragePriceChart() {
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div>
         <div className="leading-none text-muted-foreground">
-          Showing average link prince since joining XPesa.
+          Showing average link price since joining Xydra.
         </div>
       </CardFooter>
     </Card>

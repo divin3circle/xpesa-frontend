@@ -29,7 +29,7 @@ export const howItWorksContent = {
         badge: "Step 1",
         title: "Create a paid link in under 3 minutes",
         description:
-          "Add your Notion page, Google Drive folder, Telegram invite, or any destination URL, then publish your unique xpesa link with clear pricing.",
+          "Add your Notion page, Google Drive folder, Telegram invite, or any destination URL, then publish your unique Xydra link with clear pricing.",
         buttonText: "Create your first link",
         imageSrc:
           "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80",
@@ -41,7 +41,7 @@ export const howItWorksContent = {
       icon: "share",
       label: "Share with your audience",
       shortDescription:
-        "Post your xpesa link in bio, social posts, newsletters, and chat communities.",
+        "Post your Xydra link in bio, social posts, newsletters, and chat communities.",
       content: {
         badge: "Step 2",
         title: "Share once, automate delivery",
@@ -63,7 +63,7 @@ export const howItWorksContent = {
         badge: "Step 3",
         title: "Collect earnings and withdraw smoothly",
         description:
-          "Your earnings settle on Hedera as USDC, then xpesa routes your offramp via Kotani Pay so you can receive funds in M-Pesa.",
+          "Your earnings settle on Hedera as USDC, then Xydra routes your offramp via Kotani Pay so you can receive funds in M-Pesa.",
         buttonText: "View payout path",
         imageSrc:
           "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=1200&q=80",
