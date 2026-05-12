@@ -15,25 +15,16 @@ interface AuthResponse {
 
 export type AvailableAuthProviders = 'twitter' | 'google';
 
-function getAuthRedirectUrl(next = "/auth/post-login") {
-  const origin =
-    typeof window !== "undefined" ? window.location.origin : envConfig.APP_URL
-
-  const url = new URL("/auth/callback", origin)
-  url.searchParams.set("next", next)
-
-  return url.toString()
-}
-
 async function signInWithAProvider({ provider }: {
   provider: AvailableAuthProviders
 }) {
   try {
     const supabase = createClient()
+    console.log(envConfig.APP_URL + "/auth/post-login")
     const { data, error } = await  supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: getAuthRedirectUrl("/auth/post-login")
+        redirectTo: envConfig.APP_URL + "/auth/post-login",
       }
     })
     if(error){
