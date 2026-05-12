@@ -28,7 +28,7 @@ export default function LearnPage() {
               Getting Started Hub
             </Badge>
             <h1 className="max-w-3xl font-heading text-4xl font-semibold tracking-tight md:text-5xl">
-              Learn Xydra faster with practical tracks
+              Learn xpesa faster with practical tracks
             </h1>
             <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
               Start with quick, focused lessons you can complete in minutes. The{" "}
@@ -37,7 +37,7 @@ export default function LearnPage() {
             </p>
             <div className="flex flex-wrap gap-2 pt-1">
               <Button asChild>
-                <Link href="#errors-track">Start Errors Track</Link>
+                <Link href="#">Start Errors Track</Link>
               </Button>
               <Button variant="outline" asChild>
                 <Link href="/dashboard/links/create">
@@ -65,7 +65,7 @@ export default function LearnPage() {
             </CardHeader>
             <CardContent>
               <Button asChild className="w-full">
-                <Link href="#errors-track">Open Track</Link>
+                <Link href="#">Open Track</Link>
               </Button>
             </CardContent>
           </Card>
@@ -145,7 +145,7 @@ export default function LearnPage() {
                 <iframe
                   className="h-full w-full"
                   src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                  title="Xydra Errors Track Introduction"
+                  title="XPesa Errors Track Introduction"
                   loading="lazy"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   referrerPolicy="strict-origin-when-cross-origin"

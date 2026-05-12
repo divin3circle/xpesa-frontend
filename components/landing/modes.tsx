@@ -7,6 +7,7 @@ import { AsteriskRevealHeading } from "@/components/ui/asterisk-reveal-heading"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { modesContent } from "@/lib/landing/modes-content"
+import React from "react"
 
 function FanMockup({
   heading,
@@ -33,7 +34,7 @@ function FanMockup({
         <div>
           <div className="mb-2 inline-flex items-center gap-2 font-sans text-xs font-bold tracking-[0.2em] text-background/55 uppercase">
             {icon}
-            xydra/goodcreator77
+            xpesa/goodcreator77
           </div>
           <h4 className="font-heading text-lg leading-tight font-semibold">
             {heading}

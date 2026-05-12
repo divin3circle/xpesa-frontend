@@ -31,7 +31,7 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
               <div className="absolute right-0 bottom-0 h-72 w-72 translate-y-1/3 rounded-full bg-[radial-gradient(circle,oklch(0.508_0.118_165.612/.14),transparent_70%)]" />
               <div className="absolute bottom-1 z-10 flex w-full flex-col items-center justify-between gap-2 p-2 pt-3 text-sm text-muted-foreground md:flex-row">
                 <p className="font-heading text-xs font-semibold text-foreground/50">
-                  © 2026 Xydra. All rights reserved.
+                  © 2026 xpesa. All rights reserved.
                 </p>
                 <p className="font-heading text-xs font-semibold text-foreground/50">
                   Creator monetization in Africa.
@@ -43,7 +43,7 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
               <AnimatedContainer className="w-full max-w-sm min-w-2xs space-y-4">
                 <BrandLogo />
                 <p className="mt-8 text-sm text-foreground/75 md:mt-0">
-                  Xydra helps creators in Africa monetize links and tips, then
+                  xpesa helps creators in Africa monetize links and tips, then
                   withdraw earnings to local mobile money rails like M-Pesa.
                 </p>
                 <div className="flex gap-2">

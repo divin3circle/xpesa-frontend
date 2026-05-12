@@ -61,7 +61,7 @@ export function HandleStep() {
         <label className="text-sm font-medium">Handle</label>
         <div className="relative">
           <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm text-muted-foreground">
-            xydra.com/
+            xpesa.com/
           </span>
           <Input
             value={handle}
@@ -100,7 +100,7 @@ export function HandleStep() {
         <div className="rounded-3xl border border-border/70 bg-muted/30 p-4 text-sm">
           <p className="font-medium">Preview</p>
           <p className="mt-1 text-muted-foreground">
-            Your page will be at xydra.com/{handle || "your_handle"}
+            Your page will be at xpesa.com/{handle || "your_handle"}
           </p>
         </div>
       </div>

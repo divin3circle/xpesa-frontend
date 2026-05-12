@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect } from "react"
+import React, { useEffect } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { CheckCircle2, Circle } from "lucide-react"
 

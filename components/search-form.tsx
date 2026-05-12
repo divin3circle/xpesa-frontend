@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/sidebar"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { SearchIcon } from "@hugeicons/core-free-icons"
+import React from "react"
 
 export function SearchForm({ ...props }: React.ComponentProps<"form">) {
   return (

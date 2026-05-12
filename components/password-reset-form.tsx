@@ -17,8 +17,10 @@ import {
   InputOTPSlot,
 } from "@/components/ui/input-otp"
 import { useState } from "react"
-import type { FormEvent } from "react"
+import type { ComponentProps } from "react"
 import { Input } from "./ui/input"
+
+type FormSubmitHandler = NonNullable<ComponentProps<"form">["onSubmit"]>
 
 export function InputOTPForm() {
   return (
@@ -82,8 +84,8 @@ export function InputOTPForm() {
 export default function PasswordResetForm() {
   const [showOTPInput, setShowOTPInput] = useState(false)
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
+  const handleSubmit: FormSubmitHandler = (event) => {
+    event.preventDefault()
     setShowOTPInput(true)
   }
 

@@ -12,11 +12,11 @@ export function BrandLogo({ tone = "light" }: BrandLogoProps) {
     <Link
       href="/"
       className="group flex items-center gap-2"
-      aria-label="Xydra home"
+      aria-label="xpesa home"
     >
       <Image
         src={xpesaLogo}
-        alt="Xydra logo"
+        alt="xpesa logo"
         className="size-7 animate-[spin_3s_linear_infinite] rounded-md group-hover:animate-none"
       />
 
@@ -26,7 +26,7 @@ export function BrandLogo({ tone = "light" }: BrandLogoProps) {
           tone === "light" ? "text-white" : "text-foreground"
         )}
       >
-        Xydra
+        xpesa
       </span>
     </Link>
   )

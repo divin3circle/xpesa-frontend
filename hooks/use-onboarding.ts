@@ -235,7 +235,7 @@ export function useCompleteOnboarding() {
     mutationFn: createCreator,
     onSuccess: () => {
       toast.success("Setup complete.", {
-        description: "Welcome to Xydra. Get started with our docs.",
+        description: "Welcome to xpesa. Get started with our docs.",
         action: {
           label: "Learn more",
           onClick() {

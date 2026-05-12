@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { ThirdwebProvider } from "thirdweb/react"
 import { AppQueryClientProvider } from "@/components/query-client-provider"
 import { FanWalletProvider } from "@/components/fan-wallet-context"
+import React from "react"
 
 const oxaniumHeading = Oxanium({
   subsets: ["latin"],
@@ -26,7 +27,7 @@ const fontMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Xydra",
+  title: "X-Pesa",
   description: "A creator tools platform",
 }
 

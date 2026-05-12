@@ -10,7 +10,10 @@ export default async function PostLoginGatePage() {
     data: { user },
   } = await supabase.auth.getUser()
 
+  console.log("user", user)
+
   if (!user) {
+    console.error("User not found")
     redirect("/login")
   }
 

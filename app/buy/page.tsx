@@ -43,7 +43,7 @@ export default function GetUSDCPage() {
             instantly
           </h1>
           <p className="max-w-xl text-xl text-muted-foreground">
-            Xydra uses Moonpay to help you buy USDC instantly using the currency
+            xpesa uses Moonpay to help you buy USDC instantly using the currency
             of your choice available in more that 100+ regions with 83+
             currencies.
           </p>

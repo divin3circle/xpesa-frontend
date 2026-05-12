@@ -12,9 +12,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { IconBrandGoogle } from "@tabler/icons-react"
 import { useState } from "react"
-import type { ComponentProps, FormEvent } from "react"
+import type { ComponentProps } from "react"
 import { useSignInWithProvider, useSignUp } from "@/hooks/use-auth"
 import LoadingSpinner from "./ui/loading-spinner"
+
+type FormSubmitHandler = NonNullable<ComponentProps<"form">["onSubmit"]>
 
 export function SignupForm({
   className,
@@ -28,13 +30,17 @@ export function SignupForm({
   const { mutate: loginWithProvider, isPending: isProviderPending } = useSignInWithProvider()
 
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
+  const handleSubmit: FormSubmitHandler = (event) => {
+    event.preventDefault()
     signUp({ email, password })
   }
 
   return (
-    <form className={cn("flex flex-col gap-6", className)} {...props}>
+    <form
+      className={cn("flex flex-col gap-6", className)}
+      {...props}
+      onSubmit={handleSubmit}
+    >
       <FieldGroup>
         <div className="flex flex-col items-center gap-1 text-center">
           <h1 className="text-2xl font-bold">Create your account</h1>
@@ -92,7 +98,6 @@ export function SignupForm({
               password !== confirmPassword
             }
             className="w-full"
-            onClick={(e) => handleSubmit(e)}
           >
             {isPending ? <LoadingSpinner /> : "Create Account"}
           </Button>

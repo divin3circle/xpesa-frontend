@@ -20,14 +20,14 @@ export const pricingContent = {
   ],
   featuresTitle: "Included FREE!",
   features: [
-    { text: "Custom creator page at xydra.com/[handle]" },
+    { text: "Custom creator page at xpesa.com/[handle]" },
     { text: "Up to 5 active links (gate + tip combined)" },
     { text: "Both link modes: Gate and Tip" },
     { text: "Access expiry controls: one-time, timed, forever" },
     { text: "Basic dashboard: earnings, transactions, active links" },
     { text: "M-Pesa offramp via Kotani Pay" },
     { text: "AI link description writer (3 uses/day)" },
-    { text: '"Powered by Xydra" branding on public/payment pages' },
+    { text: '"Powered by xpesa" branding on public/payment pages' },
     { text: "Transaction fee: 5%" },
   ],
   testimonials: [

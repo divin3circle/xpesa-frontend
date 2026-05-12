@@ -70,7 +70,7 @@ export default function MyPagePage() {
           Preview creator page
         </h1>
         <p className="text-sm text-muted-foreground">
-          This is the page your audience sees at xydra.com/{data.creator.handle}
+          This is the page your audience sees at xpesa.com/{data.creator.handle}
           .
         </p>
       </section>
@@ -159,7 +159,7 @@ export default function MyPagePage() {
           <CardContent className="space-y-3">
             <div className="rounded-2xl border p-3 text-sm">
               <p className="font-medium">
-                xydra.com/creator/{data.creator.handle}
+                xpesa.com/creator/{data.creator.handle}
               </p>
               <p className="text-xs text-muted-foreground">
                 Public URL for your audience

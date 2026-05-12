@@ -15,7 +15,7 @@ export const ctaContent = {
       label: "Creator trust",
       value: "Built for African creators. Not adapted for them.",
       description:
-        "Every other tool was built elsewhere and bolted on an offramp. Xydra starts with M-Pesa withdrawal as a core feature, not an afterthought.",
+        "Every other tool was built elsewhere and bolted on an offramp. xpesa starts with M-Pesa withdrawal as a core feature, not an afterthought.",
     },
     {
       label: "Audience fit",

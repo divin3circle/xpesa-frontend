@@ -3,6 +3,7 @@ import { OnboardingShell } from "@/components/onboarding/onboarding-shell"
 import { createClient as createServerClient } from "@/lib/supabase/server"
 import { TABLENAMES } from "@/lib/supabase/utilities"
 import { redirect } from "next/navigation"
+import React from "react"
 
 export default async function OnboardingLayout({
   children,

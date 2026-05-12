@@ -13,29 +13,31 @@ interface AuthResponse {
   error: AuthError | null
 }
 
-export type AvailableAuthProviders = 'twitter' | 'google';
+export type AvailableAuthProviders = "twitter" | "google"
 
-async function signInWithAProvider({ provider }: {
+const POST_LOGIN_PATH = "/auth/post-login"
+
+async function signInWithAProvider({
+  provider,
+}: {
   provider: AvailableAuthProviders
 }) {
   try {
     const supabase = createClient()
-    console.log(envConfig.APP_URL + "/auth/post-login")
-    const { data, error } = await  supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: envConfig.APP_URL + "/auth/post-login",
-      }
+        redirectTo: `${envConfig.APP_URL}/auth/callback?next=${encodeURIComponent(POST_LOGIN_PATH)}`,
+      },
     })
-    if(error){
+    if (error) {
       toast.error(error.message)
     }
     return data
-  }catch (error) {
+  } catch (error) {
     console.error(error)
   }
 }
-
 async function signOutUser() {
   try {
     const supabase = createClient()
@@ -49,7 +51,6 @@ async function signOutUser() {
     toast.error("Failed to sign out. Please try again.")
   }
 }
-
 
 async function signUpNewUser({
   email,

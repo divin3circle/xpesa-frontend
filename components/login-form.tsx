@@ -11,9 +11,11 @@ import { Input } from "@/components/ui/input"
 import { IconBrandGoogle } from "@tabler/icons-react"
 import { toast } from "sonner"
 import { useState } from "react"
-import type { ComponentProps, FormEvent } from "react"
+import type { ComponentProps } from "react"
 import { useSignIn, useSignInWithProvider } from "@/hooks/use-auth";
 import LoadingSpinner from "./ui/loading-spinner";
+
+type FormSubmitHandler = NonNullable<ComponentProps<"form">["onSubmit"]>
 
 export function LoginForm({
   className,
@@ -24,7 +26,7 @@ export function LoginForm({
   const { mutate: loginInUser, isPending } = useSignIn()
   const { mutate: loginWithProvider, isPending: isProviderPending } = useSignInWithProvider()
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const handleSubmit: FormSubmitHandler = async (event) => {
     event.preventDefault()
 
     if (!email || !password) {

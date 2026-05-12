@@ -1,6 +1,6 @@
 "use client"
 
-import { ChangeEvent, useMemo, useState } from "react"
+import React, { ChangeEvent, useMemo, useState } from "react"
 import Image from "next/image"
 
 import { Badge } from "@/components/ui/badge"

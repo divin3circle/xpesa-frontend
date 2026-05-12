@@ -58,8 +58,7 @@ export async function GET(
     return Response.json({ error: "Link not found" }, { status: 404 })
   }
 
-  let files: { id: string; name: string; type: string; size: string }[] = []
-  files = [
+  const files = [
     {
       id: link.id,
       name: link.title,
