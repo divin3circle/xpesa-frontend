@@ -9,7 +9,7 @@ export default function GetUSDCPage() {
       <div className="mb-8 flex flex-col items-start justify-between gap-8">
         <div className="mt-4 flex w-full items-start justify-between p-4">
           <BrandLogo tone={"default"} />
-          <div className="hidden items-center justify-between gap-4 md:flex">
+          <div className=" items-center justify-between gap-4 flex">
             <Link
               href="/"
               className="text-sm font-semibold text-muted-foreground duration-200 ease-in hover:scale-95 hover:text-foreground hover:underline"
