@@ -24,6 +24,9 @@ async function signInWithAProvider({
 }) {
   try {
     const supabase = createClient()
+    console.log(
+      `${envConfig.APP_URL}/auth/callback?next=${encodeURIComponent(POST_LOGIN_PATH)}`
+    )
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
