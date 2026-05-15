@@ -163,6 +163,12 @@ export const envConfig = {
   RPC_URL: resolvePaymentRpcUrl(),
   USDC_CONTRACT_ADDRESS: resolvePaymentUsdcContractAddress(),
   CHAIN_ID: resolvePaymentChainId(),
+  GOOGLE_APPLICATION_CREDENTIALS:
+    process.env.GOOGLE_APPLICATION_CREDENTIALS ||
+    process.env.GOOGLE_APPLICATION_CREDETIALS ||
+    "",
+  SHEET_ID: process.env.SHEET_ID || "",
+  GOOGLE_APPLICATION_SCOPES: ["https://www.googleapis.com/auth/spreadsheets"],
 }
 
 export const HEDERA_HTS_ADDR = "0x0000000000000000000000000000000000000167"
@@ -210,9 +216,7 @@ export function getCurrentMonthName() {
   ]
 
   const now = new Date()
-  const currentMonthName = months[now.getMonth()]
-
-  return currentMonthName
+  return months[now.getMonth()]
 }
 
 type ExpectedDateFormat = "full" | "month-and-year" | "month-only" | "year"

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { FormEvent, useEffect, useState } from "react"
 import {
   ArrowRight,
   Check,
@@ -19,6 +19,8 @@ import {
   TypeWriter,
 } from "@/components/ui/hero-designali"
 import { TextGlitch } from "@/components/ui/text-glitch-effect"
+import { useWaitlist } from "@/hooks/use-waitlist"
+import LoadingSpinner from "@/components/ui/loading-spinner"
 
 const creatorTypes = [
   "Digital Products",
@@ -48,7 +50,39 @@ const creatorTools = [
 ]
 
 export default function Waitlist() {
+  const waitlist = useWaitlist()
   const [submitted, setSubmitted] = useState(false)
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    const form = event.currentTarget
+    const formData = new FormData(form)
+
+    try {
+      await waitlist.mutateAsync({
+        name: String(formData.get("name") || ""),
+        email: String(formData.get("email") || ""),
+        creatorFocus: String(formData.get("creator-focus") || ""),
+        notes: String(formData.get("first-sale") || ""),
+      })
+
+      setSubmitted(true)
+      formData.forEach((_, key) => {
+        const field = form.elements.namedItem(key)
+
+        if (
+          field instanceof HTMLInputElement ||
+          field instanceof HTMLTextAreaElement ||
+          field instanceof HTMLSelectElement
+        ) {
+          field.value = ""
+        }
+      })
+    } catch (submitError) {
+      console.error(submitError)
+    }
+  }
 
   useEffect(() => {
     const cleanup = renderCanvas()
@@ -65,7 +99,7 @@ export default function Waitlist() {
         className="pointer-events-none absolute inset-0 z-0 mx-auto opacity-80"
       />
 
-      <div className="absolute inset-x-0 top-0 -z-10 h-[520px] bg-[linear-gradient(to_right,color-mix(in_oklab,var(--foreground)_12%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--foreground)_12%,transparent)_1px,transparent_1px)] [mask-image:radial-gradient(ellipse_80%_55%_at_50%_0%,#000_65%,transparent_110%)] bg-[size:3rem_3rem] opacity-25" />
+      <div className="absolute inset-x-0 top-0 -z-10 h-130 bg-[linear-gradient(to_right,color-mix(in_oklab,var(--foreground)_12%,transparent)_1px,transparent_1px),linear-gradient(to_bottom,color-mix(in_oklab,var(--foreground)_12%,transparent)_1px,transparent_1px)] mask-[radial-gradient(ellipse_80%_55%_at_50%_0%,#000_65%,transparent_110%)] bg-size-[3rem_3rem] opacity-25" />
       <section className="relative z-10 mx-auto flex min-h-dvh w-full max-w-7xl flex-col px-5 py-5 sm:px-8 lg:px-10">
         <header className="flex items-center justify-between">
           <BrandLogo tone="default" />
@@ -84,7 +118,7 @@ export default function Waitlist() {
               Creator waitlist is open
             </div>
 
-            <div className="relative border bg-background/75 [mask-image:radial-gradient(80rem_50rem_at_center,white,transparent)] p-5 shadow-sm backdrop-blur-xl sm:p-8">
+            <div className="relative border bg-background/75 mask-[radial-gradient(80rem_50rem_at_center,white,transparent)] p-5 shadow-sm backdrop-blur-xl sm:p-8">
               <PlusMarker className="-top-5 -left-5" />
               <PlusMarker className="-bottom-5 -left-5" />
               <PlusMarker className="-top-5 -right-5" />
@@ -92,7 +126,7 @@ export default function Waitlist() {
 
               <TextGlitch
                 text="JOIN XPESA"
-                hoverText="GET PAID"
+                hoverText="GET PAID IN USDC"
                 delay={2}
                 className="text-[clamp(3.3rem,11vw,8.5rem)]"
               />
@@ -120,10 +154,7 @@ export default function Waitlist() {
             >
               <form
                 className="relative z-10 grid w-full gap-4 rounded-[1.35rem] border bg-background/50 p-5 text-left shadow-xl sm:p-6"
-                onSubmit={(event) => {
-                  event.preventDefault()
-                  setSubmitted(true)
-                }}
+                onSubmit={handleSubmit}
               >
                 <div>
                   <p className="text-sm font-semibold text-primary">
@@ -186,8 +217,17 @@ export default function Waitlist() {
                   />
                 </label>
 
-                <Button type="submit" size="lg" className="mt-1 w-full">
-                  {submitted ? "You are on the list" : "Join the waitlist"}
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="mt-1 w-full flex items-center gap-1"
+                  disabled={waitlist.isPending || submitted}
+                >
+                  {waitlist.isPending
+                    ? <LoadingSpinner />
+                    : submitted
+                      ? "You are on the list"
+                      : "Join the waitlist"}
                   {submitted ? (
                     <Check data-icon="inline-end" />
                   ) : (
