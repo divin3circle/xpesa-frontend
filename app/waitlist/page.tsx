@@ -93,7 +93,7 @@ export default function Waitlist() {
   }, [])
 
   return (
-    <main className="relative isolate min-h-dvh overflow-hidden bg-background text-foreground">
+    <main className="relative isolate md:min-h-dvh md:overflow-hidden bg-background text-foreground">
       <canvas
         id="canvas"
         className="pointer-events-none absolute inset-0 z-0 mx-auto opacity-80"

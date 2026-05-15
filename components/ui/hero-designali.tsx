@@ -148,8 +148,6 @@ function updatePointer(event: MouseEvent | TouchEvent) {
     pos.x = event.clientX
     pos.y = event.clientY
   }
-
-  event.preventDefault()
 }
 
 function onTouchStart(event: TouchEvent) {
@@ -163,7 +161,7 @@ function onInitialPointerMove(event: MouseEvent | TouchEvent) {
   document.removeEventListener("mousemove", onInitialPointerMove)
   document.removeEventListener("touchstart", onInitialPointerMove)
   document.addEventListener("mousemove", updatePointer)
-  document.addEventListener("touchmove", updatePointer, { passive: false })
+  document.addEventListener("touchmove", updatePointer, { passive: true })
   document.addEventListener("touchstart", onTouchStart)
   updatePointer(event)
   createLines()
