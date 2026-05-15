@@ -1,0 +1,23 @@
+---
+title: "M-Pesa Withdrawal"
+description: "How USDC becomes KES in an M-Pesa wallet."
+icon: "smartphone"
+---
+
+import { minimumWithdrawal, withdrawalTimeline } from '/snippets/config.mdx';
+
+<img src="/images/mpesa.png" alt="M-Pesa logo" />
+
+When a creator withdraws, USDC is converted into local currency and sent to the creator's M-Pesa number through an offramp partner.
+
+## Kotani Pay
+
+Kotani Pay helps handle the conversion from USDC to mobile money. You may see their name in the withdrawal flow.
+
+## Rate and timing
+
+The KES amount depends on the rate shown when you request the withdrawal. The current minimum withdrawal is {minimumWithdrawal}. Withdrawals are {withdrawalTimeline}.
+
+<Warning>
+  Always confirm the M-Pesa number before submitting a withdrawal.
+</Warning>

@@ -127,7 +127,7 @@ export default function Waitlist() {
               <TextGlitch
                 text="JOIN XPESA"
                 hoverText="GET PAID IN USDC"
-                delay={2}
+                delay={0}
                 className="text-[clamp(3.3rem,11vw,8.5rem)]"
               />
               <p className="mt-4 max-w-2xl font-heading text-3xl leading-none font-black tracking-normal text-foreground sm:text-5xl lg:text-6xl">

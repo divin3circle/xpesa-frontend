@@ -1,0 +1,151 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "almond",
+  "name": "XPesa Docs",
+  "colors": {
+    "primary": "#16A34A",
+    "light": "#07C983",
+    "dark": "#15803D"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Start Here",
+        "groups": [
+          {
+            "group": "Getting started",
+            "pages": [
+              "index",
+              "getting-started/what-is-xpesa",
+              "getting-started/how-xpesa-works",
+              "getting-started/who-is-xpesa-for",
+              "getting-started/supported-countries"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Creators",
+        "groups": [
+          {
+            "group": "Onboarding",
+            "pages": [
+              "creators/creating-your-account",
+              "creators/setting-up-your-wallet",
+              "creators/choosing-your-handle",
+              "creators/your-creator-page"
+            ]
+          },
+          {
+            "group": "Selling content",
+            "pages": [
+              "creators/creating-a-gate-link",
+              "creators/uploading-a-document",
+              "creators/creating-a-file-pack",
+              "creators/setting-up-a-tip-link",
+              "creators/access-controls"
+            ]
+          },
+          {
+            "group": "Money and analytics",
+            "pages": [
+              "creators/withdrawing-to-mpesa",
+              "creators/understanding-your-dashboard"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Fans",
+        "groups": [
+          {
+            "group": "Buyer guide",
+            "pages": [
+              "fans/how-to-pay",
+              "fans/getting-a-wallet",
+              "fans/getting-usdc",
+              "fans/accessing-content",
+              "fans/troubleshooting-payments"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "How Payments Work",
+        "groups": [
+          {
+            "group": "Payments",
+            "pages": [
+              "payments/overview",
+              "payments/usdc-and-stablecoins",
+              "payments/avalanche-network",
+              "payments/platform-fees",
+              "payments/mpesa-withdrawals",
+              "payments/content-protection"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Reference",
+        "groups": [
+          {
+            "group": "Reference",
+            "pages": [
+              "reference/web3-glossary",
+              "reference/security-and-trust",
+              "reference/investors-and-builders",
+              "reference/roadmap",
+              "reference/contact-and-press"
+            ]
+          }
+        ]
+      }
+    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Creator quickstart",
+          "href": "/creators/creating-your-account",
+          "icon": "rocket"
+        },
+        {
+          "anchor": "Support",
+          "href": "/reference/contact-and-press",
+          "icon": "life-ring"
+        }
+      ]
+    }
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "/reference/contact-and-press"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Start as a Creator",
+      "href": "/creators/creating-your-account"
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
+  },
+  "footer": {}
+}

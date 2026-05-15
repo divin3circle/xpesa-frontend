@@ -1,0 +1,37 @@
+---
+title: "Withdrawing to M-Pesa"
+description: "Move creator earnings from USDC to M-Pesa."
+icon: "smartphone"
+---
+
+import { minimumWithdrawal, withdrawalTimeline } from '/snippets/config.mdx';
+
+<img src="/images/withdraw.webp" alt="M-Pesa withdrawal illustration" />
+
+Creators can withdraw available USDC earnings to an M-Pesa number in supported markets.
+
+<Steps>
+  <Step title="Open withdrawals">
+    Go to your dashboard wallet area and choose withdraw.
+  </Step>
+  <Step title="Enter the amount">
+    Enter the USDC amount you want to withdraw. The current minimum is {minimumWithdrawal}.
+  </Step>
+  <Step title="Add the M-Pesa number">
+    Enter the M-Pesa number that should receive the payout.
+  </Step>
+  <Step title="Review the conversion">
+    Check the KES estimate and payout details before confirming.
+  </Step>
+  <Step title="Confirm withdrawal">
+    Submit the withdrawal and wait for the M-Pesa payout.
+  </Step>
+</Steps>
+
+## What is Kotani Pay?
+
+Kotani Pay is the offramp partner that helps convert USDC into local mobile money payouts. You may see their name during the withdrawal flow or in payout references.
+
+<Note>
+  Withdrawals are {withdrawalTimeline}.
+</Note>

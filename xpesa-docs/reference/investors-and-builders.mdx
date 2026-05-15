@@ -1,0 +1,37 @@
+---
+title: "For Investors & Builders"
+description: "A concise overview of the product, market, and technical stack."
+icon: "building-2"
+---
+
+import { productName } from '/snippets/config.mdx';
+
+## xpesa at a glance
+
+- {productName} helps African creators sell digital content and get paid in dollars.
+- The first withdrawal path is M-Pesa.
+- The core buyer flow is link-based, fast, and account-light.
+- The product combines creator pages, paid links, protected content, USDC settlement, and local offramp support.
+
+## The problem we solve
+
+Many creators sell through DMs: a fan asks for content, the creator sends M-Pesa details, waits for a screenshot, manually checks payment, then sends a file or link. This is slow, hard to scale, and easy to lose track of.
+
+xpesa turns that flow into a checkout link.
+
+## Technical overview
+
+**Avalanche C-Chain** settles payments quickly and cheaply.
+
+**USDC** is the settlement asset, giving creators dollar-denominated pricing.
+
+**Supabase** supports database and storage workflows.
+
+**Thirdweb** supports wallet connection and embedded wallet experiences.
+
+**Kotani Pay** supports the M-Pesa offramp path.
+
+<CardGroup cols={2}>
+  <Card title="Payment overview" icon="coins" href="/payments/overview" />
+  <Card title="Security and trust" icon="shield" href="/reference/security-and-trust" />
+</CardGroup>

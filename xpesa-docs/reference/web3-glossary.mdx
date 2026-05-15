@@ -1,0 +1,55 @@
+---
+title: "Web3 Glossary"
+description: "Plain definitions for crypto terms used in xpesa."
+icon: "book-open"
+---
+
+import { exampleTransactionHash } from '/snippets/config.mdx';
+
+<AccordionGroup>
+  <Accordion title="Wallet" icon="wallet">
+    A wallet is like a digital bank account you control. In xpesa, it receives creator payments and proves which fan paid for content.
+  </Accordion>
+  <Accordion title="USDC" icon="coins">
+    USDC is a stablecoin designed to be worth one US dollar. xpesa uses it so creators can price content in dollars.
+  </Accordion>
+  <Accordion title="Stablecoin" icon="badge-dollar-sign">
+    A stablecoin is crypto designed not to fluctuate heavily in price. It matters because buyers and creators can understand the price more easily.
+  </Accordion>
+  <Accordion title="Blockchain" icon="blocks">
+    A blockchain is a public record of transactions. xpesa uses it to confirm that a payment happened.
+  </Accordion>
+  <Accordion title="Avalanche" icon="mountain">
+    Avalanche is the network xpesa uses for payments. It is chosen for speed, low fees, and reliability.
+  </Accordion>
+  <Accordion title="Transaction hash" icon="receipt-text">
+    A transaction hash is a public payment receipt, such as `{exampleTransactionHash}`. It can be used to verify that a blockchain transaction happened.
+  </Accordion>
+  <Accordion title="Gas fees" icon="fuel">
+    Gas fees are network costs paid to process transactions. xpesa aims to keep the fan payment experience simple and low-cost.
+  </Accordion>
+  <Accordion title="Smart contract" icon="file-code">
+    A smart contract is an automatic agreement on a blockchain. It can move funds or enforce rules once conditions are met.
+  </Accordion>
+  <Accordion title="Embedded wallet" icon="mail">
+    An embedded wallet is a wallet created with an easier login method like email. It helps new fans pay without learning wallet setup first.
+  </Accordion>
+  <Accordion title="Access token" icon="key-round">
+    An access token is how xpesa tracks what a fan has paid for. It helps decide whether content should open.
+  </Accordion>
+  <Accordion title="USDC on-ramp" icon="arrow-down-to-line">
+    An on-ramp is a way to buy USDC with regular money. Fans may use exchanges, wallet providers, or checkout funding tools.
+  </Accordion>
+  <Accordion title="Offramp" icon="arrow-up-from-line">
+    An offramp converts crypto back to regular currency. xpesa uses an offramp path so creators can withdraw to M-Pesa.
+  </Accordion>
+  <Accordion title="Wallet address" icon="fingerprint">
+    A wallet address is your public identifier on the blockchain. It can appear in payment records and document watermarks.
+  </Accordion>
+  <Accordion title="Non-custodial" icon="shield-check">
+    Non-custodial means you control your funds. xpesa does not hold creator money in a central platform balance.
+  </Accordion>
+  <Accordion title="Signed URL" icon="link">
+    A signed URL is a temporary secure link used to serve protected content. It helps avoid exposing permanent file storage URLs.
+  </Accordion>
+</AccordionGroup>
