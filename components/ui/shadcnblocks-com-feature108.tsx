@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { AsteriskRevealHeading } from "@/components/ui/asterisk-reveal-heading"
 import { cn } from "@/lib/utils"
+import Link from "next/link"
 
 export interface TabContent {
   badge: string
@@ -19,6 +20,7 @@ export interface TabContent {
   buttonText: string
   imageSrc: string
   imageAlt: string
+  hrefLink: string
 }
 
 export interface Tab {
@@ -51,6 +53,7 @@ const defaultTabs: Tab[] = [
       buttonText: "Create first link",
       imageSrc: dashboardImage.src,
       imageAlt: "Creator dashboard setup",
+      hrefLink: "/signup",
     },
   },
   {
@@ -67,6 +70,7 @@ const defaultTabs: Tab[] = [
       buttonText: "See buyer flow",
       imageSrc: socialImage.src,
       imageAlt: "Social sharing on mobile",
+      hrefLink: "/docs",
     },
   },
   {
@@ -79,10 +83,11 @@ const defaultTabs: Tab[] = [
       badge: "Step 3",
       title: "Get paid in USDC and withdraw to M-Pesa",
       description:
-        "Payments settle on Base, then you offramp through Kotani Pay into your M-Pesa number without exchange complexity.",
+        "Payments settle on Base, then you off-ramp into your M-Pesa number without exchange complexity.",
       buttonText: "View payout flow",
       imageSrc: paymentImage.src,
       imageAlt: "Mobile payout confirmation",
+      hrefLink: "/signup",
     },
   },
 ]
@@ -174,9 +179,11 @@ export function Feature108({
                   <p className="font-sans text-foreground/70 lg:text-lg">
                     {tab.content.description}
                   </p>
-                  <Button className="mt-1 w-fit" size="lg">
-                    {tab.content.buttonText}
-                  </Button>
+                  <Link href={tab.content.hrefLink}>
+                    <Button className="mt-1 w-fit" size="lg">
+                      {tab.content.buttonText}
+                    </Button>
+                  </Link>
                 </div>
 
                 <div className="relative overflow-hidden rounded-2xl bg-chart-1 p-1">

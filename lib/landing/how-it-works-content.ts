@@ -10,6 +10,7 @@ export type HowItWorksStep = {
     buttonText: string
     imageSrc: string
     imageAlt: string
+    hrefLink: string
   }
 }
 
@@ -34,6 +35,7 @@ export const howItWorksContent = {
         imageSrc:
           "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80",
         imageAlt: "Creator setting up product link",
+        hrefLink: "/signup",
       },
     },
     {
@@ -51,6 +53,7 @@ export const howItWorksContent = {
         imageSrc:
           "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=1200&q=80",
         imageAlt: "Audience discovery through mobile feed",
+        hrefLink: "/docs",
       },
     },
     {
@@ -68,6 +71,7 @@ export const howItWorksContent = {
         imageSrc:
           "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=1200&q=80",
         imageAlt: "Mobile payment confirmation",
+        hrefLink: "/docs",
       },
     },
   ] as HowItWorksStep[],

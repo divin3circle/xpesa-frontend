@@ -9,7 +9,7 @@ import { audienceContent } from "@/lib/landing/audience-content"
 
 export function WhoIsThisForSection() {
   return (
-    <section id="who-for" className="py-24">
+    <section id="usecases" className="py-24">
       <div className="mx-auto w-full max-w-6xl px-6 lg:px-10">
         <motion.div
           initial={{ opacity: 0, y: 18 }}

@@ -55,11 +55,17 @@ export function MobileMenu({ navItems }: MobileMenuProps) {
           </div>
         </DrawerHeader>
         <DrawerFooter>
-          <Button size="lg">Join creator waitlist</Button>
-          <DrawerClose asChild>
-            <Button variant="outline" className="w-full">
-              Get Started
+          <Link href={"/waitlist"} className={"w-full"}>
+            <Button size="lg" className={"w-full"}>
+              Join creator waitlist
             </Button>
+          </Link>
+          <DrawerClose asChild>
+            <Link href={"/signup"} className={"w-full"}>
+              <Button variant="outline" className="w-full">
+                Get Started
+              </Button>
+            </Link>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>

@@ -9,17 +9,10 @@ export type HeroStat = {
 }
 
 export const heroNavItems: HeroNavItem[] = [
-  { label: "Overview", href: "#overview" },
   { label: "How It Works", href: "#solution" },
-  { label: "Models", href: "#models" },
+  { label: "Modes", href: "#modes" },
+  { label: "Use Cases", href: "#usecases" },
 ]
-
-export const heroAnnouncement = {
-  title: "Now in build",
-  body: "Link Gate and Tip mode for African creators.",
-  href: "#overview",
-  cta: "Read product thesis",
-}
 
 export const heroCopy = {
   eyebrow: "Creator monetization for Africa",
@@ -34,12 +27,12 @@ export const heroCopy = {
 export const heroStats: HeroStat[] = [
   {
     label: "On-Chain Settlement",
-    value: "x402 triggered stablecoin settlements",
+    value: "Smart account stablecoin(USDC) settlements",
   },
-  { label: "Core Models", value: "Premium link Gate and Custom Tipping" },
+  { label: "Core Models", value: "Paywall premium content and customizable tips" },
   { label: "Custody", value: "Creators retain 100% control of their funds" },
   {
     label: "Off-chain Redemption",
-    value: "Off-ramp SDKs to local payment systems",
+    value: "Off-ramp railways to local payment systems",
   },
 ]

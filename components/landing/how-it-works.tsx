@@ -23,11 +23,13 @@ export function HowItWorks() {
   }))
 
   return (
-    <Feature108
-      badge={howItWorksContent.badge}
-      heading={howItWorksContent.heading}
-      description={howItWorksContent.description}
-      tabs={tabs}
-    />
+    <section id="solution">
+      <Feature108
+        badge={howItWorksContent.badge}
+        heading={howItWorksContent.heading}
+        description={howItWorksContent.description}
+        tabs={tabs}
+      />
+    </section>
   )
 }
