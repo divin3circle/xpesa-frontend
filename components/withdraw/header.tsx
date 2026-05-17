@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input"
 function SearchBar() {
   return (
     <Field orientation="horizontal">
-      <Input type="search" placeholder="Find action..." />
+      <Input type="search" placeholder="Find action,transaction..." />
       <Button>Search</Button>
     </Field>
   )
