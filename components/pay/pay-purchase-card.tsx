@@ -1,7 +1,8 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { client, envConfig } from "@/lib/utils"
+import { envConfig } from "@/lib/env"
+import { client } from "@/lib/utils"
 import { useParams } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"

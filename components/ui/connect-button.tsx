@@ -6,7 +6,13 @@ import { createWallet } from "thirdweb/wallets"
 import { Button } from "./button"
 import LoadingSpinner from "./loading-spinner"
 import { toast } from "sonner"
-function UIConnectButton() {
+import type { ComponentProps } from "react"
+
+type ButtonVariant = ComponentProps<typeof Button>["variant"]
+
+function UIConnectButton({ variant = "default", }: {
+  variant?: ButtonVariant
+}) {
   const { connect, isConnecting, error } = useConnect()
   const wallet = useActiveWallet()
   const { disconnect } = useDisconnect()
@@ -21,6 +27,7 @@ function UIConnectButton() {
   return (
     <Button
       type="button"
+      variant={variant}
       className="w-full"
       onClick={() => {
         if (wallet) {

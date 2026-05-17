@@ -22,7 +22,7 @@ export function TextGlitch({
   const [displayHoverText, setDisplayHoverText] = useState(hoverText || text)
   const hoverIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+  const letters = "A@C#E$G%I^K&M*O!Q@S#U$W%Y#"
 
   useEffect(() => {
     const loadGSAP = async () => {
@@ -133,7 +133,7 @@ export function TextGlitch({
   return (
     <h1
       ref={textRef}
-      className={`relative m-0 flex w-full cursor-pointer flex-col items-start justify-center overflow-hidden border-b border-neutral-600/20 bg-gradient-to-r from-neutral-800 to-neutral-500 bg-clip-text bg-no-repeat font-heading text-[clamp(3rem,10vw,7rem)] font-black leading-[0.9] tracking-normal text-neutral-600/20 transition-all duration-500 ease-out dark:from-neutral-100 dark:to-neutral-400 ${className}`}
+      className={`relative h-28 md:h-auto m-0 flex w-full cursor-pointer flex-col items-start justify-center overflow-hidden border-b border-neutral-600/20 bg-gradient-to-r from-neutral-800 to-neutral-500 bg-clip-text bg-no-repeat font-heading text-[clamp(3rem,10vw,7rem)] font-black leading-[0.9] tracking-normal text-neutral-600/20 transition-all duration-500 ease-out dark:from-neutral-100 dark:to-neutral-400 ${className}`}
       style={{
         backgroundSize: "0%",
         WebkitBackgroundClip: "text",

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/client"
-import { envConfig, onNavigate } from "@/lib/utils"
+import { envConfig } from "@/lib/env"
+import { onNavigate } from "@/lib/utils"
 import { AuthError, Session, User } from "@supabase/supabase-js"
 import { toast } from "sonner"
 import { useMutation } from "@tanstack/react-query"

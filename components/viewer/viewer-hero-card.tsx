@@ -5,7 +5,6 @@ import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
-import creatorBanner from "@/public/dashboard.avif"
 
 type ViewerHeroCardProps = {
   title: string
@@ -31,7 +30,7 @@ export function ViewerHeroCard({
     >
       <div className="absolute inset-0">
         <Image
-          src={creatorBanner}
+          src="/dashboard.avif"
           alt={title}
           fill
           className="object-cover"

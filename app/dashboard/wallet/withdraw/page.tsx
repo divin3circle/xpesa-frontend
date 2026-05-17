@@ -1,3 +1,5 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -9,6 +11,11 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Image from "next/image"
+import { useActiveAccount } from "thirdweb/react"
+import { useMyBalance } from "@/hooks/use-balance"
+import ConnectButton from "@/components/ui/connect-button"
+import LottieComponent from "@/components/lottie-animation"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const withdrawals = [
   { date: "2026-04-05", usdc: "$420", kes: "KES 54,010", status: "Processing" },
@@ -16,14 +23,20 @@ const withdrawals = [
 ]
 
 export default function WithdrawFundsPage() {
+  const activeAccount = useActiveAccount()
+  const {
+    data: balance,
+    isLoading: balanceIsLoading,
+  } = useMyBalance(activeAccount)
+
   return (
     <div className="space-y-6">
       <section>
         <h1 className="font-heading text-3xl font-semibold tracking-tight">
-          Withdraw to M-Pesa
+          Withdraw to Mobile Money
         </h1>
         <p className="text-sm text-muted-foreground">
-          Convert USDC earnings to KES and send directly to your M-Pesa number.
+          Convert USDC earnings to the currency of your choice
         </p>
       </section>
 
@@ -32,27 +45,48 @@ export default function WithdrawFundsPage() {
           <CardHeader>
             <CardTitle>Withdrawal request</CardTitle>
             <CardDescription>
-              Available balance: $1,204.75 (~KES 155,215)
+              {activeAccount ? (
+               <div className="flex gap-2">
+                 <p className="text-sm text-muted-foreground">Available Balance: </p>
+                 <div className="flex items-center justify-center gap-1 font-semibold underline">
+                   { balanceIsLoading ? <Skeleton /> : `${balance} USDC`}
+                   <Image src={"/usdc.svg"} alt={"USDC Icon"} height={1000} width={1000} className={"h-5 w-5 rounded-full object-contain"} />
+                 </div>
+               </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Connect wallet to withdraw.
+                </p>
+              )}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="withdraw-amount">Amount (USDC)</Label>
-              <Input id="withdraw-amount" placeholder="100.00" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="withdraw-phone">M-Pesa number</Label>
-              <Input id="withdraw-phone" placeholder="07XXXXXXXX" />
-            </div>
-            <div className="rounded-2xl border bg-muted/40 p-3 text-sm">
-              <p>You receive approximately: KES 12,884</p>
-              <p className="text-muted-foreground">
-                Includes estimated conversion + processing fee.
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <Button>Withdraw to M-Pesa</Button>
-            </div>
+          <CardContent className={activeAccount ? "space-y-4" : "flex flex-col items-center justify-center"}>
+            {activeAccount ? (
+              <>
+                <div className="space-y-2">
+                  <Label htmlFor="withdraw-amount">Amount (USDC)</Label>
+                  <Input id="withdraw-amount" placeholder="100.00" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="withdraw-phone">M-Pesa number</Label>
+                  <Input id="withdraw-phone" placeholder="07XXXXXXXX" />
+                </div>
+                <div className="rounded-2xl border bg-muted/40 p-3 text-sm">
+                  <p>You receive approximately: KES 12,884</p>
+                  <p className="text-muted-foreground">
+                    Includes estimated conversion + processing fee.
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button>Withdraw to M-Pesa</Button>
+                </div>
+              </>
+            ) : (
+              <div className="w-full md:w-1/4">
+                <LottieComponent page="wallet" />
+                <ConnectButton variant="outline" />
+              </div>
+            )}
           </CardContent>
         </Card>
 

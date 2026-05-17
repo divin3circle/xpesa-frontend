@@ -3,7 +3,8 @@ import { useActiveAccount, useActiveWallet } from "thirdweb/react"
 import { toast } from "sonner"
 
 import { PAYMENT_CHAIN } from "@/lib/thirdweb/chains"
-import { envConfig, getErrorMessage } from "@/lib/utils"
+import { envConfig } from "@/lib/env"
+import { getErrorMessage } from "@/lib/utils"
 
 export function usePaymentChainGuard() {
   const account = useActiveAccount()

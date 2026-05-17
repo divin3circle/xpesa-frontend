@@ -4,7 +4,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import type { CreatorPublicProfile } from "@/app/api/public/creator/[handle]/route"
-import creatorBanner from "@/public/dashboard.avif"
 import { getUserAvatarURL } from "@/lib/utils"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { BadgeCheck } from "@hugeicons/core-free-icons"
@@ -18,7 +17,7 @@ export function CreatorHeroCard({ creator }: CreatorHeroCardProps) {
     <Card className="relative min-h-90 overflow-hidden border-border/70">
       <div className="absolute inset-0">
         <Image
-          src={creatorBanner}
+          src="/dashboard.avif"
           alt="Creator profile banner"
           fill
           className="object-cover"

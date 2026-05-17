@@ -1,4 +1,4 @@
-import { envConfig } from "../utils"
+import { envConfig } from "../env"
 import { defaultChain } from "./account-abstraction"
 
 export const PAYMENT_CHAIN = defaultChain

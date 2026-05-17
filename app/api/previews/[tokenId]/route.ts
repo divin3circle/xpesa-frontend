@@ -7,7 +7,7 @@ import { cookies } from "next/headers"
 import { r2, R2_BUCKET } from "@/lib/r2"
 import { checkRateLimit } from "@/lib/rate-limit"
 import { getRequestIp, hashIp } from "@/lib/view-access"
-import { envConfig } from "@/lib/utils"
+import { envConfig } from "@/lib/env"
 
 const redis = Redis.fromEnv()
 const PREVIEW_COOKIE_NAME = "xpesa_preview_session"

@@ -1,7 +1,7 @@
 import Image from "next/image"
 
 import { Badge } from "@/components/ui/badge"
-import { envConfig } from "@/lib/utils"
+import { envConfig } from "@/lib/env"
 
 type PaymentMethodsBadgesProps = {
   showConnectedBadge: boolean

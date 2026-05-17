@@ -3,8 +3,6 @@ import * as Tabs from "@radix-ui/react-tabs"
 import { Layout, Pointer, Wallet } from "lucide-react"
 import { motion } from "motion/react"
 import Image from "next/image"
-import dashboardImage from "@/public/dashboard.avif"
-import socialImage from "@/public/share.avif"
 import paymentImage from "@/public/payment.jpg"
 
 import { Badge } from "@/components/ui/badge"
@@ -51,7 +49,7 @@ const defaultTabs: Tab[] = [
       description:
         "Choose gate or tip mode, add your destination URL, and publish instantly with your custom xpesa link.",
       buttonText: "Create first link",
-      imageSrc: dashboardImage.src,
+      imageSrc: "/dashboard.avif",
       imageAlt: "Creator dashboard setup",
       hrefLink: "/signup",
     },
@@ -68,7 +66,7 @@ const defaultTabs: Tab[] = [
       description:
         "Your audience pays through the link, and access is delivered automatically without DMs or screenshot verification.",
       buttonText: "See buyer flow",
-      imageSrc: socialImage.src,
+      imageSrc: "/share.avif",
       imageAlt: "Social sharing on mobile",
       hrefLink: "/docs",
     },

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card"
 import { useUserDetails } from "@/hooks/use-user"
 import LoadingSpinner from "@/components/ui/loading-spinner"
-import { envConfig } from "@/lib/utils"
+import { envConfig } from "@/lib/env"
 import { Skeleton } from "@/components/ui/skeleton"
 import Image from "next/image"
 import { useState } from "react"
@@ -58,10 +58,9 @@ export default function MyPagePage() {
     return null
   }
 
-  const avatarURL =
-    !data || error
-      ? "/logo.png"
-      : envConfig.AVATARS_URL + data.creator?.avatar_url || "/logo.png"
+  const avatarURL = data.creator?.avatar_url
+    ? envConfig.AVATARS_URL + data.creator.avatar_url
+    : "/logo.png"
 
   return (
     <div className="space-y-6">

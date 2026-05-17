@@ -1,6 +1,7 @@
 import { LinkPublic } from "@/app/api/public/creator/[handle]/route"
 import Image from "next/image"
-import { envConfig, getLinkImageURL } from "@/lib/utils"
+import { envConfig } from "@/lib/env"
+import { getLinkImageURL } from "@/lib/link-assets"
 import { Button } from "@/components/ui/button"
 import { ArrowRight01Icon } from "hugeicons-react"
 import { Badge } from "@/components/ui/badge"
@@ -22,16 +23,15 @@ function formatType(type: string) {
   return type.charAt(0).toUpperCase() + type.slice(1)
 }
 
-export default function CreatorLinkCard({ link}: {
+export default function CreatorLinkCard({ link }: {
   link: LinkPublic
 }) {
   const { data, isLoading } = useTransactionsByLinkId(link.id, 10)
   const router = useRouter()
 
-  const thumbnailURL = !data
-    ? getLinkImageURL(link.type)
-    : envConfig.AVATARS_URL + link.thumbnail_url ||
-      getLinkImageURL(link.type)
+  const thumbnailURL = link.thumbnail_url
+    ? envConfig.AVATARS_URL + link.thumbnail_url
+    : getLinkImageURL(link.type)
 
   return (
     <Card key={link.id} className="overflow-hidden border-border/70">

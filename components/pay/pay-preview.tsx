@@ -3,9 +3,11 @@
 import { useParams } from "next/navigation"
 import { usePublicLink } from "@/hooks/use-public"
 import Image from "next/image"
-import dummyThumbnail from "@/public/dashboard.avif"
 import { Skeleton } from "../ui/skeleton"
-import { envConfig, getReadableDateTime } from "@/lib/utils"
+import { envConfig } from "@/lib/env"
+import { getReadableDateTime } from "@/lib/utils"
+
+const dummyThumbnail = "/dashboard.avif"
 
 export default function PayPreview() {
   const params = useParams<{ linkId: string }>()
@@ -13,9 +15,9 @@ export default function PayPreview() {
 
   const { data, isLoading } = usePublicLink(linkId)
 
-  const thumbnailURL = !data
-    ? dummyThumbnail
-    : envConfig.AVATARS_URL + data.link.thumbnail_url || dummyThumbnail
+  const thumbnailURL = data?.link.thumbnail_url
+    ? envConfig.AVATARS_URL + data.link.thumbnail_url
+    : dummyThumbnail
 
   if (isLoading) {
     return (

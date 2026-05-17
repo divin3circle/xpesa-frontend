@@ -7,7 +7,7 @@ import { BlocksIcon, Eye, HandCoins, WalletCards } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useCreatorInsights } from "@/hooks/analytics/use-creator-insights"
-import { envConfig } from "@/lib/utils"
+import { envConfig } from "@/lib/env"
 
 type CreatorKpiStackProps = {
   handle: string | null

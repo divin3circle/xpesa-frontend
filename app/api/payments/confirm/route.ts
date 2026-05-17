@@ -8,7 +8,7 @@ import {
   envConfig,
   getPaymentNetworkLabel,
   isAvalanchePaymentChain,
-} from "@/lib/utils"
+} from "@/lib/env"
 import crypto from "crypto"
 import { USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains"
 

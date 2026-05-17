@@ -1,4 +1,4 @@
-import { envConfig } from "@/lib/utils"
+import { envConfig } from "@/lib/env"
 import { useQuery } from "@tanstack/react-query"
 import { ethers } from "ethers"
 

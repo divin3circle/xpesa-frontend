@@ -1,5 +1,5 @@
 import { defineChain } from "thirdweb"
-import { envConfig, isAvalanchePaymentChain } from "../utils"
+import { envConfig, isAvalanchePaymentChain } from "../env"
 
 const hederaMainnet = defineChain(295)
 const hederaTestnet = defineChain(296)

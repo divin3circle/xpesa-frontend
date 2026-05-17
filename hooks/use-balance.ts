@@ -4,9 +4,10 @@ import { getContract } from "thirdweb"
 import { Account } from "thirdweb/wallets"
 
 import { PAYMENT_CHAIN, USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains"
-import { client, envConfig } from "@/lib/utils"
+import { envConfig } from "@/lib/env"
+import { client } from "@/lib/utils"
 
-async function getMyBalance(account: Account) {
+async function getMyBalance(account: Account | undefined) {
   if (!USDC_CONTRACT_ADDRESS || !account) {
     return "0.00"
   }
@@ -21,9 +22,9 @@ async function getMyBalance(account: Account) {
   return balance.displayValue
 }
 
-export function useMyBalance(account: Account) {
+export function useMyBalance(account: Account | undefined) {
   return useQuery({
-    queryKey: ["my-balance", envConfig.CHAIN, account.address],
+    queryKey: ["my-balance", envConfig.CHAIN, account?.address],
     queryFn: () => getMyBalance(account),
   })
 }

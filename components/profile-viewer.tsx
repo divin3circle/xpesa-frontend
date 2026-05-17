@@ -21,7 +21,7 @@ import {
 import Image from "next/image"
 import { ModeToggle } from "./mode-toggle"
 import { useUserDetails } from "@/hooks/use-user"
-import { envConfig } from "@/lib/utils"
+import { envConfig } from "@/lib/env"
 import { Skeleton } from "./ui/skeleton"
 import { useSignOut } from "@/hooks/use-auth"
 
@@ -30,9 +30,9 @@ export function ProfileViewer({ defaultVersion }: { defaultVersion: string }) {
   const { mutate: signOut } = useSignOut()
 
   const avatarURL =
-    !data || error
-      ? "/logo.png"
-      : envConfig.AVATARS_URL + data.creator?.avatar_url || "/logo.png"
+    data?.creator?.avatar_url && !error
+      ? envConfig.AVATARS_URL + data.creator.avatar_url
+      : "/logo.png"
 
   return (
     <SidebarMenu>

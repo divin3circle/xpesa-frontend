@@ -16,7 +16,6 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import creatorBanner from "@/public/dashboard.avif"
 
 const navItems = [
   { href: "", label: "Overview" },
@@ -37,7 +36,7 @@ export function ViewerFrame({ children }: { children: ReactNode }) {
         <header className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-card/40 shadow-lg shadow-black/5">
           <div className="absolute inset-0">
             <Image
-              src={creatorBanner}
+              src="/dashboard.avif"
               alt="Secure viewer banner"
               fill
               className="object-cover"

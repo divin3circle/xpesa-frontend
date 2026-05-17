@@ -2,7 +2,9 @@
   <dictionary name="project">
     <words>
       <w>Usdc</w>
+      <w>avax</w>
       <w>supabase</w>
+      <w>thirdweb</w>
       <w>xpesa</w>
     </words>
   </dictionary>

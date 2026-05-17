@@ -4,7 +4,7 @@ import { verifyMessage } from "viem"
 import { NextResponse } from "next/server"
 import { randomUUID } from "node:crypto"
 
-import { envConfig } from "@/lib/utils"
+import { envConfig } from "@/lib/env"
 import { normalizeAddress } from "@/lib/view-access"
 
 export interface PackAccessResponse {

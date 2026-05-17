@@ -9,7 +9,7 @@ import { useTransactionDetails } from "@/hooks/use-blockchain-transactions"
 import { Skeleton } from "./skeleton"
 import { toast } from "sonner"
 import { getTokenLogo, getNetworkLogo } from "./transaction-management-table"
-import { resolveExplorerUrl } from "@/lib/utils"
+import { resolveExplorerUrl } from "@/lib/env"
 type MinimalTx = {
   hash: string
   link?: string
