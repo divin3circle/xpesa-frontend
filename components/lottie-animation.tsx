@@ -1,15 +1,30 @@
-"use client"
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
+import type { DotLottie } from "@lottiefiles/dotlottie-react"
+
+export type AnimationFile =
+  | "login"
+  | "signup"
+  | "confirmed"
+  | "wallet"
+  | "earn"
+  | "receive"
+  | "export"
+  | "withdraw"
 
 export default function LottieComponent({
   page,
+  loop = true,
+  dotLottieRefCallback,
 }: {
-  page: "login" | "signup" | "confirmed" | "wallet"
+  page: AnimationFile
+  loop?: boolean
+  dotLottieRefCallback?: (instance: DotLottie | null) => void
 }) {
   return (
     <DotLottieReact
-      src={page === "login" ? "/login.json" : page === "signup" ? "/signup.json" : page === "wallet" ? "/wallet.json" : "/confirmed.json"}
-      loop
+      dotLottieRefCallback={dotLottieRefCallback}
+      src={`/${page}.json`}
+      loop={loop}
       autoplay
     />
   )

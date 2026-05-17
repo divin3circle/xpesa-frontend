@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input"
 import { usePublicLink } from "@/hooks/use-public"
 import { smartAccountConfig } from "@/lib/thirdweb/account-abstraction"
 import { PayButton } from "./pay-button"
-import { useTheme } from "next-themes"
+import { useTheme } from "@/components/theme-provider"
 import {
   Dialog,
   DialogContent,

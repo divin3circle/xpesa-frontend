@@ -12,7 +12,7 @@ import { useOnboarding } from "@/components/onboarding/onboarding-provider"
 import { IconInfoCircleFilled } from "@tabler/icons-react"
 import { ConnectButton, useActiveWallet } from "thirdweb/react"
 import { client } from "@/lib/utils"
-import { useTheme } from "next-themes"
+import { useTheme } from "@/components/theme-provider"
 import { defaultChain } from "@/lib/thirdweb/account-abstraction"
 
 export function WalletStep() {

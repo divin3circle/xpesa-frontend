@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { motion } from "framer-motion"
-import { useTheme } from "next-themes"
+import { useTheme } from "@/components/theme-provider"
 import type { PublicTransaction } from "@/app/api/public/transactions/route"
 import { getNetworkLogo } from "./transaction-management-table"
 import Image from "next/image"
