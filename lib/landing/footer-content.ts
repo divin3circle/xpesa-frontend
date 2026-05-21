@@ -1,10 +1,7 @@
 import {
-  BookOpenText,
   CircleDollarSign,
   FileText,
-  HandCoins,
   HelpCircle,
-  Home,
   Landmark,
   ShieldCheck,
 } from "lucide-react"
@@ -35,28 +32,43 @@ export const footerSocialLinks = [
 
 export const footerLinkGroups: FooterLinkGroup[] = [
   {
-    label: "Product",
+    label: "Resources",
     links: [
-      { title: "How it works", href: "#how-it-works", icon: Home },
-      { title: "Modes", href: "#modes", icon: HandCoins },
-      { title: "Pricing", href: "#pricing", icon: CircleDollarSign },
-      { title: "Who it is for", href: "#who-for", icon: BookOpenText },
-    ],
-  },
-  {
-    label: "Payouts",
-    links: [
-      { title: "M-Pesa flow", href: "#cta", icon: Landmark },
-      { title: "Fees", href: "#pricing", icon: CircleDollarSign },
-      { title: "Status", href: "#", icon: HelpCircle },
+      {
+        title: "Litepaper",
+        href: "https://divin3circle.github.io/xpesa-litepaper/",
+        icon: Landmark,
+      },
+      {
+        title: "Fees",
+        href: "https://xpesa.mintlify.app/payments/platform-fees",
+        icon: CircleDollarSign,
+      },
+      {
+        title: "References",
+        href: "https://xpesa.mintlify.app/reference",
+        icon: HelpCircle,
+      },
     ],
   },
   {
     label: "Company",
     links: [
-      { title: "Documentation", href: "#", icon: FileText },
-      { title: "Terms", href: "#", icon: ShieldCheck },
-      { title: "Privacy", href: "#", icon: ShieldCheck },
+      {
+        title: "Documentation",
+        href: "https://xpesa.mintlify.app",
+        icon: FileText,
+      },
+      {
+        title: "Policies & Terms",
+        href: "https://xpesa.mintlify.app/reference/contact-and-press",
+        icon: ShieldCheck,
+      },
+      {
+        title: "Contact",
+        href: "https://xpesa.mintlify.app/reference/contact-and-press",
+        icon: ShieldCheck,
+      },
     ],
   },
 ]

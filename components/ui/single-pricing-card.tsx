@@ -230,7 +230,7 @@ function SinglePricingCardContent({
               asChild={!!primaryButton.href}
             >
               {primaryButton.href ? (
-                <Link href={primaryButton.href}>
+                <Link href="/signup">
                   <PrimaryButtonIcon className="size-4" />
                   <span>{primaryButton.text}</span>
                   {ChevronIcon && (

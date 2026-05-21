@@ -32,7 +32,7 @@ export const audienceContent = {
       title: "Campus tutors",
       description:
         "Students selling notes, past papers, and revision packs around Kenyatta, UoN, Strathmore, and USIU.",
-      href: "#",
+      href: "https://xpesa.mintlify.app/creators/creating-your-account",
       icon: BookOpenText,
       imageSrc: campusStudentsImage.src,
       imageAlt: "Students studying with notebooks",
@@ -43,7 +43,7 @@ export const audienceContent = {
       title: "Twitter/X educators",
       description:
         "Finance, career, and growth educators with active audiences already asking for M-Pesa tip options.",
-      href: "#",
+      href: "https://xpesa.mintlify.app/creators/creating-your-account",
       icon: MessageSquareShare,
       imageSrc: twitterEducatorsImage.src,
       imageAlt: "Phone showing social media feed",
@@ -54,7 +54,7 @@ export const audienceContent = {
       title: "Freelancers selling templates",
       description:
         "Developers, designers, and VAs monetizing reusable templates, packs, and digital assets.",
-      href: "#",
+      href: "https://xpesa.mintlify.app/creators/creating-your-account",
       icon: BriefcaseBusiness,
       imageSrc: freelancersImage.src,
       imageAlt: "Freelancer coding on laptop",
@@ -65,7 +65,7 @@ export const audienceContent = {
       title: "Coaches and consultants",
       description:
         "Micro-consultants like nutritionists, fitness coaches, and therapists selling one resource or receiving appreciation tips.",
-      href: "#",
+      href: "https://xpesa.mintlify.app/creators/creating-your-account",
       icon: Stethoscope,
       imageSrc: coachesImage.src,
       imageAlt: "Coach consulting a client",

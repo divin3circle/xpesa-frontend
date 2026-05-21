@@ -52,7 +52,7 @@ export function PricingSection() {
           secondaryButton={{
             text: "View docs",
             icon: ExternalLink,
-            href: "#",
+            href: "https://xpesa.mintlify.app",
           }}
           testimonials={pricingContent.testimonials}
           testimonialRotationSpeed={4200}

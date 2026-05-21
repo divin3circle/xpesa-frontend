@@ -32,7 +32,7 @@ export const navigationConfig: NavGroup[] = [
     items: [
       {
         title: "Documentation",
-        url: "/docs",
+        url: "https://xpesa.mintlify.app/",
         iconName: "book-open",
       },
       {

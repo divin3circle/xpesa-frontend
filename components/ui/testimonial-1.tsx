@@ -9,12 +9,14 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { AsteriskRevealHeading } from "@/components/ui/asterisk-reveal-heading"
 import { ctaContent } from "@/lib/landing/cta-content"
+import { useRouter } from "next/navigation"
 
 type Testimonial1Props = {
   className?: string
 }
 
 export default function Testimonial1({ className }: Testimonial1Props) {
+  const router = useRouter()
   return (
     <section id="cta" className={className}>
       <div className="mx-auto w-full max-w-6xl px-6 pb-24 lg:px-10">
@@ -75,10 +77,16 @@ export default function Testimonial1({ className }: Testimonial1Props) {
           </div>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Button size="lg">{ctaContent.primaryCta}</Button>
+            <Button size="lg" onClick={() => {
+              router.push("/waitlist")
+            }}>{ctaContent.primaryCta}</Button>
             <Button
               variant={"link"}
               className="flex items-center gap-1 rounded-4xl px-4 py-2 transition-colors"
+              onClick={() => {
+                router.push("https://xpesa.mintlify.app/payments/overview")
+              }
+              }
             >
               {ctaContent.secondaryCta}
               <ArrowUpRight className="size-4" />
