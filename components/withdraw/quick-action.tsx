@@ -63,14 +63,14 @@ export default function QuickAction({
         </Button>
       </DrawerTrigger>
       <DrawerContent>
-        <DrawerHeader>
+        {quickAction.id == "withdraw" ? null : (<DrawerHeader>
           <DrawerTitle className="font-sans text-xl font-semibold">
             {quickAction.title}
           </DrawerTitle>
           <DrawerDescription className="text-sm">
             {quickAction.description}
           </DrawerDescription>
-        </DrawerHeader>
+        </DrawerHeader>)}
         <div className="mx-auto my-0 w-full overflow-y-scroll md:max-w-md">
           {quickAction.content}
         </div>

@@ -4,11 +4,10 @@ import QuickAction, { IQuickAction } from "./quick-action"
 import WithdrawReceiveAction, {
   WithdrawReceiveActionFooter,
 } from "@/components/withdraw/receive-action"
-import { Button } from "@/components/ui/button"
-import { DrawerClose, DrawerFooter } from "@/components/ui/drawer"
 import React from "react"
 import ExportAction, { ExportActionFooter } from "@/components/withdraw/export-action"
 import EarnAction, { EarnActionFooter } from "@/components/withdraw/earn-action"
+import WithdrawAction from "@/components/withdraw/withdraw-view"
 
 const quickActions: IQuickAction[] = [
   {
@@ -26,15 +25,8 @@ const quickActions: IQuickAction[] = [
     description:
       "Get your USDC where you want, when your want via our off-ramp services.",
     onClick: () => {},
-    content: <h1>Withdraw</h1>,
-    footer: (
-      <DrawerFooter className="mx-auto my-0 w-full md:max-w-md">
-        <Button>Submit</Button>
-        <DrawerClose>
-          <Button variant="outline">Cancel</Button>
-        </DrawerClose>
-      </DrawerFooter>
-    ),
+    content: <WithdrawAction />,
+    footer: <></>,
   },
   {
     id: "wallet",
