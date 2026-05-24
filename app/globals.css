@@ -154,6 +154,25 @@
   }
 }
 
+@keyframes border-beam {
+  0%,
+  100% {
+    border-color: color-mix(in oklab, var(--chart-1) 30%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--chart-1) 30%, transparent);
+  }
+
+  50% {
+    border-color: var(--chart-1);
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--chart-1) 70%, transparent),
+      0 0 18px color-mix(in oklab, var(--chart-1) 22%, transparent);
+  }
+}
+
+.border-beam {
+  animation: border-beam 6s ease-in-out infinite;
+}
+
 .tw-back-button {
   background-color: red !important;
 }
