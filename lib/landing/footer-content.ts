@@ -61,7 +61,7 @@ export const footerLinkGroups: FooterLinkGroup[] = [
       },
       {
         title: "Policies & Terms",
-        href: "https://xpesa.mintlify.app/reference/contact-and-press",
+        href: "/policies-and-terms",
         icon: ShieldCheck,
       },
       {

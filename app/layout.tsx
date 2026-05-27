@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 import { ThirdwebProvider } from "thirdweb/react"
 import { AppQueryClientProvider } from "@/components/query-client-provider"
 import { FanWalletProvider } from "@/components/fan-wallet-context"
+import { CookieConsentToast } from "@/components/policies/cookie-consent-toast"
 import React from "react"
 
 const oxaniumHeading = Oxanium({
@@ -66,6 +67,7 @@ export default function RootLayout({
                       className: "rounded-2xl font-semibold font-sans",
                     }}
                   />
+                  <CookieConsentToast />
                 </ThemeProvider>
               </TooltipProvider>
             </FanWalletProvider>

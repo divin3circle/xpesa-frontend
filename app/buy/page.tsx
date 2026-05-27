@@ -51,8 +51,10 @@ export default function GetUSDCPage() {
             <Button variant="outline" className="w-full md:w-1/2">
               Get USDC
             </Button>
-            <Button variant="default" className="w-full md:w-1/3">
-              Privacy Policy
+            <Button variant="default" className="w-full md:w-1/3" asChild>
+              <Link href="/policies-and-terms#privacy-policy">
+                Privacy Policy
+              </Link>
             </Button>
           </div>
         </div>

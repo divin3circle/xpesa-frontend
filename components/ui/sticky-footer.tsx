@@ -60,7 +60,7 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
                         <a
                           href={link.href}
                           aria-label={link.title}
-                          className="text-foreground/75 transition-all duration-300 hover:text-background"
+                          className="text-foreground/75 transition-all duration-300"
                         >
                           <Icon className="size-6d" />
                         </a>
@@ -88,7 +88,7 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
                             <li key={link.title}>
                               <a
                                 href={link.href}
-                                className="inline-flex items-center text-foreground/50 transition-all duration-300 hover:text-background"
+                                className="inline-flex items-center text-foreground/50 transition-all duration-300 hover:text-foreground/50"
                               >
                                 {Icon && <Icon className="me-1 size-4" />}
                                 {link.title}
