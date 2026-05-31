@@ -1,5 +1,4 @@
 import Link from "next/link"
-import Image from "next/image"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -28,16 +27,17 @@ export default function LearnPage() {
               Getting Started Hub
             </Badge>
             <h1 className="max-w-3xl font-heading text-4xl font-semibold tracking-tight md:text-5xl">
-              Learn xpesa faster with practical tracks
+              Get Started with XPesa in minutes
             </h1>
             <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
-              Start with quick, focused lessons you can complete in minutes. The{" "}
-              <span className="font-medium text-foreground">Errors track</span>
-              is live now with a guided video and field-tested fixes.
+              Learn to quickly create and share content behind a paywall or
+              withdraw your earnings to local fiat accounts.
             </p>
             <div className="flex flex-wrap gap-2 pt-1">
               <Button asChild>
-                <Link href="#">Start Errors Track</Link>
+                <Link href="https://xpesa.mintlify.app/">
+                  Full Documentation
+                </Link>
               </Button>
               <Button variant="outline" asChild>
                 <Link href="/dashboard/links/create">
@@ -53,37 +53,14 @@ export default function LearnPage() {
             <CardHeader>
               <div className="mb-2 flex items-center justify-between">
                 <Badge variant="secondary" className="rounded-full">
-                  Live Now
+                  3 Minutes
                 </Badge>
                 <p className="text-xs font-medium text-chart-2">Track 01</p>
               </div>
-              <CardTitle className="text-xl">Error recovery track</CardTitle>
+              <CardTitle className="text-xl">Link Creation</CardTitle>
               <CardDescription>
-                Learn the fastest path to identify, verify, and fix common setup
-                and runtime issues.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button asChild className="w-full">
-                <Link href="#">Open Track</Link>
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="border-dashed border-border/80 bg-card/40">
-            <CardHeader>
-              <div className="mb-2 flex items-center justify-between">
-                <Badge variant="outline" className="rounded-full">
-                  Placeholder
-                </Badge>
-                <p className="text-xs font-medium text-muted-foreground">
-                  Track 02
-                </p>
-              </div>
-              <CardTitle className="text-xl">Payments quick track</CardTitle>
-              <CardDescription>
-                Coming next: embedded walkthroughs for payment states,
-                confirmations, and edge-case handling.
+                Follow along as we build a link from scratch, set up a paywall,
+                and share it with the world.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -97,16 +74,39 @@ export default function LearnPage() {
             <CardHeader>
               <div className="mb-2 flex items-center justify-between">
                 <Badge variant="outline" className="rounded-full">
-                  Placeholder
+                  5 Minutes
+                </Badge>
+                <p className="text-xs font-medium text-muted-foreground">
+                  Track 02
+                </p>
+              </div>
+              <CardTitle className="text-xl">Onboarding Setup</CardTitle>
+              <CardDescription>
+                Learn how to set up your payout details, a wallet, and withdraw
+                your first earnings.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button variant="secondary" disabled className="w-full">
+                Coming soon
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-dashed border-border/80 bg-card/40">
+            <CardHeader>
+              <div className="mb-2 flex items-center justify-between">
+                <Badge variant="outline" className="rounded-full">
+                  7 Minutes
                 </Badge>
                 <p className="text-xs font-medium text-muted-foreground">
                   Track 03
                 </p>
               </div>
-              <CardTitle className="text-xl">Growth and optimization</CardTitle>
+              <CardTitle className="text-xl">Invest Earnings</CardTitle>
               <CardDescription>
-                Coming next: pricing tests, conversion improvements, and
-                recurring optimization loops.
+                Not eager to withdraw? See how to use your Avalanche earnings to
+                grow your USDC.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -117,15 +117,15 @@ export default function LearnPage() {
           </Card>
         </section>
 
-        <section
+        {/* <section
           id="errors-track"
           className="grid gap-4 rounded-3xl border bg-card/70 p-4 shadow-sm md:grid-cols-5 md:p-6"
         >
           <div className="space-y-4 md:col-span-3">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="rounded-full">Errors Track</Badge>
+              <Badge className="rounded-full">Link Creation</Badge>
               <Badge variant="outline" className="rounded-full">
-                12 minutes
+                3 minutes
               </Badge>
               <Badge variant="outline" className="rounded-full">
                 Beginner friendly
@@ -133,7 +133,7 @@ export default function LearnPage() {
             </div>
 
             <h2 className="font-heading text-3xl font-semibold tracking-tight">
-              From confusion to fix, quickly
+              Setup a payment link
             </h2>
             <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
               This track gives your team a clean troubleshooting flow:
@@ -210,7 +210,7 @@ export default function LearnPage() {
               </CardContent>
             </Card>
           </div>
-        </section>
+        </section> */}
 
         <section className="rounded-2xl border bg-muted/20 p-4 md:p-6">
           <h3 className="font-heading text-2xl font-semibold">Next steps</h3>
@@ -223,7 +223,7 @@ export default function LearnPage() {
               <Link href="/dashboard/links/create">Create a new link</Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link href="/docs">Read docs</Link>
+              <Link href="/docs">See docs</Link>
             </Button>
           </div>
         </section>

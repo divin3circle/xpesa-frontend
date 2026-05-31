@@ -1,28 +1,28 @@
 import { Badge } from "@/components/ui/badge"
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import Link from "next/link"
 
 const sections = [
   {
-    title: "V1 Scope",
+    title: "For Creators",
     body: "Creator onboarding, public pages, gate + tip links, x402 payments, and M-Pesa withdrawals.",
   },
   {
-    title: "UI Pages",
-    body: "13 core pages across auth, onboarding, dashboard, public creator pages, and fan payment flow.",
+    title: "For Fans",
+    body: "Understanding the fan payment flow, no-account payments, smart accounts, and instant access to creator content.",
   },
   {
-    title: "Database",
-    body: "Postgres + Drizzle with core tables: creators, links, transactions, access_tokens, withdrawals.",
+    title: "Data and Security",
+    body: "How we secure creator links and fan payments, our data model, and how we handle personally identifiable information.",
   },
   {
-    title: "API Routes",
-    body: "Next.js route handlers for auth, onboarding, links CRUD, payments, dashboard stats, and payouts.",
+    title: "Terms & Policies",
+    body: "Our terms of service, privacy policy, and acceptable use policy for creators and fans using xpesa.",
   },
 ]
 
@@ -30,13 +30,13 @@ export default function DocsPage() {
   return (
     <div className="mx-auto max-w-5xl space-y-6 p-4 md:p-8">
       <section className="space-y-2">
-        <Badge variant="outline">xpesa reference</Badge>
+        <Badge variant="outline">xpesa docs</Badge>
         <h1 className="font-heading text-4xl font-semibold tracking-tight">
-          Product documentation
+          Read the docs
         </h1>
         <p className="max-w-3xl text-sm text-muted-foreground">
-          V1 implementation reference for pages, schema, API surface, and payout
-          architecture.
+          The docs cover how creators can set up paid links, share them with
+          their audience, and withdraw earnings to local mobile money accounts.
         </p>
       </section>
 
@@ -50,34 +50,14 @@ export default function DocsPage() {
           </Card>
         ))}
       </section>
-
-      <section className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>V1 technology stack</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm text-muted-foreground">
-            <p>Frontend: Next.js App Router, TypeScript, Tailwind, shadcn/ui</p>
-            <p>
-              Wallet + chain: ThirdWeb, Hedera (env-driven), USDC, x402 flow
-            </p>
-            <p>Data: Neon Postgres + Drizzle, Upstash Redis, Cloudflare R2</p>
-            <p>Payouts: Kotani Pay M-Pesa offramp pipeline</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>V1 shipping priorities</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm text-muted-foreground">
-            <p>1. Frictionless creator onboarding in under 3 minutes.</p>
-            <p>2. Clean fan payment flow with no fan account required.</p>
-            <p>3. Reliable payment confirmation + secure URL reveal.</p>
-            <p>4. Fast creator withdrawal flow to M-Pesa.</p>
-          </CardContent>
-        </Card>
-      </section>
+      <Link
+        href="https://xpesa.mintlify.app/"
+        rel="noopener noreferrer"
+        target="_blank"
+        className="text-sm text-muted-foreground hover:underline"
+      >
+        Explore the full documentation
+      </Link>
     </div>
   )
 }

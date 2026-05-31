@@ -53,7 +53,7 @@ export const howItWorksContent = {
         imageSrc:
           "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=1200&q=80",
         imageAlt: "Audience discovery through mobile feed",
-        hrefLink: "/docs",
+        hrefLink: "https://xpesa.mintlify.app/",
       },
     },
     {
@@ -71,7 +71,7 @@ export const howItWorksContent = {
         imageSrc:
           "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=1200&q=80",
         imageAlt: "Mobile payment confirmation",
-        hrefLink: "/docs",
+        hrefLink: "https://xpesa.mintlify.app/",
       },
     },
   ] as HowItWorksStep[],
