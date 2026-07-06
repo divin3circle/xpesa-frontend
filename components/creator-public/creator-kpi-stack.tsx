@@ -68,7 +68,7 @@ function KpiSkeleton() {
 }
 
 export function CreatorKpiStack({ handle }: CreatorKpiStackProps) {
-  const [range] = useState<RangeOption>("30d")
+  const [range] = useState<RangeOption>("all")
   const { data, isLoading } = useCreatorInsights(handle, range)
 
   const cards = data
