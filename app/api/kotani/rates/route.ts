@@ -31,6 +31,11 @@ export async function GET(request: Request) {
 
     return NextResponse.json(body, { status: resp.status })
   } catch (err) {
-    return NextResponse.json({ error: "Kotani proxy failed" }, { status: 502 })
+    return NextResponse.json(
+      {
+        error: `Kotani proxy failed. ${err instanceof Error ? err.message : "Unknown error"}`,
+      },
+      { status: 502 }
+    )
   }
 }

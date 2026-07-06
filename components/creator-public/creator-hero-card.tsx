@@ -17,7 +17,7 @@ export function CreatorHeroCard({ creator }: CreatorHeroCardProps) {
     <Card className="relative min-h-90 overflow-hidden border-border/70">
       <div className="absolute inset-0">
         <Image
-          src="/dashboard.avif"
+          src="/banner2.jpg"
           alt="Creator profile banner"
           fill
           className="object-cover"
