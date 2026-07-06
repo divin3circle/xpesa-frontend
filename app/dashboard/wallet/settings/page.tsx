@@ -1,3 +1,4 @@
+"use client"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -8,6 +9,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { toast } from "sonner"
 
 export default function PayoutSettingsPage() {
   return (
@@ -36,9 +38,9 @@ export default function PayoutSettingsPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="legal-name">Legal name</Label>
-              <Input id="legal-name" defaultValue="Wanjiru Mwangi" />
+              <Input id="legal-name" defaultValue="Legal Name" />
             </div>
-            <Button>Save payout profile</Button>
+            <Button disabled>Save payout profile</Button>
           </CardContent>
         </Card>
 
@@ -51,7 +53,14 @@ export default function PayoutSettingsPage() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             <label className="flex items-start gap-2 rounded-md border p-3">
-              <input type="checkbox" defaultChecked className="mt-0.5" />
+              <input
+                type="checkbox"
+                defaultChecked
+                className="mt-0.5"
+                onChange={() => {
+                  toast.success("Preferences updated successfully.")
+                }}
+              />
               <span>
                 Email me when a payout completes
                 <p className="text-xs text-muted-foreground">
@@ -60,7 +69,14 @@ export default function PayoutSettingsPage() {
               </span>
             </label>
             <label className="flex items-start gap-2 rounded-md border p-3">
-              <input type="checkbox" defaultChecked className="mt-0.5" />
+              <input
+                type="checkbox"
+                defaultChecked
+                className="mt-0.5"
+                onChange={() => {
+                  toast.success("Preferences updated successfully.")
+                }}
+              />
               <span>
                 Require confirmation modal before every withdraw
                 <p className="text-xs text-muted-foreground">

@@ -108,3 +108,7 @@ export function getUserAvatarURL(url: string | null | undefined) {
   if (!url) return "/logo.png"
   return url
 }
+
+export const getMultiChainExplorerUrl = (param: string) => {
+  return `https://blockscan.com/address/${param}`
+}

@@ -1,3 +1,4 @@
+"use client"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -7,8 +8,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { useRouter } from "next/navigation"
 
 export default function SupportedMethodsPage() {
+  const router = useRouter()
   return (
     <div className="space-y-6">
       <section>
@@ -60,7 +63,13 @@ export default function SupportedMethodsPage() {
           <CardContent className="space-y-2 text-sm">
             <p>Processing: Instant</p>
             <p>Network: Multiple</p>
-            <Button className="w-full" variant="outline">
+            <Button
+              className="w-full"
+              variant="outline"
+              onClick={() => {
+                router.push("/dashboard/wallet/withdraw")
+              }}
+            >
               Manage wallet
             </Button>
           </CardContent>
