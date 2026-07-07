@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link"
 
 import { Badge } from "@/components/ui/badge"
@@ -10,6 +11,9 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { BrandLogo } from "@/components/landing/brand-logo"
+import Image from "next/image"
+import { HugeiconsIcon } from "@hugeicons/react"
+import { YoutubeIcon } from "@hugeicons/core-free-icons"
 
 export default function LearnPage() {
   return (
@@ -53,7 +57,7 @@ export default function LearnPage() {
             <CardHeader>
               <div className="mb-2 flex items-center justify-between">
                 <Badge variant="secondary" className="rounded-full">
-                  3 Minutes
+                  15 Minutes
                 </Badge>
                 <p className="text-xs font-medium text-chart-2">Track 01</p>
               </div>
@@ -64,8 +68,17 @@ export default function LearnPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="secondary" disabled className="w-full">
-                Coming soon
+              <Button
+                variant="secondary"
+                className="w-full cursor-pointer group-hover:scale-105"
+                onClick={() =>
+                  window.open(
+                    "https://youtu.be/uOAHL-cOAlE?si=pqrv3tS2XJZ6Qvor"
+                  )
+                }
+              >
+                <HugeiconsIcon icon={YoutubeIcon} className="mr-2 h-4 w-4" />
+                Watch video
               </Button>
             </CardContent>
           </Card>
@@ -117,15 +130,15 @@ export default function LearnPage() {
           </Card>
         </section>
 
-        {/* <section
+        <section
           id="errors-track"
           className="grid gap-4 rounded-3xl border bg-card/70 p-4 shadow-sm md:grid-cols-5 md:p-6"
         >
           <div className="space-y-4 md:col-span-3">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="rounded-full">Link Creation</Badge>
+              <Badge className="rounded-full">Introduction</Badge>
               <Badge variant="outline" className="rounded-full">
-                3 minutes
+                15 minutes
               </Badge>
               <Badge variant="outline" className="rounded-full">
                 Beginner friendly
@@ -133,84 +146,97 @@ export default function LearnPage() {
             </div>
 
             <h2 className="font-heading text-3xl font-semibold tracking-tight">
-              Setup a payment link
+              Get to know Xpesa
             </h2>
             <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
-              This track gives your team a clean troubleshooting flow:
-              reproduce, classify, verify, and resolve with confidence.
+              Xpesa is a creator monetization platform for African creators. It
+              lets creators create paid content gates and tip links, accept USDC
+              payments through Avalanche smart accounts, and withdraw earnings
+              to local fiat through an offramp partner.
             </p>
 
             <div className="overflow-hidden rounded-2xl border bg-background">
               <div className="aspect-video w-full">
                 <iframe
-                  className="h-full w-full"
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                  title="XPesa Errors Track Introduction"
-                  loading="lazy"
+                  width="560"
+                  height="315"
+                  className="h-full w-full rounded-2xl"
+                  src="https://www.youtube.com/embed/uOAHL-cOAlE?si=8oBIyC7gCTt5w_hd"
+                  title="YouTube video player"
+                  frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   referrerPolicy="strict-origin-when-cross-origin"
                   allowFullScreen
-                />
+                ></iframe>
               </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
               <div className="rounded-xl border bg-background/70 p-3">
                 <p className="text-xs text-muted-foreground">Step 1</p>
-                <p className="text-sm font-medium">Capture the symptom</p>
+                <p className="text-sm font-medium">Setup Account</p>
               </div>
               <div className="rounded-xl border bg-background/70 p-3">
                 <p className="text-xs text-muted-foreground">Step 2</p>
-                <p className="text-sm font-medium">Run focused checks</p>
+                <p className="text-sm font-medium">Create Content Link</p>
               </div>
               <div className="rounded-xl border bg-background/70 p-3">
                 <p className="text-xs text-muted-foreground">Step 3</p>
-                <p className="text-sm font-medium">Apply and verify fix</p>
+                <p className="text-sm font-medium">Share Link & Earn</p>
               </div>
             </div>
           </div>
 
-          <div className="space-y-4 md:col-span-2">
-            <div className="overflow-hidden rounded-2xl border">
+          <div className="flex flex-col gap-2 md:col-span-2">
+            <Link
+              href="/docs"
+              rel="noopener noreferrer"
+              target="_blank"
+              className="mb-2 overflow-hidden"
+            >
               <Image
-                src="/error1.avif"
-                alt="Error diagnostics panel illustration"
+                src="/share.avif"
+                alt="Documentation landing page."
                 width={1200}
                 height={800}
-                className="h-44 w-full object-cover"
+                className="h-44 w-full rounded-2xl object-cover"
                 priority
               />
-            </div>
+            </Link>
 
-            <div className="overflow-hidden rounded-2xl border">
+            <Link
+              href="https://xpesa.mintlify.app/creators/creating-your-account"
+              rel="noopener noreferrer"
+              target="_blank"
+              className="overflow-hidden"
+            >
               <Image
-                src="/error2.avif"
+                src="/banner2.jpg"
                 alt="Error workflow illustration"
                 width={1200}
                 height={800}
-                className="h-44 w-full object-cover"
+                className="h-44 w-full rounded-2xl object-cover"
               />
-            </div>
+            </Link>
 
             <Card className="border-chart-1/30 bg-chart-1/5">
               <CardHeader>
                 <CardTitle className="text-lg">
-                  Ready-to-use checklist
+                  Account setup checklist
                 </CardTitle>
                 <CardDescription>
-                  Use this flow every time you see a critical issue before
-                  launch.
+                  As a creator, you need to ensure your account is fully set up
+                  to receive payments and withdraw earnings.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-2 text-sm text-muted-foreground">
-                <p>1. Confirm reproduction path and environment.</p>
-                <p>2. Validate auth/session and API response status.</p>
-                <p>3. Re-test with clean cache and expected user role.</p>
-                <p>4. Ship fix only after regression check passes.</p>
+                <p>1. Confirm your email address.</p>
+                <p>2. Add and confirm your wallet and mobile information.</p>
+                <p>3. Ensure profile details are accurate and up to date.</p>
               </CardContent>
             </Card>
           </div>
-        </section> */}
+        </section>
 
         <section className="rounded-2xl border bg-muted/20 p-4 md:p-6">
           <h3 className="font-heading text-2xl font-semibold">Next steps</h3>
