@@ -15,6 +15,18 @@ function normalizePaymentChain(chain: string | undefined): SupportedPaymentChain
   return DEFAULT_PAYMENT_CHAIN
 }
 
+function getRuntimeEnv() {
+  return process.env.NEXT_PUBLIC_ENV || process.env.ENV
+}
+
+function getRuntimeChain() {
+  return process.env.NEXT_PUBLIC_CHAIN || process.env.CHAIN
+}
+
+function getEnvValue(publicKey: string, serverKey: string) {
+  return process.env[publicKey] || process.env[serverKey]
+}
+
 export function isDevEnvironment(env: string | undefined): boolean {
   const normalized = (env || "DEV").toUpperCase()
   return normalized === "DEV" || normalized === "LOCAL"
@@ -25,7 +37,7 @@ export function isProductionEnvironment(env: string | undefined): boolean {
 }
 
 export function getActivePaymentChain(): SupportedPaymentChain {
-  return normalizePaymentChain(process.env.CHAIN)
+  return normalizePaymentChain(getRuntimeChain())
 }
 
 export function isAvalanchePaymentChain(): boolean {
@@ -38,7 +50,7 @@ export function resolvePaymentNetworkFamily(): PaymentNetworkFamily {
 
 export function getPaymentNetworkLabel(): string {
   const networkFamily = resolvePaymentNetworkFamily()
-  const isDev = isDevEnvironment(process.env.ENV)
+  const isDev = isDevEnvironment(getRuntimeEnv())
 
   if (networkFamily === "avalanche") {
     return isDev ? "Avalanche Fuji" : "Avalanche Mainnet"
@@ -49,12 +61,12 @@ export function getPaymentNetworkLabel(): string {
 
 export function resolvePaymentRpcUrl(): string {
   const chain = getActivePaymentChain()
-  const isDev = isDevEnvironment(process.env.ENV)
+  const isDev = isDevEnvironment(getRuntimeEnv())
 
   if (chain === "A") {
     return isDev
-      ? process.env.AVAX_TESTNET_RPC_URL || DEFAULT_AVAX_TESTNET_RPC_URL
-      : process.env.AVAX_MAINNET_RPC_URL || DEFAULT_AVAX_MAINNET_RPC_URL
+      ? getEnvValue("NEXT_PUBLIC_AVAX_TESTNET_RPC_URL", "AVAX_TESTNET_RPC_URL") || DEFAULT_AVAX_TESTNET_RPC_URL
+      : getEnvValue("NEXT_PUBLIC_AVAX_MAINNET_RPC_URL", "AVAX_MAINNET_RPC_URL") || DEFAULT_AVAX_MAINNET_RPC_URL
   }
 
   return isDev
@@ -64,30 +76,42 @@ export function resolvePaymentRpcUrl(): string {
 
 export function resolvePaymentUsdcContractAddress(): string {
   const chain = getActivePaymentChain()
-  const isDev = isDevEnvironment(process.env.ENV)
+  const isDev = isDevEnvironment(getRuntimeEnv())
 
   if (chain === "A") {
     return isDev
-      ? process.env.AVAX_TESTNET_USDC_CONTRACT_ADDRESS ||
+      ? getEnvValue(
+          "NEXT_PUBLIC_AVAX_TESTNET_USDC_CONTRACT_ADDRESS",
+          "AVAX_TESTNET_USDC_CONTRACT_ADDRESS"
+        ) ||
           DEFAULT_AVAX_TESTNET_USDC
-      : process.env.AVAX_MAINNET_USDC_CONTRACT_ADDRESS ||
+      : getEnvValue(
+          "NEXT_PUBLIC_AVAX_MAINNET_USDC_CONTRACT_ADDRESS",
+          "AVAX_MAINNET_USDC_CONTRACT_ADDRESS"
+        ) ||
           DEFAULT_AVAX_MAINNET_USDC
   }
 
   return isDev
-    ? process.env.TESTNET_USDC_CONTRACT_ADDRESS || DEFAULT_HEDERA_TESTNET_USDC
-    : process.env.MAINNET_USDC_CONTRACT_ADDRESS || DEFAULT_HEDERA_TESTNET_USDC
+    ? getEnvValue(
+        "NEXT_PUBLIC_TESTNET_USDC_CONTRACT_ADDRESS",
+        "TESTNET_USDC_CONTRACT_ADDRESS"
+      ) || DEFAULT_HEDERA_TESTNET_USDC
+    : getEnvValue(
+        "NEXT_PUBLIC_MAINNET_USDC_CONTRACT_ADDRESS",
+        "MAINNET_USDC_CONTRACT_ADDRESS"
+      ) || DEFAULT_HEDERA_TESTNET_USDC
 }
 
 export function resolvePaymentChainId(): number {
   const chain = getActivePaymentChain()
-  const isDev = isDevEnvironment(process.env.ENV)
+  const isDev = isDevEnvironment(getRuntimeEnv())
 
   if (chain === "A") {
     return Number(
       isDev
-        ? process.env.AVAX_TESTNET_CHAIN_ID || 43113
-        : process.env.AVAX_MAINNET_CHAIN_ID || 43114
+        ? getEnvValue("NEXT_PUBLIC_AVAX_TESTNET_CHAIN_ID", "AVAX_TESTNET_CHAIN_ID") || 43113
+        : getEnvValue("NEXT_PUBLIC_AVAX_MAINNET_CHAIN_ID", "AVAX_MAINNET_CHAIN_ID") || 43114
     )
   }
 
@@ -131,7 +155,7 @@ export function getKotaniWebhookUrl(): string {
     process.env.KOTANI_PROD_WEBHOOK_URL ||
     "https://xpesacreators.xyz/api/kotani/webhook"
 
-  return isDevEnvironment(process.env.ENV) ? localWebhookUrl : prodWebhookUrl
+  return isDevEnvironment(getRuntimeEnv()) ? localWebhookUrl : prodWebhookUrl
 }
 
 export const envConfig = {
@@ -148,9 +172,9 @@ export const envConfig = {
   R2_TOKEN_VALUE: process.env.R2_TOKEN_VALUE || "",
   R2_ENDPOINT: process.env.R2_ENDPOINT || "",
   R2_BUCKET_NAME: process.env.R2_BUCKET_NAME || "",
-  ENV: process.env.ENV || "DEV",
-  IS_DEV: isDevEnvironment(process.env.ENV),
-  IS_PROD: isProductionEnvironment(process.env.ENV),
+  ENV: getRuntimeEnv() || "DEV",
+  IS_DEV: isDevEnvironment(getRuntimeEnv()),
+  IS_PROD: isProductionEnvironment(getRuntimeEnv()),
   FEE: process.env.FEE || "5",
   PREVIEW_RATE_LIMIT: Number(process.env.PREVIEW_RATE_LIMIT || 2),
   PREVIEW_RATE_LIMIT_WINDOW_SECONDS: Number(process.env.PREVIEW_RATE_LIMIT_WINDOW_SECONDS || 60),
