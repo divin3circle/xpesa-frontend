@@ -59,7 +59,6 @@ export function useFanWalletConnection() {
       const message =
         error instanceof Error ? error.message : "Failed to connect fan wallet"
       toast.error(message)
-      console.error("Fan wallet connection error:", error)
     }
   }, [connectFanWallet])
 

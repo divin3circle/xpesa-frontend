@@ -7,12 +7,23 @@ import {
   getDestinationTxHash,
 } from "@/lib/payments/multichain/status"
 import { multichainStatusRequestSchema } from "@/lib/payments/multichain/schema"
+import {
+  checkSensitiveRateLimit,
+  rateLimitResponse,
+} from "@/lib/security/sensitive-rate-limit"
 
 export async function POST(request: NextRequest) {
   const supabase = createAdminClient()
 
   try {
     const input = multichainStatusRequestSchema.parse(await request.json())
+    const rateLimit = await checkSensitiveRateLimit({
+      request,
+      scope: "payment_multichain",
+      identity: input.intentId,
+    })
+    if (!rateLimit.allowed) return rateLimitResponse(rateLimit.retryAfterSeconds)
+
     const { data: intent, error } = await supabase
       .from("bridge_payment_intents")
       .select("*")

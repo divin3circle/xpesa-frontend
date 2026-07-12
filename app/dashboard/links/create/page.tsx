@@ -29,10 +29,17 @@ import type { CreateLinkParams } from "@/hooks/use-links"
 import { createClient } from "@/lib/supabase/client"
 import {
   getUploadErrorMessage,
-  toPackFileType,
   uploadDocumentAndFinalize,
   uploadPackAndFinalize,
 } from "@/lib/links/upload-client"
+import {
+  acceptedUploadTypes,
+  classifyFileByExtension,
+  validatePackSelection,
+  validateSingleUpload,
+  type SupportedFileKind,
+} from "@/lib/links/file-policy"
+import type { PackFileCreateInput } from "@/lib/links/types"
 import { toast } from "sonner"
 
 type UploadedDoc = {
@@ -40,12 +47,13 @@ type UploadedDoc = {
   pageCount: number | null
   fileSizeBytes: number
   filename: string
+  fileType?: SupportedFileKind
 }
 
 type SelectedPackFile = {
   id: string
   file: File
-  fileType: "pdf" | "image"
+  fileType: SupportedFileKind
 }
 
 type LinkMode = "gate" | "document" | "pack" | "tip"
@@ -65,14 +73,14 @@ const modeCards: Array<{
   {
     mode: "document",
     emoji: <DocumentCodeIcon />,
-    title: "Upload a document",
-    subtitle: "Single PDF, Code or Word doc with secured view.",
+    title: "Upload a file",
+    subtitle: "Single file up to 50MB with secured access.",
   },
   {
     mode: "pack",
     emoji: <Package01Icon />,
     title: "Upload a file pack",
-    subtitle: "Up to 3 files. All viewed in-browser.",
+    subtitle: "Up to 3 files, 150MB total.",
   },
   {
     mode: "tip",
@@ -125,6 +133,7 @@ type LinkFormValues = {
   selectedPackFiles: SelectedPackFile[]
   finalizedPackSizeBytes?: number
   finalizedPackR2Key?: string
+  finalizedPackFiles?: PackFileCreateInput[]
 }
 
 function buildCreateLinkParams({
@@ -143,6 +152,7 @@ function buildCreateLinkParams({
   selectedPackFiles,
   finalizedPackSizeBytes,
   finalizedPackR2Key,
+  finalizedPackFiles,
 }: LinkFormValues): {
   params: CreateLinkParams | null
   errorMessage: string | null
@@ -252,6 +262,7 @@ function buildCreateLinkParams({
           documentR2Key: finalizedPackR2Key,
           packFileCount: selectedPackFiles.length,
           packTotalSizeBytes: finalizedPackSizeBytes,
+          packFiles: finalizedPackFiles,
           priceUsdc: parseOptionalNumber(packPriceUsdc),
           accessExpiryType,
         },
@@ -286,6 +297,9 @@ export default function CreateLinkPage() {
   const [finalizedPackR2Key, setFinalizedPackR2Key] = useState<
     string | undefined
   >(undefined)
+  const [finalizedPackFiles, setFinalizedPackFiles] = useState<
+    PackFileCreateInput[] | undefined
+  >(undefined)
   const [uploadError, setUploadError] = useState("")
   const [tipMessage, setTipMessage] = useState("Thank you for your support! 🙏")
   const [accessExpiryType, setAccessExpiryType] = useState("Forever")
@@ -304,21 +318,20 @@ export default function CreateLinkPage() {
   ])
 
   const packSummary = useMemo(() => {
-    const pdfCount = selectedPackFiles.filter(
-      (file) => file.fileType === "pdf"
-    ).length
-    const imageCount = selectedPackFiles.filter(
-      (file) => file.fileType === "image"
-    ).length
     const totalBytes = selectedPackFiles.reduce(
       (sum, file) => sum + file.file.size,
       0
     )
+    const counts = selectedPackFiles.reduce<Record<string, number>>(
+      (acc, file) => {
+        acc[file.fileType] = (acc[file.fileType] ?? 0) + 1
+        return acc
+      },
+      {}
+    )
 
-    const breakdown = [
-      pdfCount > 0 ? `${pdfCount} PDF` : null,
-      imageCount > 0 ? `${imageCount} Image` : null,
-    ]
+    const breakdown = Object.entries(counts)
+      .map(([kind, count]) => `${count} ${kind}`)
       .filter(Boolean)
       .join(" • ")
 
@@ -329,6 +342,15 @@ export default function CreateLinkPage() {
   }, [selectedPackFiles])
 
   const onDocumentFileSelect = (file: File | null) => {
+    if (file) {
+      const validationError = validateSingleUpload(file)
+      if (validationError) {
+        toast.error(validationError)
+        setUploadError(validationError)
+        return
+      }
+    }
+
     setSelectedDocumentFile(file)
     setDocumentUpload(null)
     setUploadError("")
@@ -339,16 +361,24 @@ export default function CreateLinkPage() {
   }
 
   const onPackFilesSelect = (files: FileList | null) => {
-    const picked = Array.from(files ?? []).slice(0, 3)
+    const picked = Array.from(files ?? [])
+    const validationError = validatePackSelection(picked)
+    if (validationError) {
+      toast.error(validationError)
+      setUploadError(validationError)
+      return
+    }
+
     const mapped = picked.map((file, index) => ({
       id: `${file.name}-${file.lastModified}-${index}`,
       file,
-      fileType: toPackFileType(file.name),
+      fileType: classifyFileByExtension(file.name),
     }))
 
     setSelectedPackFiles(mapped)
     setFinalizedPackSizeBytes(undefined)
     setFinalizedPackR2Key(undefined)
+    setFinalizedPackFiles(undefined)
     setUploadError("")
 
     if (mapped.length && !title.trim()) {
@@ -388,6 +418,7 @@ export default function CreateLinkPage() {
     let finalizedDocumentUpload = documentUpload
     let finalizedPackBytes = finalizedPackSizeBytes
     let finalizedPackKey = finalizedPackR2Key
+    let finalizedFiles = finalizedPackFiles
 
     try {
       setDocumentUploadPending(true)
@@ -424,8 +455,10 @@ export default function CreateLinkPage() {
 
         finalizedPackBytes = finalized.fileSizeBytes
         finalizedPackKey = finalized.r2Key
+        finalizedFiles = finalized.files
         setFinalizedPackSizeBytes(finalized.fileSizeBytes)
         setFinalizedPackR2Key(finalized.r2Key)
+        setFinalizedPackFiles(finalized.files)
       }
     } catch (error) {
       setDocumentUploadPending(false)
@@ -454,6 +487,7 @@ export default function CreateLinkPage() {
       selectedPackFiles,
       finalizedPackSizeBytes: finalizedPackBytes,
       finalizedPackR2Key: finalizedPackKey,
+      finalizedPackFiles: finalizedFiles,
     })
 
     if (!params) {
@@ -598,13 +632,16 @@ export default function CreateLinkPage() {
               <>
                 <div className="space-y-2">
                   <Label>Document upload</Label>
-                  <Input
-                    type="file"
-                    accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    <Input
+                      type="file"
+                    accept={acceptedUploadTypes}
                     onChange={(event) =>
                       onDocumentFileSelect(event.target.files?.[0] ?? null)
                     }
                   />
+                  <p className="text-xs text-muted-foreground">
+                    PDF, Office, CSV, image, or video. Max 50MB.
+                  </p>
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -710,12 +747,12 @@ export default function CreateLinkPage() {
                   <Input
                     type="file"
                     multiple
-                    accept=".pdf,.docx,.png,.jpg,.jpeg,.webp"
+                    accept={acceptedUploadTypes}
                     onChange={(event) => onPackFilesSelect(event.target.files)}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Up to 3 files. Files will be zipped in your browser and
-                    uploaded as one secure pack.
+                    Up to 3 files, 150MB total. PDF, Office, CSV, image, and
+                    video are supported.
                   </p>
                   {selectedPackFiles.length > 0 ? (
                     <div className="rounded-xl border p-3 text-xs text-muted-foreground">

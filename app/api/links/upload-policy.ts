@@ -1,3 +1,10 @@
+import {
+  allowedExtensions,
+  allowedMimeTypes,
+  normalizeMimeType,
+  SINGLE_FILE_MAX_BYTES,
+} from "@/lib/links/file-policy"
+
 export type UploadMode = "document" | "pack"
 
 type ModePolicy = {
@@ -7,23 +14,18 @@ type ModePolicy = {
   allowedExtensions: readonly string[]
 }
 
-const MB = 1024 * 1024
-
 export const uploadPolicy: Record<UploadMode, ModePolicy> = {
   document: {
     prefix: "documents",
-    maxBytes: 50 * MB,
-    allowedContentTypes: [
-      "application/pdf",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    ],
-    allowedExtensions: ["pdf", "docx"],
+    maxBytes: SINGLE_FILE_MAX_BYTES,
+    allowedContentTypes: allowedMimeTypes,
+    allowedExtensions,
   },
   pack: {
     prefix: "packs",
-    maxBytes: 150 * MB,
-    allowedContentTypes: ["application/zip"],
-    allowedExtensions: ["zip"],
+    maxBytes: SINGLE_FILE_MAX_BYTES,
+    allowedContentTypes: allowedMimeTypes,
+    allowedExtensions,
   },
 }
 
@@ -32,7 +34,7 @@ export function getExtension(fileName: string) {
 }
 
 export function normalizeContentType(contentType: string | null | undefined) {
-  return contentType?.split(";")[0]?.trim().toLowerCase() ?? ""
+  return normalizeMimeType(contentType)
 }
 
 export function isAllowedContentType(mode: UploadMode, contentType: string) {

@@ -41,9 +41,8 @@ export function useUnifiedFileExplorer(
   }: {
     file: FileItem
     tokenId: string
-    onOpen?: (file: FileItem) => void
+    onOpen?: (file: FileItem) => void | Promise<void>
   }) {
-    console.log("File clicked:", file)
     if (!account?.address && !connectedWalletAddress && !allowTokenOnlyAccess) {
       toast.error("Please connect your wallet first")
       return
@@ -54,13 +53,13 @@ export function useUnifiedFileExplorer(
 
     try {
       toast.info(`Opening ${file.name}...`)
-      onOpen?.(file)
+      await onOpen?.(file)
     } catch (err) {
       toast.error("Failed to open file", {
         description: getErrorMessage(err),
       })
     } finally {
-      console.log(tokenId)
+      void tokenId
       setIsAuthenticating(false)
     }
   }

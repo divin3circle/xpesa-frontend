@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/client"
 import { getErrorMessage } from "@/lib/utils"
+import { validatePackSelection } from "@/lib/links/file-policy"
 import type { CreateLinkParams, Link, LinkMode } from "./types"
 
 type LinkInsert = {
@@ -103,6 +104,35 @@ async function uploadThumbnail(creatorId: string, dataUrl?: string) {
   return data?.fullPath ?? null
 }
 
+async function createPackFileRows(
+  linkId: string,
+  params: Extract<CreateLinkParams, { type: "pack" }>
+) {
+  if (!params.packFiles?.length) return null
+
+  const validationError = validatePackSelection(
+    params.packFiles.map((file) => ({
+      name: file.originalFilename,
+      size: file.fileSizeBytes,
+    }))
+  )
+  if (validationError) return new Error(validationError)
+
+  const supabase = createClient()
+  const rows = params.packFiles.map((file) => ({
+    link_id: linkId,
+    r2_key: file.r2Key,
+    original_filename: file.originalFilename,
+    file_type: file.fileType,
+    mime_type: file.mimeType,
+    file_size_bytes: file.fileSizeBytes,
+    sort_order: file.sortOrder,
+  }))
+
+  const { error } = await supabase.from("pack_files").insert(rows)
+  return error
+}
+
 export async function createLink(creatorId: string, params: CreateLinkParams) {
   try {
     const supabase = createClient()
@@ -117,6 +147,11 @@ export async function createLink(creatorId: string, params: CreateLinkParams) {
       .insert(insert)
       .select()
       .single()
+
+    if (!error && data && params.type === "pack") {
+      const packFileError = await createPackFileRows(data.id, params)
+      if (packFileError) return { data: null, error: packFileError }
+    }
 
     return { data: data as Link | null, error }
   } catch (error) {

@@ -18,7 +18,6 @@ async function getTransactionDetails({
 
   if (!isValidHash) {
     const err = new Error("Invalid transaction hash format")
-    console.error("getTransactionDetails: invalid txHash", txHash)
     return { tx: null, error: err }
   }
 
@@ -34,7 +33,6 @@ async function getTransactionDetails({
 
     return { tx, error: null }
   } catch (error) {
-    console.error("Error fetching transaction details:", error)
     return {
       tx: null,
       error: error instanceof Error ? error : new Error("Unknown error"),

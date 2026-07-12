@@ -35,8 +35,7 @@ export function useTokenOnlyAutoUnlock({
         storeContent(response)
         setIsAuthorized(true)
       })
-      .catch((err: unknown) => {
-        console.error("auto unlock error", err)
+      .catch(() => {
         autoUnlockRef.current = false
       })
   }, [enabled, hydrated, setIsAuthorized, storeContent, unlock, unlockedContent])

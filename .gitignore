@@ -36,6 +36,7 @@ pnpm-debug.log*
 .env.production
 .env.preview
 secrets.json
+.agents/
 
 # typescript
 *.tsbuildinfo

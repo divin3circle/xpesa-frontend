@@ -79,8 +79,8 @@ export default function Waitlist() {
           field.value = ""
         }
       })
-    } catch (submitError) {
-      console.error(submitError)
+    } catch {
+      // useWaitlist surfaces submission errors through toast.
     }
   }
 

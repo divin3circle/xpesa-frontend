@@ -13,6 +13,8 @@ export interface PackAccessResponse {
     id: string
     original_filename: string
     file_type: string
+    mime_type?: string | null
+    file_size_bytes?: number | null
     sort_order: number
   }[]
   watermarkEnabled: boolean
@@ -140,16 +142,28 @@ export async function POST(
     })
     .eq("id", tokenId)
 
+  const { data: storedFiles } = await supabase
+    .from("pack_files")
+    .select(
+      "id, original_filename, file_type, mime_type, file_size_bytes, sort_order"
+    )
+    .eq("link_id", token.link_id)
+    .order("sort_order", { ascending: true })
+
   const declaredCount = Number(link.pack_file_count ?? 0)
   const packFiles =
-    declaredCount > 0
-      ? Array.from({ length: declaredCount }, (_, index) => ({
-          id: `${token.link_id}-pack-item-${index + 1}`,
-          original_filename: `Pack file ${index + 1}`,
-          file_type: "pack",
-          sort_order: index + 1,
-        }))
-      : []
+    storedFiles && storedFiles.length > 0
+      ? storedFiles
+      : declaredCount > 0
+        ? Array.from({ length: declaredCount }, (_, index) => ({
+            id: `${token.link_id}-pack-item-${index + 1}`,
+            original_filename: `Pack file ${index + 1}`,
+            file_type: "pack",
+            mime_type: null,
+            file_size_bytes: null,
+            sort_order: index + 1,
+          }))
+        : []
 
   if (!link.document_r2_key) {
     return NextResponse.json(

@@ -42,8 +42,8 @@ async function createCreator({
       .upload(`avatars/${fileName}`, blob, {
         cacheControl: "3600",
       })
-    console.log("Image upload error", error)
-    const { data: creatorData, error: creatorError } = await supabase
+    if (error) throw error
+    const { error: creatorError } = await supabase
       .from(TABLENAMES.CREATORS)
       .insert({
         id: user.id,
@@ -57,7 +57,7 @@ async function createCreator({
         onboarding_step: creatorDetails.onboardingStep,
         onboarding_complete: creatorDetails.onboardingComplete,
       })
-    console.log("Creator create:", creatorData, creatorError)
+    if (creatorError) throw creatorError
   } catch (error) {
     toast.error("Couldn't set up your account. Please try again.")
     throw error
@@ -86,8 +86,7 @@ async function checkIfUserCompletedOnboarding(): Promise<boolean> {
     }
 
     return data[0]?.onboarding_complete === true
-  } catch (error) {
-    console.log(error)
+  } catch {
     return false
   }
 }
@@ -100,12 +99,10 @@ async function checkIfUserHandleExists(handle: string): Promise<boolean> {
       .select("handle")
       .eq("handle", handle)
     if (error) {
-      console.log("Error checking handle existence: ", error, "Handle: ", data)
       return false
     }
     return data && data.length > 0
-  } catch (error) {
-    console.log("Error checking handle existence: ", error)
+  } catch {
     return false
   }
 }
@@ -122,17 +119,10 @@ async function checkIfDisplayNameExists(displayName: string): Promise<boolean> {
       .ilike("display_name", normalizedDisplayName)
       .limit(1)
     if (error) {
-      console.log(
-        "Error checking display name existence: ",
-        error,
-        "Display Name: ",
-        data
-      )
       return false
     }
     return data && data.length > 0
-  } catch (error) {
-    console.log("Error checking display name existence: ", error)
+  } catch {
     return false
   }
 }
@@ -156,8 +146,8 @@ export function useDebouncedHandleCheck(handle: string, delay = 500) {
         if (!cancelled) {
           setExists(handleExists)
         }
-      } catch (error) {
-        console.log("Error checking handle existence: ", error)
+      } catch {
+        if (!cancelled) setExists(false)
       } finally {
         if (!cancelled) {
           setIsChecking(false)
@@ -199,8 +189,8 @@ export function useDebouncedDisplayNameCheck(displayName: string, delay = 500) {
         if (!cancelled) {
           setExists(displayNameExists)
         }
-      } catch (error) {
-        console.log("Error checking display name existence: ", error)
+      } catch {
+        if (!cancelled) setExists(false)
       } finally {
         if (!cancelled) {
           setIsChecking(false)
@@ -246,7 +236,6 @@ export function useCompleteOnboarding() {
       onNavigate("/dashboard", router)
     },
     onError: (error) => {
-      console.log(error)
       toast.error("Setup couldn't be completed", {
         description: error.message,
       })

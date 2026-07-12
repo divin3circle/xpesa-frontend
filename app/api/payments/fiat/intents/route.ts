@@ -8,12 +8,22 @@ import {
 } from "@/lib/payments/fiat"
 import { requestKotaniCollection } from "@/lib/payments/kotani"
 import { createKotaniReferenceId } from "@/lib/kotani-pay"
+import {
+  checkSensitiveRateLimit,
+  rateLimitResponse,
+} from "@/lib/security/sensitive-rate-limit"
 
 export async function POST(request: NextRequest) {
   const supabase = createAdminClient()
 
   try {
     const input = fiatPaymentIntentRequestSchema.parse(await request.json())
+    const rateLimit = await checkSensitiveRateLimit({
+      request,
+      scope: "payment_intent",
+      identity: input.buyerPhone ?? input.linkId,
+    })
+    if (!rateLimit.allowed) return rateLimitResponse(rateLimit.retryAfterSeconds)
 
     if (!envConfig.PLATFORM_WALLET_ADDRESS) {
       return NextResponse.json(

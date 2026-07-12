@@ -46,6 +46,15 @@ export interface LinkResponse {
   error: Error | string | null
 }
 
+export type PackFileCreateInput = {
+  r2Key: string
+  originalFilename: string
+  fileType: string
+  mimeType: string
+  fileSizeBytes: number
+  sortOrder: number
+}
+
 interface BaseLinkParams {
   title: string
   description?: string
@@ -80,6 +89,7 @@ export type CreateLinkParams =
       packThumbnailR2Key?: string
       packFileCount: number
       packTotalSizeBytes: number
+      packFiles?: PackFileCreateInput[]
       priceUsdc?: number
       docDownloadBlocked?: boolean
     })

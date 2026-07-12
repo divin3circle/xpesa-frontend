@@ -23,12 +23,19 @@ export function getFileIcon(fileName: string): string {
     case "pdf":
       return "/pdf.avif"
     case "docx":
+    case "document":
+    case "presentation":
+    case "spreadsheet":
+    case "csv":
       return "/docx.avif"
     case "jpg":
     case "jpeg":
     case "png":
     case "gif":
+    case "image":
       return "/image.avif"
+    case "video":
+      return "/unknown.avif"
     case "zip":
       return "/zip.avif"
     default:

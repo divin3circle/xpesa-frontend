@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { Redis } from "@upstash/redis"
+import { classifyFileByExtension } from "@/lib/links/file-policy"
 
 const redis = Redis.fromEnv()
 
@@ -18,7 +19,7 @@ export interface TokenResponse {
   files: {
     id: string
     name: string
-    type: "document" | "pack" | "gate" | "tip"
+    type: string
     size: string
   }[]
   previewUrl: string
@@ -58,16 +59,17 @@ export async function GET(
     return Response.json({ error: "Link not found" }, { status: 404 })
   }
 
-  const files = [
-    {
-      id: link.id,
-      name: link.title,
-      type: link.type === "document" ? "pdf" : "zip",
-      size: link.document_file_size_bytes
-        ? `${(link.document_file_size_bytes / 1024 / 1024).toFixed(1)} MB`
-        : "Unknown",
-    },
-  ]
+  const files =
+    link.type === "pack"
+      ? await getPackFiles(supabase, link.id, link.title)
+      : [
+          {
+            id: link.id,
+            name: link.title,
+            type: classifyFileByExtension(link.document_r2_key ?? link.title),
+            size: formatBytes(link.document_file_size_bytes),
+          },
+        ]
 
   return Response.json({
     token: {
@@ -84,4 +86,39 @@ export async function GET(
     files,
     previewUrl: `/api/previews/${tokenId}`,
   })
+}
+
+function formatBytes(bytes: number | null | undefined) {
+  if (!bytes) return "Unknown"
+  return `${(bytes / 1024 / 1024).toFixed(1)} MB`
+}
+
+async function getPackFiles(
+  supabase: ReturnType<typeof createAdminClient>,
+  linkId: string,
+  title: string
+) {
+  const { data } = await supabase
+    .from("pack_files")
+    .select("id, original_filename, file_type, file_size_bytes, sort_order")
+    .eq("link_id", linkId)
+    .order("sort_order", { ascending: true })
+
+  if (data?.length) {
+    return data.map((file) => ({
+      id: file.id,
+      name: file.original_filename,
+      type: file.file_type,
+      size: formatBytes(file.file_size_bytes),
+    }))
+  }
+
+  return [
+    {
+      id: linkId,
+      name: title,
+      type: "zip",
+      size: "Unknown",
+    },
+  ]
 }

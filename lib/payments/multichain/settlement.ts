@@ -9,6 +9,17 @@ type SupabaseAdminClient = ReturnType<
   typeof import("@/lib/supabase/admin").createAdminClient
 >
 
+type BridgePaymentIntent = {
+  id: string
+  status: string
+  access_token_id: string | null
+  transaction_id: string | null
+  amount_usdc: number | string
+  payout_tx_hash: string | null
+  payer_wallet_address: string
+  destination_tx_hash: string | null
+}
+
 const ERC20_ABI = ["function transfer(address to, uint256 amount) returns (bool)"]
 
 function roundUsdc(value: number) {
@@ -22,7 +33,7 @@ export async function settleMultichainPayment({
   requestHeaders,
 }: {
   supabase: SupabaseAdminClient
-  intent: Record<string, any>
+  intent: BridgePaymentIntent
   link: MultichainLink
   requestHeaders: Headers
 }) {

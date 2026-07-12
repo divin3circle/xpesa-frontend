@@ -27,6 +27,7 @@ const productionRequiredEnvKeys = [
   "KOTANI_SECRET",
   "KOTANI_COLLECTION_ENDPOINT",
   "KOTANI_PROD_WEBHOOK_URL",
+  "KOTANI_WEBHOOK_SECRET",
 ] as const
 
 export function getMissingProductionEnvKeys() {

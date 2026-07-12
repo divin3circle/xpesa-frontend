@@ -36,7 +36,7 @@ async function signInWithAProvider({
     }
     return data
   } catch (error) {
-    console.error(error)
+    toast.error("Failed to sign in. Please try again.")
   }
 }
 async function signOutUser() {
@@ -48,7 +48,6 @@ async function signOutUser() {
     }
     toast.success("Signed out successfully")
   } catch (error) {
-    console.error("Error signing out:", error)
     toast.error("Failed to sign out. Please try again.")
   }
 }
@@ -71,7 +70,6 @@ async function signUpNewUser({
     })
     return { data, error }
   } catch (error) {
-    console.error("Error signing up:", error)
     toast.error("Failed to sign up. Please try again.")
     return {
       data: {
@@ -98,7 +96,6 @@ async function signInUser({
     })
     return { data, error }
   } catch (error) {
-    console.log("Error signing in user:", error)
     return {
       data: {
         user: null,
@@ -126,7 +123,6 @@ export function useSignUp() {
       }
     },
     onError: (error) => {
-      console.error("Error during sign up:", error)
       toast.error("An unexpected error occurred. Please try again.")
     },
   })
@@ -147,7 +143,6 @@ export function useSignIn() {
       onNavigate("/auth/post-login", router)
     },
     onError: (error) => {
-      console.log("Error during sign in:", error)
       toast.error("Couldn't sign you in", {
         description: error.message,
       })
@@ -163,7 +158,6 @@ export function useSignOut() {
       onNavigate("/login", router)
     },
     onError: (error) => {
-      console.error("Error during sign out:", error)
       toast.error("Failed to sign out. Please try again.")
     },
   })
@@ -178,7 +172,6 @@ export function useSignInWithProvider(){
       }
     },
     onError: (error) => {
-      console.error("Error during sign in:", error)
       toast.error("Failed to sign in. Please try again.", {
         description: error.message,
       })

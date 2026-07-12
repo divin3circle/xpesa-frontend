@@ -8,12 +8,23 @@ import {
 } from "@/lib/payments/multichain/config"
 import { getValidPaidLink } from "@/lib/payments/multichain/link"
 import { multichainIntentRequestSchema } from "@/lib/payments/multichain/schema"
+import {
+  checkSensitiveRateLimit,
+  rateLimitResponse,
+} from "@/lib/security/sensitive-rate-limit"
 
 export async function POST(request: NextRequest) {
   const supabase = createAdminClient()
 
   try {
     const input = multichainIntentRequestSchema.parse(await request.json())
+    const rateLimit = await checkSensitiveRateLimit({
+      request,
+      scope: "payment_multichain",
+      identity: input.payerWalletAddress,
+    })
+    if (!rateLimit.allowed) return rateLimitResponse(rateLimit.retryAfterSeconds)
+
     const source = findMultichainToken(input.sourceChainId)
     if (!source) throw new Error("Unsupported source chain")
 

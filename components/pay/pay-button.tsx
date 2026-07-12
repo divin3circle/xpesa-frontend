@@ -172,7 +172,6 @@ export function PayButton({
           break
       }
     } catch (err) {
-      console.error("Payment failed", err)
       toast.error("Payment failed. Please try again.", {
         description: getErrorMessage(err),
       })

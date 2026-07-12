@@ -31,26 +31,22 @@ export function LoginForm({
 
     if (!email || !password) {
       toast.error("Please enter both email and password.")
-      console.error("Email and password are required.")
       return
     }
 
     if (!email) {
       toast.error("Email is required.")
-      console.error("Email is required.")
       return
     }
 
     if (!password) {
       toast.error("Password is required.")
-      console.error("Password is required.")
       return
     }
 
     try {
       loginInUser({ email, password })
-    } catch (error) {
-      console.error("Login failed:", error)
+    } catch {
       toast.error("Login failed")
     }
   }

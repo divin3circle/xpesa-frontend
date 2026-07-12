@@ -16,6 +16,10 @@ import { deriveReceiptPaymentId } from "@/lib/receipts/payment-id"
 import { calculateReceiptPoints } from "@/lib/receipts/points"
 import { uploadReceiptObject } from "@/lib/receipts/storage"
 import { buildReceiptSvg } from "@/lib/receipts/svg"
+import {
+  checkSensitiveRateLimit,
+  rateLimitResponse,
+} from "@/lib/security/sensitive-rate-limit"
 
 function receiptResponse(receipt: unknown) {
   return NextResponse.json({ receipt })
@@ -34,6 +38,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   const { accessToken, recipientWalletAddress } = await request.json()
+  const rateLimit = await checkSensitiveRateLimit({
+    request,
+    scope: "receipt_mint",
+    identity: recipientWalletAddress ?? accessToken,
+  })
+  if (!rateLimit.allowed) return rateLimitResponse(rateLimit.retryAfterSeconds)
+
   if (!accessToken || !recipientWalletAddress) {
     return NextResponse.json(
       { error: "accessToken and recipientWalletAddress are required" },

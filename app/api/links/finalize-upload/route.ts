@@ -1,6 +1,11 @@
 import { DeleteObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3"
 import { NextResponse } from "next/server"
+import { envConfig } from "@/lib/env"
 import { R2_BUCKET, r2 } from "@/lib/r2"
+import {
+  checkSensitiveRateLimit,
+  rateLimitResponse,
+} from "@/lib/security/sensitive-rate-limit"
 import {
   getExtension,
   hasExpectedPrefix,
@@ -28,6 +33,15 @@ export async function POST(request: Request) {
         { status: 400 }
       )
     }
+
+    const rateLimit = await checkSensitiveRateLimit({
+      request,
+      scope: "upload_finalize",
+      identity: creatorId,
+      limit: envConfig.UPLOAD_RATE_LIMIT,
+      windowSeconds: envConfig.UPLOAD_RATE_LIMIT_WINDOW_SECONDS,
+    })
+    if (!rateLimit.allowed) return rateLimitResponse(rateLimit.retryAfterSeconds)
 
     if (!(mode in uploadPolicy)) {
       return NextResponse.json({ error: "Unsupported mode" }, { status: 400 })

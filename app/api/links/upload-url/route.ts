@@ -3,6 +3,12 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 import { r2, R2_BUCKET } from "@/lib/r2"
 import { v4 as uuid } from "uuid"
 import { NextResponse } from "next/server"
+import { createAdminClient } from "@/lib/supabase/admin"
+import { envConfig } from "@/lib/env"
+import {
+  checkSensitiveRateLimit,
+  rateLimitResponse,
+} from "@/lib/security/sensitive-rate-limit"
 
 import {
   getExtension,
@@ -12,6 +18,23 @@ import {
   uploadPolicy,
   type UploadMode,
 } from "../upload-policy"
+import { resolveMimeType } from "@/lib/links/file-policy"
+
+async function getCreatorStorageBytes(creatorId: string) {
+  const supabase = createAdminClient()
+  const { data } = await supabase
+    .from("links")
+    .select("document_file_size_bytes, pack_total_size_bytes")
+    .eq("creator_id", creatorId)
+
+  return (data ?? []).reduce((sum, link) => {
+    return (
+      sum +
+      Number(link.document_file_size_bytes ?? 0) +
+      Number(link.pack_total_size_bytes ?? 0)
+    )
+  }, 0)
+}
 
 export async function POST(request: Request) {
   try {
@@ -36,6 +59,15 @@ export async function POST(request: Request) {
       )
     }
 
+    const rateLimit = await checkSensitiveRateLimit({
+      request,
+      scope: "upload_sign",
+      identity: creatorId,
+      limit: envConfig.UPLOAD_RATE_LIMIT,
+      windowSeconds: envConfig.UPLOAD_RATE_LIMIT_WINDOW_SECONDS,
+    })
+    if (!rateLimit.allowed) return rateLimitResponse(rateLimit.retryAfterSeconds)
+
     if (!(mode in uploadPolicy)) {
       return NextResponse.json({ error: "Unsupported mode" }, { status: 400 })
     }
@@ -52,23 +84,23 @@ export async function POST(request: Request) {
       )
     }
 
+    if (typeof fileSizeBytes === "number") {
+      const currentStorageBytes = await getCreatorStorageBytes(creatorId)
+      if (currentStorageBytes + fileSizeBytes > envConfig.MAX_CREATOR_STORAGE_BYTES) {
+        return NextResponse.json(
+          { error: "Creator storage quota exceeded" },
+          { status: 413 }
+        )
+      }
+    }
+
     let key: string
     let contentType: string
 
-    if (mode === "pack") {
-      key = `packs/${creatorId}/${uuid()}.zip`
-      contentType = "application/zip"
-
-      if (fileType && !isAllowedContentType(mode, fileType)) {
-        return NextResponse.json(
-          { error: "Pack uploads must use application/zip" },
-          { status: 400 }
-        )
-      }
-    } else if (mode === "document") {
+    if (mode === "pack" || mode === "document") {
       if (!fileName || !fileType) {
         return NextResponse.json(
-          { error: "fileName and fileType are required for document uploads" },
+          { error: "fileName and fileType are required for uploads" },
           { status: 400 }
         )
       }
@@ -83,20 +115,21 @@ export async function POST(request: Request) {
 
       if (!isAllowedExtension(mode, ext)) {
         return NextResponse.json(
-          { error: "Unsupported document extension" },
+          { error: "Unsupported file extension" },
           { status: 400 }
         )
       }
 
-      if (!isAllowedContentType(mode, fileType)) {
+      contentType = resolveMimeType(fileName, fileType)
+
+      if (!isAllowedContentType(mode, contentType)) {
         return NextResponse.json(
-          { error: "Unsupported document MIME type" },
+          { error: "Unsupported file MIME type" },
           { status: 400 }
         )
       }
 
-      key = `documents/${creatorId}/${uuid()}.${ext}`
-      contentType = fileType
+      key = `${uploadPolicy[mode].prefix}/${creatorId}/${uuid()}.${ext}`
     } else {
       return NextResponse.json({ error: "Unsupported mode" }, { status: 400 })
     }

@@ -16,6 +16,8 @@ import { HeaderActions } from "./unified-file-explorer/header-actions"
 import { FileList } from "./unified-file-explorer/file-list"
 import { LockedFilesPreview } from "./unified-file-explorer/locked-files-preview"
 import { PdfOverlay } from "./unified-file-explorer/pdf-overlay"
+import { ImageOverlay } from "./unified-file-explorer/image-overlay"
+import { VideoOverlay } from "./unified-file-explorer/video-overlay"
 import { useUnlockToken } from "@/hooks/use-unlock-token"
 import { FanWalletConnectModal } from "@/components/fan-wallet-connect-modal"
 import { useFanWalletContext } from "@/components/fan-wallet-context"
@@ -112,7 +114,6 @@ export function UnifiedFileExplorer({
       setIsAuthorized(true)
       toast.success("Access granted!")
     } catch (err: unknown) {
-      console.error("unlock error", err)
       const msg = err instanceof Error ? err.message : String(err)
       toast.error(msg || "Failed to confirm access")
     }
@@ -159,12 +160,13 @@ export function UnifiedFileExplorer({
         isAuthorized={isAuthorized}
         isWrongWallet={isWrongWallet}
         onConfirm={handleConfirm}
-        onDownload={() => {
-          void download.mutateAsync({
-            tokenId,
-            filename: linkType === "pack" ? `${title}.zip` : title,
-          })
-        }}
+        onDownload={
+          linkType === "pack"
+            ? undefined
+            : () => {
+                void download.mutateAsync({ tokenId, filename: title })
+              }
+        }
         isAuthorizing={unlock.isAuthorizing}
         isDownloading={download.isDownloading}
       />
@@ -185,13 +187,29 @@ export function UnifiedFileExplorer({
         />
       )}
 
-      {viewingFileUrl && selectedFile && (
+      {viewingFileUrl && selectedFile?.type === "pdf" && (
         <PdfOverlay
           fileUrl={viewingFileUrl}
           fileName={selectedFile.name}
           onCloseAction={closeViewer}
           watermark={account?.address || "Locked"}
           onLoadErrorAction={handlePreviewLoadError}
+        />
+      )}
+
+      {viewingFileUrl && selectedFile?.type === "image" && (
+        <ImageOverlay
+          fileUrl={viewingFileUrl}
+          fileName={selectedFile.name}
+          onCloseAction={closeViewer}
+        />
+      )}
+
+      {viewingFileUrl && selectedFile?.type === "video" && (
+        <VideoOverlay
+          fileUrl={viewingFileUrl}
+          fileName={selectedFile.name}
+          onCloseAction={closeViewer}
         />
       )}
     </div>

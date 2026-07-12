@@ -25,7 +25,6 @@ async function getCurrentMonthEarnings(): Promise<string> {
       .select("creator_net_usdc")
       .gte("created_at", thirtyDaysAgo.toISOString())
     if (error || !data) {
-      console.log("Error getting this month's earnings: ", error)
       return "0.0"
     }
     const sum = data?.reduce((a, c) => a + Number(c.creator_net_usdc), 0)
@@ -36,8 +35,7 @@ async function getCurrentMonthEarnings(): Promise<string> {
         minimumFractionDigits: 2,
       }) || "0.0"
     )
-  } catch (error) {
-    console.error("Error getting this month's earnings data", error)
+  } catch {
     return "0.0"
   }
 }
@@ -70,8 +68,7 @@ async function getAllTimeEarnings(): Promise<AllTimeEarningsResponse> {
       thisMonthEarnings: await getCurrentMonthEarnings(),
       allTimeTransactions: data?.length || 0,
     }
-  } catch (error) {
-    console.log("Error getting all time earnings: ", error)
+  } catch {
     return {
       allTimeEarnings: "0",
       thisMonthEarnings: "0",

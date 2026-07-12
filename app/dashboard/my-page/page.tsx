@@ -29,20 +29,6 @@ export default function MyPagePage() {
     error: myLinksError,
   } = useMyLinks()
 
-  // const router = useRouter()
-
-  // if (!isLoading && (!data?.creator || error)) {
-  //   console.error("Error fetching user details:", error)
-  //   router.push(`/error?q=${error?.message || "Ano unexpected error occurred"}`)
-  // }
-
-  // if (!isMyLinksLoading && (!myLinksData || myLinksError)) {
-  //   console.error("Error fetching my links:", myLinksError)
-  //   router.push(
-  //     `/error?q=${myLinksError?.message || "An unexpected error occurred"}`
-  //   )
-  // }
-
   if (isLoading) {
     return (
       <div className="flex h-full w-full flex-col items-center justify-center">

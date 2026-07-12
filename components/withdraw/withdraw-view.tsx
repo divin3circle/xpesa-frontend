@@ -15,6 +15,7 @@ import { Input } from "../ui/input"
 import { useForm, Controller, useWatch, type Resolver } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { StarsFreeIcons } from "@hugeicons/core-free-icons"
 import { useKotaniOfframp } from "@/hooks/use-kotani-offramp"
@@ -847,11 +848,9 @@ export default function WithdrawAction() {
           quote={quote}
           onBack={() => goToStep(3)}
           onConfirm={() => {
-            const payload = {
-              draft,
-              quote,
-            }
-            console.log("Kotani offramp payload", payload)
+            void draft
+            void quote
+            toast.info("Withdrawal submission is not live yet.")
           }}
         />
       ) : null}

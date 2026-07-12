@@ -6,6 +6,7 @@ import { toast } from "sonner"
 type DownloadInput = {
   tokenId: string
   filename?: string
+  fileId?: string
 }
 
 function parseFilename(contentDisposition: string | null) {
@@ -35,9 +36,27 @@ async function triggerDownload(response: Response, fallbackName: string) {
 
 export function useDownload() {
   const download = useMutation({
-    mutationFn: async ({ tokenId, filename }: DownloadInput) => {
+    mutationFn: async ({ tokenId, filename, fileId }: DownloadInput) => {
       if (!tokenId) {
         throw new Error("Token id is required")
+      }
+
+      if (fileId) {
+        const response = await fetch(
+          `/api/packs/file/${encodeURIComponent(tokenId)}/${encodeURIComponent(fileId)}`
+        )
+        if (!response.ok) throw new Error("Failed to prepare file download")
+        const data = (await response.json()) as { signedUrl?: string }
+        if (!data.signedUrl) throw new Error("Download URL is missing")
+
+        const anchor = document.createElement("a")
+        anchor.href = data.signedUrl
+        anchor.download = filename ?? "download"
+        anchor.rel = "noopener"
+        document.body.appendChild(anchor)
+        anchor.click()
+        anchor.remove()
+        return
       }
 
       const response = await fetch(

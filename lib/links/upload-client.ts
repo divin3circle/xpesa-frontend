@@ -1,4 +1,11 @@
-import JSZip from "jszip"
+import {
+  classifyFileByExtension,
+  getFileExtension,
+  PACK_MAX_FILES,
+  resolveMimeType,
+  validatePackSelection,
+  validateSingleUpload,
+} from "@/lib/links/file-policy"
 
 export type UploadMode = "document" | "pack"
 type UploadStage = "sign" | "upload" | "finalize" | "zip"
@@ -41,25 +48,9 @@ export class LinkUploadError extends Error {
   }
 }
 
-function getExtension(fileName: string) {
-  return fileName.split(".").pop()?.toLowerCase() ?? ""
-}
-
-function resolveDocumentMimeType(file: File) {
-  if (file.type) return file.type
-
-  const extension = getExtension(file.name)
-  if (extension === "pdf") return "application/pdf"
-  if (extension === "docx") {
-    return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  }
-
-  return "application/octet-stream"
-}
-
 async function deriveDocumentPageCount(file: File): Promise<number | null> {
-  const extension = getExtension(file.name)
-  const mimeType = resolveDocumentMimeType(file)
+  const extension = getFileExtension(file.name)
+  const mimeType = resolveMimeType(file.name, file.type)
 
   // DOCX pagination depends on renderer/layout settings. Persist unknown as null.
   if (extension !== "pdf" && mimeType !== "application/pdf") {
@@ -259,22 +250,30 @@ async function finalizeUpload(payload: {
   )
 }
 
-export function toPackFileType(fileName: string): "pdf" | "image" {
-  const extension = getExtension(fileName)
-  return ["png", "jpg", "jpeg", "webp"].includes(extension) ? "image" : "pdf"
+export function toPackFileType(fileName: string) {
+  return classifyFileByExtension(fileName)
 }
 
 export async function uploadDocumentAndFinalize(params: {
   creatorId: string
   file: File
 }) {
+  const validationError = validateSingleUpload(params.file)
+  if (validationError) {
+    throw new LinkUploadError({
+      message: validationError,
+      stage: "sign",
+      retryable: false,
+    })
+  }
+
   const derivedPageCount = await deriveDocumentPageCount(params.file)
 
   const signedUpload = await requestSignedUpload({
     creatorId: params.creatorId,
     mode: "document",
     fileName: params.file.name,
-    fileType: resolveDocumentMimeType(params.file),
+    fileType: resolveMimeType(params.file.name, params.file.type),
     fileSizeBytes: params.file.size,
   })
 
@@ -295,6 +294,7 @@ export async function uploadDocumentAndFinalize(params: {
     pageCount: derivedPageCount,
     fileSizeBytes: finalized.fileSizeBytes,
     filename: params.file.name,
+    fileType: classifyFileByExtension(params.file.name),
   }
 }
 
@@ -303,7 +303,8 @@ export async function uploadPackAndFinalize(params: {
   title?: string
   files: File[]
 }) {
-  if (!params.files.length) {
+  const selectedFiles = params.files.slice(0, PACK_MAX_FILES)
+  if (!selectedFiles.length) {
     throw new LinkUploadError({
       message: "Please add at least one file to your pack.",
       stage: "zip",
@@ -311,53 +312,51 @@ export async function uploadPackAndFinalize(params: {
     })
   }
 
-  const selectedFiles = params.files.slice(0, 3)
-  const zip = new JSZip()
-
-  selectedFiles.forEach((file) => {
-    zip.file(file.name, file)
-  })
-
-  let zipBlob: Blob
-  try {
-    zipBlob = await zip.generateAsync({
-      type: "blob",
-      compression: "DEFLATE",
-    })
-  } catch {
+  const validationError = validatePackSelection(selectedFiles)
+  if (validationError) {
     throw new LinkUploadError({
-      message: "Failed to prepare your pack for upload. Please try again.",
-      stage: "zip",
-      retryable: true,
+      message: validationError,
+      stage: "sign",
+      retryable: false,
     })
   }
 
-  const safeTitle =
-    params.title?.trim().replace(/[^a-zA-Z0-9-_]/g, "-") || "pack"
-  const signedUpload = await requestSignedUpload({
-    creatorId: params.creatorId,
-    mode: "pack",
-    fileName: `${safeTitle}.zip`,
-    fileType: "application/zip",
-    fileSizeBytes: zipBlob.size,
-  })
+  const uploadedFiles = []
+  for (const [index, file] of selectedFiles.entries()) {
+    const signedUpload = await requestSignedUpload({
+      creatorId: params.creatorId,
+      mode: "pack",
+      fileName: file.name,
+      fileType: resolveMimeType(file.name, file.type),
+      fileSizeBytes: file.size,
+    })
 
-  await uploadToSignedUrl(
-    signedUpload.uploadUrl,
-    zipBlob,
-    signedUpload.contentType
-  )
+    await uploadToSignedUrl(signedUpload.uploadUrl, file, signedUpload.contentType)
 
-  const finalized = await finalizeUpload({
-    creatorId: params.creatorId,
-    key: signedUpload.key,
-    mode: "pack",
-  })
+    const finalized = await finalizeUpload({
+      creatorId: params.creatorId,
+      key: signedUpload.key,
+      mode: "pack",
+    })
+
+    uploadedFiles.push({
+      r2Key: finalized.r2Key,
+      originalFilename: file.name,
+      fileType: classifyFileByExtension(file.name),
+      mimeType: finalized.contentType,
+      fileSizeBytes: finalized.fileSizeBytes,
+      sortOrder: index + 1,
+    })
+  }
 
   return {
-    r2Key: finalized.r2Key,
-    fileSizeBytes: finalized.fileSizeBytes,
+    r2Key: uploadedFiles[0]?.r2Key,
+    fileSizeBytes: uploadedFiles.reduce(
+      (total, file) => total + file.fileSizeBytes,
+      0
+    ),
     fileCount: selectedFiles.length,
+    files: uploadedFiles,
   }
 }
 

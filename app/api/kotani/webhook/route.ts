@@ -6,6 +6,13 @@ import {
   settleFiatPaymentIntent,
   verifyKotaniWebhookSignature,
 } from "@/lib/payments/kotani"
+import { auditSecurityEvent } from "@/lib/security/audit"
+
+const ALLOWED_KOTANI_EVENTS = new Set([
+  "transaction.deposit.status.updated",
+  "transaction.status.updated",
+  "deposit.status.updated",
+])
 
 export async function POST(request: NextRequest) {
   const supabase = createAdminClient()
@@ -16,10 +23,22 @@ export async function POST(request: NextRequest) {
   })
 
   if (!signature.ok) {
+    auditSecurityEvent("warn", "kotani_webhook_rejected", {
+      reason: signature.reason,
+    })
     return NextResponse.json({ error: signature.reason }, { status: 401 })
   }
 
   const event = parseKotaniWebhook(payload)
+  if (!ALLOWED_KOTANI_EVENTS.has(event.eventType)) {
+    auditSecurityEvent("warn", "kotani_webhook_unexpected_event", {
+      eventType: event.eventType,
+    })
+    return NextResponse.json(
+      { error: "Unexpected Kotani webhook event" },
+      { status: 400 }
+    )
+  }
 
   const { data: existingEvent } = await supabase
     .from("payment_events")

@@ -164,7 +164,11 @@ export function verifyKotaniWebhookSignature({
   headerSignature: string | null
   secret?: string
 }): KotaniWebhookSignatureResult {
-  if (!secret) return { ok: true }
+  if (!secret) {
+    return envConfig.IS_PROD
+      ? { ok: false, reason: "Kotani webhook secret is required in production" }
+      : { ok: true }
+  }
   if (!headerSignature) {
     return { ok: false, reason: "Missing Kotani webhook signature" }
   }

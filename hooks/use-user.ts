@@ -53,7 +53,6 @@ async function getCreatorDetails(): Promise<CreatorDetailsResponse> {
       error: null
     }
   } catch (error) {
-    console.log(error)
     return {
       creator: null,
       error: error as string
