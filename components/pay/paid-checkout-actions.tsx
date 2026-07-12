@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { envConfig } from "@/lib/env"
 import { ConnectToPayButton } from "./connect-to-pay-button"
 import { FiatPayButton } from "./fiat-pay-button"
+import { MultichainPayButton } from "./multichain-pay-button"
 import { PayButton } from "./pay-button"
 import {
   PaymentMethodsBadges,
@@ -56,13 +57,13 @@ export function PaidCheckoutActions({
       />
       {selectedMethod === "mobile" ? (
         <FiatPayButton link={link} amount={amount} method="mobile_money" />
-      ) : selectedMethod === "usdt" ? (
-        <div className="space-y-2 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm text-amber-700 dark:text-amber-300">
-          <p className="font-medium text-amber-800 dark:text-amber-200">
-            USDT checkout is not live yet.
-          </p>
-          <p>Use USDC or Mobile to complete purchase.</p>
-        </div>
+      ) : selectedMethod === "multichain" ? (
+        <MultichainPayButton
+          link={link}
+          account={account}
+          amount={amount}
+          theme={theme}
+        />
       ) : !account ? (
         <ConnectToPayButton theme={theme} />
       ) : hasChainMismatch ? (

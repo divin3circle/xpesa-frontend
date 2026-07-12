@@ -3,7 +3,7 @@ import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { envConfig } from "@/lib/env"
 
-export type PayMethodOption = "usdc" | "usdt" | "mobile"
+export type PayMethodOption = "usdc" | "multichain" | "mobile"
 
 type PaymentMethodsBadgesProps = {
   showConnectedBadge: boolean
@@ -32,14 +32,14 @@ export function PaymentMethodsBadges({
     {
       value: "usdc",
       label: "USDC",
-      icon: "/usdc.svg",
+      icon: "/usdcavax.png",
       alt: "USDC",
     },
     {
-      value: "usdt",
-      label: "USDT",
-      icon: "/usdt.svg",
-      alt: "USDT",
+      value: "multichain",
+      label: "Other",
+      icon: "/usdc.svg",
+      alt: "Multichain USDC",
     },
     {
       value: "mobile",
@@ -93,7 +93,7 @@ export function PaymentMethodsBadges({
                 role="radio"
                 aria-checked={isSelected}
                 onClick={() => onSelectMethod(method.value)}
-                className={`flex items-center justify-center gap-1 rounded-full border px-3 py-2 text-sm font-semibold transition-colors ${
+                className={`flex items-center justify-center gap-1 rounded-full border px-3 py-1 text-sm font-semibold transition-colors ${
                   isSelected
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border/70 text-muted-foreground hover:text-foreground"
@@ -103,8 +103,8 @@ export function PaymentMethodsBadges({
                   src={method.icon}
                   alt={method.alt}
                   className={method.value === "mobile" ? "size-5 rounded" : ""}
-                  width={16}
-                  height={16}
+                  width={24}
+                  height={24}
                 />
                 <span>{method.label}</span>
               </button>
