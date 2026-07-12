@@ -45,6 +45,9 @@ export async function POST(
   const { tokenId } = await params
   const { walletAddress, signingWalletAddress, signature } =
     await request.json()
+  const isTokenOnlyAccess =
+    String(walletAddress ?? "").startsWith("kotani:") ||
+    String(walletAddress ?? "").startsWith("free:")
 
   const cached = await redis.get(`access:${tokenId}`)
   if (!cached) {
@@ -92,19 +95,21 @@ export async function POST(
     )
   }
 
-  const verificationAddress = (signingWalletAddress ??
-    walletAddress) as `0x${string}`
+  let isValidSignature = true
+  if (!isTokenOnlyAccess) {
+    const verificationAddress = (signingWalletAddress ??
+      walletAddress) as `0x${string}`
 
-  const isValidSignature = await verifyMessage({
-    address: verificationAddress,
-    message: `xpesa-open:${tokenId}`,
-    signature: signature as `0x${string}`,
-  })
+    isValidSignature = await verifyMessage({
+      address: verificationAddress,
+      message: `xpesa-open:${tokenId}`,
+      signature: signature as `0x${string}`,
+    })
+  }
 
   if (
     !isValidSignature ||
-    normalizeAddress(walletAddress) !==
-      normalizeAddress(token.fan_wallet_address)
+    normalizeAddress(walletAddress) !== normalizeAddress(token.fan_wallet_address)
   ) {
     console.warn(
       `[packs/open] Signature or wallet mismatch for token ${tokenId}`,

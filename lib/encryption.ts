@@ -1,10 +1,11 @@
 import crypto from "crypto"
+import { envConfig } from "@/lib/env"
 
 const ALGORITHM = "aes-256-gcm"
 const IV_LENGTH = 12
 
 function getKey() {
-  const secret = process.env.LINK_ENCRYPTION_KEY ?? process.env.ENCRYPTION_KEY
+  const secret = envConfig.LINK_ENCRYPTION_KEY
   if (!secret) return null
 
   return crypto.createHash("sha256").update(secret).digest()

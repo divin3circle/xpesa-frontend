@@ -96,10 +96,24 @@ function parseOptionalNumber(value: string) {
   return Number.isFinite(parsedValue) ? parsedValue : undefined
 }
 
+const KES_PER_USDC = 129
+
+function formatKesFromUsdc(value: string) {
+  const amount = parseOptionalNumber(value)
+  if (!amount || amount <= 0) return "KES 0"
+
+  return new Intl.NumberFormat("en-KE", {
+    style: "currency",
+    currency: "KES",
+    maximumFractionDigits: 0,
+  }).format(amount * KES_PER_USDC)
+}
+
 type LinkFormValues = {
   mode: LinkMode
   title: string
   description: string
+  thumbnailDataUrl: string
   destinationUrl: string
   gatePriceUsdc: string
   documentPriceUsdc: string
@@ -117,6 +131,7 @@ function buildCreateLinkParams({
   mode,
   title,
   description,
+  thumbnailDataUrl,
   destinationUrl,
   gatePriceUsdc,
   documentPriceUsdc,
@@ -141,6 +156,12 @@ function buildCreateLinkParams({
   }
 
   const trimmedDescription = description.trim()
+  if (mode !== "tip" && !thumbnailDataUrl) {
+    return {
+      params: null,
+      errorMessage: "Please add a thumbnail before creating this link.",
+    }
+  }
 
   switch (mode) {
     case "tip":
@@ -269,6 +290,19 @@ export default function CreateLinkPage() {
   const [tipMessage, setTipMessage] = useState("Thank you for your support! 🙏")
   const [accessExpiryType, setAccessExpiryType] = useState("Forever")
 
+  const activePriceUsdc = useMemo(() => {
+    if (mode === "tip") return tipSuggestedAmountUsdc
+    if (mode === "pack") return packPriceUsdc
+    if (mode === "document") return documentPriceUsdc
+    return gatePriceUsdc
+  }, [
+    documentPriceUsdc,
+    gatePriceUsdc,
+    mode,
+    packPriceUsdc,
+    tipSuggestedAmountUsdc,
+  ])
+
   const packSummary = useMemo(() => {
     const pdfCount = selectedPackFiles.filter(
       (file) => file.fileType === "pdf"
@@ -324,6 +358,7 @@ export default function CreateLinkPage() {
 
   const canCreateLink = useMemo(() => {
     if (isPending || !title.trim()) return false
+    if (mode !== "tip" && !thumbnailDataUrl) return false
     if (mode === "document") return Boolean(selectedDocumentFile)
     if (mode === "pack") return selectedPackFiles.length > 0
     if (mode === "gate") return Boolean(destinationUrl?.trim())
@@ -334,6 +369,7 @@ export default function CreateLinkPage() {
     mode,
     selectedDocumentFile,
     selectedPackFiles.length,
+    thumbnailDataUrl,
     title,
   ])
 
@@ -406,6 +442,7 @@ export default function CreateLinkPage() {
       mode,
       title,
       description,
+      thumbnailDataUrl,
       destinationUrl: destinationUrl ? destinationUrl : "",
       gatePriceUsdc,
       documentPriceUsdc,
@@ -416,7 +453,7 @@ export default function CreateLinkPage() {
       documentUpload: finalizedDocumentUpload,
       selectedPackFiles,
       finalizedPackSizeBytes: finalizedPackBytes,
-      finalizedPackR2Key: finalizedPackKey
+      finalizedPackR2Key: finalizedPackKey,
     })
 
     if (!params) {
@@ -525,6 +562,17 @@ export default function CreateLinkPage() {
                       onChange={(event) => setGatePriceUsdc(event.target.value)}
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="thumbnail-gate">Thumbnail</Label>
+                    <Input
+                      id="thumbnail-gate"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleThumbnailChange}
+                    />
+                  </div>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="expiry-gate">Access expiry</Label>
                     <select
@@ -697,7 +745,12 @@ export default function CreateLinkPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="thumbnail-pack">Thumbnail</Label>
-                    <Input id="thumbnail-pack" type="file" accept="image/*" />
+                    <Input
+                      id="thumbnail-pack"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleThumbnailChange}
+                    />
                   </div>
                 </div>
 
@@ -851,13 +904,19 @@ export default function CreateLinkPage() {
                       : "Complete practical guide with project files and implementation checklist."}
               </p>
               <div className="rounded-2xl bg-muted p-3 text-sm">
-                <p>Price: {mode === "tip" ? "Custom amount" : packPriceUsdc || documentPriceUsdc || gatePriceUsdc || "12.00"} USDC</p>
+                <p>
+                  Price:{" "}
+                  {mode === "tip"
+                    ? "Custom amount"
+                    : activePriceUsdc || "12.00"}{" "}
+                  USDC
+                </p>
                 <p className="text-muted-foreground">
                   {mode === "pack"
-                    ? `${formatBytes(packSummary.totalBytes)}`
+                    ? `${formatKesFromUsdc(activePriceUsdc)} • ${formatBytes(packSummary.totalBytes)}`
                     : mode === "document"
-                      ? `${formatBytes(documentUpload?.fileSizeBytes ?? 0)}`
-                      : "~ KES 1,548"}
+                      ? `${formatKesFromUsdc(activePriceUsdc)} • ${formatBytes(documentUpload?.fileSizeBytes ?? 0)}`
+                      : formatKesFromUsdc(activePriceUsdc)}
                 </p>
               </div>
             </div>

@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { motion } from "framer-motion"
 import { toast } from "sonner"
 import {
   useUnifiedFileExplorer,
@@ -10,15 +9,16 @@ import {
 import { useViewingFile } from "@/hooks/use-viewing-file"
 import { useUnlockedContent } from "@/hooks/use-unlocked-content"
 import { useDownload } from "@/hooks/use-download"
+import { useTokenOnlyAutoUnlock } from "@/hooks/use-token-only-auto-unlock"
+import { useViewerFileActions } from "@/hooks/use-viewer-file-actions"
+import { AccessConnectBanner } from "./unified-file-explorer/access-connect-banner"
 import { HeaderActions } from "./unified-file-explorer/header-actions"
-import { FileCard } from "./unified-file-explorer/file-card"
 import { FileList } from "./unified-file-explorer/file-list"
+import { LockedFilesPreview } from "./unified-file-explorer/locked-files-preview"
 import { PdfOverlay } from "./unified-file-explorer/pdf-overlay"
 import { useUnlockToken } from "@/hooks/use-unlock-token"
 import { FanWalletConnectModal } from "@/components/fan-wallet-connect-modal"
 import { useFanWalletContext } from "@/components/fan-wallet-context"
-import { HugeiconsIcon } from "@hugeicons/react"
-import { StarAward01FreeIcons } from "@hugeicons/core-free-icons"
 
 interface UnifiedFileExplorerProps {
   tokenId: string
@@ -37,16 +37,23 @@ export function UnifiedFileExplorer({
 }: UnifiedFileExplorerProps) {
   const [showFanConnectModal, setShowFanConnectModal] = useState(false)
   const hasShownModalRef = useRef(false)
+  const wrongWalletModalRef = useRef<string | null>(null)
   const { fanSmartAccountAddress } = useFanWalletContext()
+  const isTokenOnlyAccess =
+    fanWalletAddress.startsWith("kotani:") || fanWalletAddress.startsWith("free:")
 
   useEffect(() => {
-    if (!fanSmartAccountAddress && !hasShownModalRef.current) {
+    if (
+      !isTokenOnlyAccess &&
+      !fanSmartAccountAddress &&
+      !hasShownModalRef.current
+    ) {
       hasShownModalRef.current = true
       queueMicrotask(() => {
         setShowFanConnectModal(true)
       })
     }
-  }, [fanSmartAccountAddress])
+  }, [fanSmartAccountAddress, isTokenOnlyAccess])
 
   const {
     account,
@@ -55,11 +62,29 @@ export function UnifiedFileExplorer({
     isWrongWallet,
     handleFileClick,
     setIsAuthorized,
-  } = useUnifiedFileExplorer(fanWalletAddress)
+  } = useUnifiedFileExplorer(
+    fanWalletAddress,
+    isTokenOnlyAccess,
+    fanSmartAccountAddress
+  )
 
-  const effectiveFanAddress = fanSmartAccountAddress || fanWalletAddress
+  useEffect(() => {
+    if (!isWrongWallet || !fanSmartAccountAddress) return
 
-  const unlock = useUnlockToken(tokenId, linkType, effectiveFanAddress)
+    const connectedWallet = fanSmartAccountAddress.toLowerCase()
+    if (wrongWalletModalRef.current === connectedWallet) return
+
+    wrongWalletModalRef.current = connectedWallet
+    queueMicrotask(() => {
+      setShowFanConnectModal(true)
+    })
+  }, [fanSmartAccountAddress, isWrongWallet])
+
+  const effectiveFanAddress = isTokenOnlyAccess
+    ? fanSmartAccountAddress || fanWalletAddress
+    : fanSmartAccountAddress
+
+  const unlock = useUnlockToken(tokenId, linkType, effectiveFanAddress ?? undefined)
   const download = useDownload()
   const {
     content: unlockedContent,
@@ -68,12 +93,13 @@ export function UnifiedFileExplorer({
   } = useUnlockedContent(tokenId)
 
   async function handleConfirm() {
-    if (!fanSmartAccountAddress) {
+    if (!isTokenOnlyAccess && !fanSmartAccountAddress) {
       setShowFanConnectModal(true)
       return
     }
 
     if (isWrongWallet) {
+      setShowFanConnectModal(true)
       toast.error(
         "Wrong wallet. Please disconnect and reconnect with the correct account."
       )
@@ -93,6 +119,15 @@ export function UnifiedFileExplorer({
   }
 
   const { viewingFileUrl, openViewer, closeViewer } = useViewingFile()
+  const { onOpen, handlePreviewLoadError, handleDownloadFile } =
+    useViewerFileActions({
+      unlockedContent,
+      openViewer,
+      download,
+      tokenId,
+      linkType,
+      title,
+    })
 
   useEffect(() => {
     if (unlockedContent) {
@@ -100,53 +135,14 @@ export function UnifiedFileExplorer({
     }
   }, [setIsAuthorized, unlockedContent])
 
-  function onOpen(file: FileItem) {
-    if (!unlockedContent) {
-      console.warn("Content not unlocked yet")
-      toast.warning("Please confirm access to view this file")
-      return
-    }
-
-    let previewUrl: string | null = null
-
-    if ("pageCount" in unlockedContent) {
-      previewUrl = unlockedContent.previewUrl
-    }
-
-    if (previewUrl) {
-      openViewer(previewUrl)
-    } else {
-      console.error("No preview URL available for file", file.id)
-    }
-  }
-
-  function handlePreviewLoadError(error: unknown) {
-    const message = error instanceof Error ? error.message : String(error)
-
-    if (/429|too many requests/i.test(message)) {
-      toast.error("Too many preview requests", {
-        description: "Try again in a minute.",
-      })
-      return
-    }
-
-    toast.error("Failed to load preview", {
-      description: message || "Please try again.",
-    })
-  }
-
-  function handleDownloadFile(file: FileItem) {
-    void download
-      .mutateAsync({
-        tokenId,
-        filename: linkType === "pack" ? `${title}.zip` : file.name || title,
-      })
-      .catch((err: unknown) => {
-        console.error("download error", err)
-        const message = err instanceof Error ? err.message : String(err)
-        toast.error(message || "Failed to download content")
-      })
-  }
+  useTokenOnlyAutoUnlock({
+    enabled: isTokenOnlyAccess,
+    hydrated,
+    unlockedContent,
+    unlock,
+    storeContent,
+    setIsAuthorized,
+  })
 
   return (
     <div className="min-h-screen p-6 lg:p-10">
@@ -155,28 +151,7 @@ export function UnifiedFileExplorer({
         onCloseAction={() => setShowFanConnectModal(false)}
       />
 
-      {!fanSmartAccountAddress && (
-        <motion.div
-          initial={{ height: 0, opacity: 0 }}
-          animate={{ height: "auto", opacity: 1 }}
-          className="mb-8 overflow-hidden"
-        >
-          <div className="flex items-center justify-between rounded-2xl border border-border/70 bg-background/50 p-4">
-            <div className="flex items-center gap-3">
-              <div className="rounded-full p-2">
-                <HugeiconsIcon icon={StarAward01FreeIcons} />
-              </div>
-              <div>
-                <p className="text-sm font-semibold">Connect Fan Wallet</p>
-                <p className="text-xs text-muted-foreground">
-                  Connect your wallet to verify ownership and access this
-                  content
-                </p>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
+      {!isTokenOnlyAccess && !fanSmartAccountAddress && <AccessConnectBanner />}
 
       <HeaderActions
         title={title}
@@ -203,25 +178,11 @@ export function UnifiedFileExplorer({
       />
 
       {hydrated && !isAuthorized && files.length > 0 && (
-        <section className="my-12">
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="mt-4 font-sans text-xl font-semibold">
-              {linkType === "pack" ? "Folder Contents" : "Included Assets"}
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {files.map((file) => (
-              <div key={file.id}>
-                <FileCard
-                  file={file}
-                  onClick={(clickedFile) =>
-                    handleFileClick({ file: clickedFile, tokenId, onOpen })
-                  }
-                />
-              </div>
-            ))}
-          </div>
-        </section>
+        <LockedFilesPreview
+          files={files}
+          linkType={linkType}
+          onFileClick={(file) => handleFileClick({ file, tokenId, onOpen })}
+        />
       )}
 
       {viewingFileUrl && selectedFile && (

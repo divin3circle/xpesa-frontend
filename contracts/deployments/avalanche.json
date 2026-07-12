@@ -1,0 +1,14 @@
+{
+  "address": "0xF1D05e55b5505E12aFC1F2Cd0918909d1F5ee1E1",
+  "admin": "0x7dAf1811c745e39a81A25b1995a4B876A7FfEE5d",
+  "blockNumber": 90071072,
+  "chainId": 43114,
+  "compilerVersion": "0.8.24",
+  "contract": "XpesaSupporterReceiptNFT",
+  "deployedAt": 1783805999,
+  "deployer": "0x7dAf1811c745e39a81A25b1995a4B876A7FfEE5d",
+  "minter": "0x7dAf1811c745e39a81A25b1995a4B876A7FfEE5d",
+  "network": "avalanche-c-chain",
+  "openzeppelinVersion": "v5.4.0",
+  "transactionHash": "0xf5ee65934e12fd110f9d73d4f20ae918f61eb3cbe7a1fb9fe28d67316c62895e"
+}

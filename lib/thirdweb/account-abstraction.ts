@@ -8,10 +8,10 @@ const avalancheFuji = defineChain(43113)
 
 function resolveDefaultChain() {
   if (isAvalanchePaymentChain()) {
-    return envConfig.ENV === "DEV" ? avalancheFuji : avalancheMainnet
+    return envConfig.IS_DEV ? avalancheFuji : avalancheMainnet
   }
 
-  return envConfig.ENV === "DEV" ? hederaTestnet : hederaMainnet
+  return envConfig.IS_DEV ? hederaTestnet : hederaMainnet
 }
 
 export const defaultChain = resolveDefaultChain()

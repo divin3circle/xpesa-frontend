@@ -2,20 +2,15 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { createPublicClient, http, parseAbi, decodeEventLog } from "viem"
 import { avalanche, avalancheFuji, hedera, hederaTestnet } from "viem/chains"
 import { NextRequest } from "next/server"
-import { Redis } from "@upstash/redis"
-import { randomUUID } from "crypto"
 import {
   envConfig,
   getPaymentNetworkLabel,
   isAvalanchePaymentChain,
 } from "@/lib/env"
-import crypto from "crypto"
 import { USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains"
+import { createAccessForConfirmedPayment } from "@/lib/payments/access"
 
-const redis = Redis.fromEnv()
-const PLATFORM_WALLET_ADDRESS = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS
-
-const isDevelopment = envConfig.ENV === "DEV"
+const isDevelopment = envConfig.IS_DEV
 const isAvalanche = isAvalanchePaymentChain()
 
 const network = isAvalanche
@@ -115,7 +110,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return Response.json({ accessToken: token.id, linkType: link.type })
+    return Response.json({
+      accessToken: token.id,
+      linkType: link.type,
+      transactionId: existing.id,
+      receiptEligible: isAvalanche,
+    })
   }
 
   const { data: link } = await supabase
@@ -123,11 +123,12 @@ export async function POST(request: NextRequest) {
     .select("*, creator:creators(wallet_address)")
     .eq("id", linkId)
     .eq("is_active", true)
+    .eq("moderation_status", "approved")
     .single()
 
   if (!link) return Response.json({ error: "Link not found" }, { status: 404 })
 
-  if (!PLATFORM_WALLET_ADDRESS) {
+  if (!envConfig.PLATFORM_WALLET_ADDRESS) {
     return Response.json(
       { error: "Platform wallet not configured" },
       { status: 500 }
@@ -142,7 +143,10 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const receipt = await viemClient.getTransactionReceipt({ hash: txHash })
+  const receipt = await viemClient.waitForTransactionReceipt({
+    hash: txHash,
+    timeout: 60_000,
+  })
   if (receipt.status !== "success") {
     return Response.json({ error: "Transaction failed" }, { status: 400 })
   }
@@ -164,7 +168,7 @@ export async function POST(request: NextRequest) {
 
   const platformTransferFound = hasTransferTo({
     logs: receipt.logs,
-    recipient: PLATFORM_WALLET_ADDRESS,
+    recipient: envConfig.PLATFORM_WALLET_ADDRESS,
   })
 
   if (!creatorTransferFound || !platformTransferFound) {
@@ -178,76 +182,23 @@ export async function POST(request: NextRequest) {
   const platformFee = grossUsdc * 0.05
   const creatorNet = grossUsdc - platformFee
 
-  const { data: insertedTransaction } = await supabase
-    .from("transactions")
-    .insert({
-      link_id: linkId,
-      creator_id: link.creator_id,
-      fan_wallet_address: fanWalletAddress,
-      tx_hash: txHash,
+  const { accessToken, linkType, transactionId } =
+    await createAccessForConfirmedPayment({
+      supabase,
+      link,
+      fanWalletAddress,
+      txHash,
       network: networkLabel,
-      amount_usdc: grossUsdc,
-      platform_fee_usdc: platformFee,
-      creator_net_usdc: creatorNet,
-      status: "confirmed",
-      fan_ip_hash: hashIp(request.headers.get("x-forwarded-for") ?? ""),
+      amountUsdc: grossUsdc,
+      platformFeeUsdc: platformFee,
+      creatorNetUsdc: creatorNet,
+      requestHeaders: request.headers,
     })
-    .select()
-    .single()
-
-  await supabase.rpc("increment_link_stats", {
-    p_link_id: linkId,
-    p_amount: grossUsdc,
-  })
-
-  const tokenId = randomUUID()
-  const expiresAt = calculateExpiry(link.access_expiry_type)
-  const ipHash = link.access_ip_binding
-    ? hashIp(request.headers.get("x-forwarded-for") ?? "")
-    : null
-
-  await supabase.from("access_tokens").insert({
-    id: tokenId,
-    transaction_id: insertedTransaction.id,
-    link_id: linkId,
-    fan_wallet_address: fanWalletAddress,
-    expires_at: expiresAt,
-    is_one_time: link.access_expiry_type === "one_time",
-    bound_ip_hash: ipHash,
-    max_views: link.access_max_views,
-  })
-
-  const ttl = expiresAt
-    ? Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000)
-    : null
-
-  if (ttl && ttl > 0) {
-    await redis.set(`access:${tokenId}`, linkId, { ex: ttl })
-  } else if (!expiresAt) {
-    await redis.set(`access:${tokenId}`, linkId) // no expiry
-  }
 
   return Response.json({
-    accessToken: tokenId,
-    linkType: link.type,
+    accessToken,
+    linkType,
+    transactionId,
+    receiptEligible: isAvalanche,
   })
-}
-
-function hashIp(ip: string): string {
-  return crypto.createHash("sha256").update(ip).digest("hex")
-}
-
-function calculateExpiry(expiryType: string): string | null {
-  const now = new Date()
-  const map: Record<string, number> = {
-    "5m": 5 * 60 * 1000,
-    "1h": 60 * 60 * 1000,
-    "24h": 24 * 60 * 60 * 1000,
-    "7d": 7 * 24 * 60 * 60 * 1000,
-    "30d": 30 * 24 * 60 * 60 * 1000,
-  }
-  if (expiryType === "forever" || expiryType === "one_time") return null
-  const ms = map[expiryType]
-  if (!ms) return null
-  return new Date(now.getTime() + ms).toISOString()
 }

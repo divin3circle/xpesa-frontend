@@ -2,19 +2,14 @@
 
 import { useMemo, useState } from "react"
 import { envConfig } from "@/lib/env"
-import { client } from "@/lib/utils"
 import { useParams } from "next/navigation"
 
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ConnectButton } from "thirdweb/react"
 
-import { PAYMENT_CHAIN } from "@/lib/thirdweb/chains"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { usePublicLink } from "@/hooks/use-public"
-import { smartAccountConfig } from "@/lib/thirdweb/account-abstraction"
-import { PayButton } from "./pay-button"
 import { useTheme } from "@/components/theme-provider"
 import {
   Dialog,
@@ -27,12 +22,15 @@ import {
 import { Button } from "@/components/ui/button"
 import { usePaymentChainGuard } from "@/hooks/use-payment-chain-guard"
 import { usePaymentAmount } from "@/hooks/use-payment-amount"
-import { PaymentMethodsBadges } from "./payment-methods-badges"
+import type { PayMethodOption } from "./payment-methods-badges"
+import { FreeAccessButton } from "./free-access-button"
+import { PaidCheckoutActions } from "./paid-checkout-actions"
 
 export function PayPurchaseCard() {
   const params = useParams<{ linkId: string }>()
   const linkId = params?.linkId
   const [isPaying, setIsPaying] = useState(false)
+  const [checkoutMethod, setCheckoutMethod] = useState<PayMethodOption>("usdc")
   const { theme } = useTheme()
   const {
     account,
@@ -49,6 +47,9 @@ export function PayPurchaseCard() {
 
   const link = data?.link
   const { displayAmount, setAmount } = usePaymentAmount(link)
+  const paymentAmount = Number(displayAmount)
+  const safePaymentAmount = Number.isFinite(paymentAmount) ? paymentAmount : 0
+  const isFreeAccess = safePaymentAmount <= 0
 
   const accessPills = useMemo(() => {
     if (!link) return []
@@ -86,8 +87,7 @@ export function PayPurchaseCard() {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          You will be able to view the content according to the access
-          conditions set by the creator.
+          Viewing content according to the access conditions set by the creator.
         </p>
 
         {accessPills.length > 0 ? (
@@ -112,64 +112,25 @@ export function PayPurchaseCard() {
             readOnly={link.type !== "tip"}
           />
         </div>
-        <PaymentMethodsBadges
-          showConnectedBadge={Boolean(account)}
-          hasChainMismatch={hasChainMismatch}
-          connectedChainLabel={connectedChainLabel}
-          onOpenChainSwitchDialog={openChainSwitchDialog}
-        />
-        <>
-          {!account ? (
-            <ConnectButton
-              client={client}
-              theme={theme === "dark" ? "dark" : "light"}
-              chain={PAYMENT_CHAIN}
-              accountAbstraction={smartAccountConfig}
-              connectButton={{
-                label: "Connect to Pay",
-                style: {
-                  backgroundColor: theme === "dark" ? "#fff" : "#000",
-                  color: theme === "dark" ? "#000" : "#fff",
-                  width: "100%",
-                  marginBottom: "1rem",
-                  borderRadius: "20px",
-                },
-              }}
-              connectModal={{
-                title: "Connect to pay",
-                titleIcon: "/logo.png",
-              }}
-            />
-          ) : hasChainMismatch ? (
-            <div className="space-y-3 rounded-xl border border-amber-500/40 bg-amber-500/10 p-4">
-              <p className="text-sm font-medium text-amber-800 dark:text-amber-200">
-                Your wallet is on the wrong network.
-              </p>
-              <p className="text-sm text-amber-700 dark:text-amber-300">
-                Switch to {envConfig.PAYMENT_NETWORK_LABEL} to continue with
-                payment.
-              </p>
-              <Button
-                type="button"
-                onClick={handleSwitchNetwork}
-                disabled={isSwitchingChain}
-                className="w-full"
-              >
-                {isSwitchingChain
-                  ? "Switching network..."
-                  : `Switch to ${envConfig.PAYMENT_NETWORK_LABEL}`}
-              </Button>
-            </div>
-          ) : (
-            <PayButton
-              link={link}
-              account={account}
-              amount={(link.suggested_amount_usdc ?? link.price_usdc) || 1}
-              isPaying={isPaying}
-              setIsPayingAction={setIsPaying}
-            />
-          )}
-        </>
+        {isFreeAccess ? (
+          <FreeAccessButton link={link} />
+        ) : (
+          <PaidCheckoutActions
+            link={link}
+            account={account ?? undefined}
+            amount={safePaymentAmount}
+            theme={theme}
+            selectedMethod={checkoutMethod}
+            onSelectMethod={setCheckoutMethod}
+            isPaying={isPaying}
+            setIsPaying={setIsPaying}
+            hasChainMismatch={hasChainMismatch}
+            connectedChainLabel={connectedChainLabel}
+            onOpenChainSwitchDialog={openChainSwitchDialog}
+            onSwitchNetwork={handleSwitchNetwork}
+            isSwitchingChain={isSwitchingChain}
+          />
+        )}
       </CardContent>
       <Dialog
         open={showChainSwitchDialog}

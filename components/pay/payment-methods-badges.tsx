@@ -3,11 +3,15 @@ import Image from "next/image"
 import { Badge } from "@/components/ui/badge"
 import { envConfig } from "@/lib/env"
 
+export type PayMethodOption = "usdc" | "usdt" | "mobile"
+
 type PaymentMethodsBadgesProps = {
   showConnectedBadge: boolean
   hasChainMismatch: boolean
   connectedChainLabel: string
   onOpenChainSwitchDialog: () => void
+  selectedMethod: PayMethodOption
+  onSelectMethod: (method: PayMethodOption) => void
 }
 
 export function PaymentMethodsBadges({
@@ -15,8 +19,35 @@ export function PaymentMethodsBadges({
   hasChainMismatch,
   connectedChainLabel,
   onOpenChainSwitchDialog,
+  selectedMethod,
+  onSelectMethod,
 }: PaymentMethodsBadgesProps) {
   const paymentChainIcon = envConfig.CHAIN === "A" ? "/avax.svg" : "/hbar.svg"
+  const methods: Array<{
+    value: PayMethodOption
+    label: string
+    icon: string
+    alt: string
+  }> = [
+    {
+      value: "usdc",
+      label: "USDC",
+      icon: "/usdc.svg",
+      alt: "USDC",
+    },
+    {
+      value: "usdt",
+      label: "USDT",
+      icon: "/usdt.svg",
+      alt: "USDT",
+    },
+    {
+      value: "mobile",
+      label: "Mobile",
+      icon: "/mpesa.png",
+      alt: "Mobile money",
+    },
+  ]
 
   return (
     <>
@@ -48,33 +79,37 @@ export function PaymentMethodsBadges({
         ) : null}
       </div>
 
-      <h1 className="font-heading font-semibold text-muted-foreground">
-        Supported Methods
-      </h1>
-      <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1 rounded-full border border-border/70 px-3 py-1">
-          <Image src="/usdc.svg" alt="USDC" width={16} height={16} />
-          <span className="text-sm font-semibold text-muted-foreground">
-            USDC
-          </span>
-        </div>
-        <div className="flex items-center gap-1 rounded-full border border-border/70 px-3 py-1">
-          <Image src="/usdt.svg" alt="USDT" width={16} height={16} />
-          <span className="text-sm font-semibold text-muted-foreground">
-            USDT
-          </span>
-        </div>
-        <div className="flex items-center gap-1 rounded-full border border-border/70 px-3 py-1">
-          <Image
-            src="/mpesa.png"
-            alt="Mobile"
-            className="size-5 rounded"
-            width={100}
-            height={100}
-          />
-          <span className="text-sm font-semibold text-muted-foreground">
-            Mobile
-          </span>
+      <div className="space-y-2">
+        <h2 className="font-heading text-sm font-semibold text-muted-foreground">
+          Payment method
+        </h2>
+        <div className="grid grid-cols-3 gap-2" role="radiogroup">
+          {methods.map((method) => {
+            const isSelected = selectedMethod === method.value
+            return (
+              <button
+                key={method.value}
+                type="button"
+                role="radio"
+                aria-checked={isSelected}
+                onClick={() => onSelectMethod(method.value)}
+                className={`flex items-center justify-center gap-1 rounded-full border px-3 py-2 text-sm font-semibold transition-colors ${
+                  isSelected
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border/70 text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <Image
+                  src={method.icon}
+                  alt={method.alt}
+                  className={method.value === "mobile" ? "size-5 rounded" : ""}
+                  width={16}
+                  height={16}
+                />
+                <span>{method.label}</span>
+              </button>
+            )
+          })}
         </div>
       </div>
     </>

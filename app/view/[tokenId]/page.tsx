@@ -10,6 +10,7 @@ import { useTokenDetails } from "@/hooks/use-token-details"
 import { Button } from "@/components/ui/button"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { ArrowLeft01FreeIcons } from "@hugeicons/core-free-icons"
+import { ReceiptMintPanel } from "@/components/receipts/receipt-mint-panel"
 
 export default function ViewTokenPage() {
   const params = useParams<{ tokenId: string }>()
@@ -64,12 +65,20 @@ export default function ViewTokenPage() {
   }
 
   return (
-    <UnifiedFileExplorer
-      tokenId={tokenId!}
-      title={data.link.title}
-      files={data.files}
-      linkType={data.link.type}
-      fanWalletAddress={data.token.fanWalletAddress}
-    />
+    <>
+      <div className="px-6 pt-6 lg:px-10">
+        <ReceiptMintPanel
+          accessToken={tokenId}
+          requiredWalletAddress={data.token.fanWalletAddress}
+        />
+      </div>
+      <UnifiedFileExplorer
+        tokenId={tokenId!}
+        title={data.link.title}
+        files={data.files}
+        linkType={data.link.type}
+        fanWalletAddress={data.token.fanWalletAddress}
+      />
+    </>
   )
 }

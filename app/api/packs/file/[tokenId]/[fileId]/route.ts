@@ -23,6 +23,9 @@ export async function POST(
   const { tokenId, fileId } = await params
   const { walletAddress, signingWalletAddress, signature } =
     await request.json()
+  const isTokenOnlyAccess =
+    String(walletAddress ?? "").startsWith("kotani:") ||
+    String(walletAddress ?? "").startsWith("free:")
 
   const cached = await redis.get(`access:${tokenId}`)
   if (!cached) {
@@ -41,14 +44,17 @@ export async function POST(
     return Response.json({ error: "not_found" }, { status: 404 })
   }
 
-  const verificationAddress = (signingWalletAddress ??
-    walletAddress) as `0x${string}`
+  let isValidSignature = true
+  if (!isTokenOnlyAccess) {
+    const verificationAddress = (signingWalletAddress ??
+      walletAddress) as `0x${string}`
 
-  const isValidSignature = await verifyMessage({
-    address: verificationAddress,
-    message: `xpesa-open:${tokenId}`,
-    signature: signature as `0x${string}`,
-  })
+    isValidSignature = await verifyMessage({
+      address: verificationAddress,
+      message: `xpesa-open:${tokenId}`,
+      signature: signature as `0x${string}`,
+    })
+  }
 
   if (
     !isValidSignature ||

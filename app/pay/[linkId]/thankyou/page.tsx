@@ -12,12 +12,15 @@ import { BrandLogo } from "@/components/landing/brand-logo"
 import LottieComponent from "@/components/lottie-animation"
 import { getPaymentNetworkLabel, resolveExplorerUrl } from "@/lib/utils"
 import { envConfig } from "@/lib/env"
+import { ReceiptMintPanel } from "@/components/receipts/receipt-mint-panel"
 
 export default function TipThankYouPage() {
   const params = useParams<{ linkId: string; txHash: string }>()
   const linkId = params?.linkId
   const searchParams = useSearchParams()
   const txHash = searchParams.get("txHash") ?? ""
+  const accessToken = searchParams.get("token") ?? ""
+  const isFreeAccess = searchParams.get("free") === "1"
   const router = useRouter()
 
   const { data, isLoading } = usePublicLink(linkId)
@@ -59,27 +62,33 @@ export default function TipThankYouPage() {
             </motion.div>
 
             <h1 className="mb-2 font-heading text-3xl font-bold text-foreground">
-              Payment Successful!
+              {isFreeAccess ? "Access Granted!" : "Payment Successful!"}
             </h1>
             <p className="mb-8 text-muted-foreground">
-              Your support means the world to the creator.
+              {isFreeAccess
+                ? "You can now enjoy this free creator content."
+                : "Your support means the world to the creator."}
             </p>
 
             <div className="mb-8 w-full rounded-2xl border border-border/40 bg-muted/30 p-6 text-left">
               <div className="mb-4 flex items-center justify-between">
                 <span className="text-sm font-medium text-muted-foreground">
-                  Amount Paid
+                  {isFreeAccess ? "Amount" : "Amount Paid"}
                 </span>
                 <span className="font-heading text-lg font-bold text-foreground">
-                  {link?.price_usdc ? `${link.price_usdc} USDC` : "Custom Tip"}
+                  {isFreeAccess
+                    ? "Free"
+                    : link?.price_usdc
+                      ? `${link.price_usdc} USDC`
+                      : "Custom Tip"}
                 </span>
               </div>
               <div className="flex items-center justify-between border-t border-border/20 pt-4">
                 <span className="text-sm font-medium text-muted-foreground">
-                  Transaction Status
+                  {isFreeAccess ? "Access Status" : "Transaction Status"}
                 </span>
                 <span className="flex items-center gap-1.5 text-xs font-bold text-emerald-500 uppercase">
-                  Confirmed
+                  {isFreeAccess ? "Unlocked" : "Confirmed"}
                 </span>
               </div>
             </div>
@@ -87,6 +96,12 @@ export default function TipThankYouPage() {
             {link?.type === "tip" && (
               <div className="mb-8 flex flex-col items-center gap-3 text-muted-foreground italic">
                 <p>&quot;{link.thank_you_message}&quot;</p>
+              </div>
+            )}
+
+            {!isFreeAccess && (
+              <div className="mb-8 w-full text-left">
+                <ReceiptMintPanel accessToken={accessToken} />
               </div>
             )}
 
@@ -104,16 +119,18 @@ export default function TipThankYouPage() {
           </CardContent>
         </Card>
 
-        <div
-          className="mt-8 flex cursor-pointer items-center justify-center gap-2 text-xs text-muted-foreground"
-          onClick={() => {
-            if (!txHash) return
-            router.push(resolveExplorerUrl(txHash))
-          }}
-        >
-          <span>Payment verified on {getPaymentNetworkLabel()}</span>
-          <ExternalLink className="h-3 w-3" />
-        </div>
+        {!isFreeAccess && (
+          <div
+            className="mt-8 flex cursor-pointer items-center justify-center gap-2 text-xs text-muted-foreground"
+            onClick={() => {
+              if (!txHash) return
+              router.push(resolveExplorerUrl(txHash))
+            }}
+          >
+            <span>Payment verified on {getPaymentNetworkLabel()}</span>
+            <ExternalLink className="h-3 w-3" />
+          </div>
+        )}
       </motion.div>
     </div>
   )

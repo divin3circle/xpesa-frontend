@@ -1,0 +1,14 @@
+{
+  "address": "0x3a9456D3db332d3b47A567a2616177B870027d7F",
+  "admin": "0xEe496FB88cFB28bCA4DAA65abf3088BdaB5Bc409",
+  "blockNumber": 56938721,
+  "chainId": 43113,
+  "compilerVersion": "0.8.24",
+  "contract": "XpesaSupporterReceiptNFT",
+  "deployedAt": 1783797808,
+  "deployer": "0xEe496FB88cFB28bCA4DAA65abf3088BdaB5Bc409",
+  "minter": "0xEe496FB88cFB28bCA4DAA65abf3088BdaB5Bc409",
+  "network": "avalanche-fuji",
+  "openzeppelinVersion": "v5.4.0",
+  "transactionHash": "0xf88b9794fbc070f3db16e7f07b1c640c2beacbba2c9ed47c2c0c10aa70cd5ea8"
+}

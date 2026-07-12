@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/sidebar"
 import { navigationConfig, type NavItem } from "@/lib/navigation"
 import { useActiveLink } from "@/hooks/use-active-link"
+import { useAdminAccess } from "@/hooks/use-admin-access"
 
 const versions = ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"]
 
@@ -70,6 +71,9 @@ function resolveIcon(iconName?: string): React.ReactNode {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { data: adminAccess } = useAdminAccess()
+  const showAdmin = adminAccess?.isAdmin === true
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
@@ -81,7 +85,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {group.items.map((item) => (
+                {group.items
+                  .filter((item) => showAdmin || item.url !== "/dashboard/admin/moderation")
+                  .map((item) => (
                   <NavItemComponent key={item.title} item={item} />
                 ))}
               </SidebarMenu>

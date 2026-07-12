@@ -2,6 +2,7 @@
 import { PayLinkPreviewCard } from "@/components/pay/pay-link-preview-card"
 import { PayLinkTransactions } from "@/components/pay/pay-link-transactions"
 import PayPreview from "@/components/pay/pay-preview"
+import { PaymentAccessDetails } from "@/components/pay/payment-access-details"
 import { PayPurchaseCard } from "@/components/pay/pay-purchase-card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "@hugeicons/core-free-icons"
@@ -32,8 +33,11 @@ export default function PayPage() {
         </p>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <PayLinkPreviewCard />
+      <section className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="space-y-4">
+          <PayLinkPreviewCard />
+          <PaymentAccessDetails />
+        </div>
         <PayPurchaseCard />
       </section>
       <PayPreview />

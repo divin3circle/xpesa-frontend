@@ -401,6 +401,7 @@ export async function GET(
         "type, is_active, view_count, payment_count, price_usdc, suggested_amount_usdc"
       )
       .eq("creator_id", creator.id)
+      .eq("moderation_status", "approved")
 
     if (linksError) {
       console.error("[creator-insights-route] links query error:", linksError)

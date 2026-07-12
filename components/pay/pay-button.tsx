@@ -20,8 +20,7 @@ import { useMyBalance } from "@/hooks/use-balance"
 import Link from "next/link"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Copy01Icon } from "@hugeicons/core-free-icons"
-
-const PLATFORM_WALLET = process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS!
+import { envConfig } from "@/lib/env"
 
 export function PayButton({
   link,
@@ -81,7 +80,7 @@ export function PayButton({
     }
 
     const normalizedCreatorWallet = creatorWalletAddress.trim()
-    const normalizedPlatformWallet = PLATFORM_WALLET.trim()
+    const normalizedPlatformWallet = envConfig.PLATFORM_WALLET_ADDRESS.trim()
 
     if (!isAddress(normalizedCreatorWallet)) {
       toast.error("Creator wallet is unavailable")

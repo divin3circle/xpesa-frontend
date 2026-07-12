@@ -1,0 +1,7 @@
+.env
+out/
+cache/
+broadcast/
+.gas-snapshot
+deployments/local.json
+deployments/*.local.json

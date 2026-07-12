@@ -44,7 +44,11 @@ export async function POST(
   const { walletAddress, signingWalletAddress, signature } =
     await request.json()
 
-  if (!walletAddress || !signature) {
+  const isTokenOnlyAccess =
+    String(walletAddress ?? "").startsWith("kotani:") ||
+    String(walletAddress ?? "").startsWith("free:")
+
+  if (!isTokenOnlyAccess && (!walletAddress || !signature)) {
     return Response.json(
       { error: "Missing wallet address or signature" },
       { status: 400 }
@@ -92,19 +96,21 @@ export async function POST(
     )
   }
 
-  const verificationAddress = (signingWalletAddress ??
-    walletAddress) as `0x${string}`
+  let isValidSignature = true
+  if (!isTokenOnlyAccess) {
+    const verificationAddress = (signingWalletAddress ??
+      walletAddress) as `0x${string}`
 
-  const isValidSignature = await verifyMessage({
-    address: verificationAddress,
-    message: `xpesa-open:${tokenId}`,
-    signature: signature as `0x${string}`,
-  })
+    isValidSignature = await verifyMessage({
+      address: verificationAddress,
+      message: `xpesa-open:${tokenId}`,
+      signature: signature as `0x${string}`,
+    })
+  }
 
   if (
     !isValidSignature ||
-    normalizeAddress(walletAddress) !==
-      normalizeAddress(token.fan_wallet_address)
+    normalizeAddress(walletAddress) !== normalizeAddress(token.fan_wallet_address)
   ) {
     console.warn(
       `[docs/open] Signature or wallet mismatch for token ${tokenId}`,

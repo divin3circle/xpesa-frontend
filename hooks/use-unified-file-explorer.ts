@@ -14,19 +14,25 @@ export type FileItem = {
   sharedBy?: string
 }
 
-export function useUnifiedFileExplorer(fanWalletAddress: string) {
+export function useUnifiedFileExplorer(
+  fanWalletAddress: string,
+  allowTokenOnlyAccess = false,
+  connectedWalletAddress?: string | null
+) {
   const account = useActiveAccount()
   const [selectedFile, setSelectedFile] = useState<FileItem | null>(null)
   const [isAuthenticating, setIsAuthenticating] = useState(false)
   const [isAuthorized, setIsAuthorized] = useState(false)
 
   const isWrongWallet = useMemo(() => {
+    if (allowTokenOnlyAccess) return false
+    const walletAddress = connectedWalletAddress ?? account?.address
     return (
-      !!account?.address &&
+      !!walletAddress &&
       !!fanWalletAddress &&
-      account.address.toLowerCase() !== fanWalletAddress.toLowerCase()
+      walletAddress.toLowerCase() !== fanWalletAddress.toLowerCase()
     )
-  }, [account?.address, fanWalletAddress])
+  }, [account?.address, allowTokenOnlyAccess, connectedWalletAddress, fanWalletAddress])
 
   async function handleFileClick({
     file,
@@ -38,7 +44,7 @@ export function useUnifiedFileExplorer(fanWalletAddress: string) {
     onOpen?: (file: FileItem) => void
   }) {
     console.log("File clicked:", file)
-    if (!account?.address) {
+    if (!account?.address && !connectedWalletAddress && !allowTokenOnlyAccess) {
       toast.error("Please connect your wallet first")
       return
     }

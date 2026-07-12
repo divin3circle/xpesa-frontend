@@ -103,6 +103,7 @@ export async function GET(
       )
       .eq("id", linkId)
       .eq("is_active", true)
+      .eq("moderation_status", "approved")
       .single()
 
     if (error) {

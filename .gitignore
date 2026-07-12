@@ -11,6 +11,8 @@
 # testing
 /coverage
 /supabase
+/docs
+/guides
 
 # next.js
 /.next/
@@ -31,9 +33,14 @@ pnpm-debug.log*
 
 # env files
 .env*.local
+.env.production
+.env.preview
 secrets.json
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 .env
+.env.production.example
+contracts/docs/BACKEND_INTEGRATION.md
+contracts/docs/CONTRACT_SPEC.md

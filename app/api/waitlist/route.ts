@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { google } from "googleapis"
 import { GoogleAuth } from "google-auth-library"
+import { envConfig } from "@/lib/env"
 
 type WaitlistRequest = {
   name?: string
@@ -9,12 +10,9 @@ type WaitlistRequest = {
   notes?: string
 }
 
-const googleApplicationCredentials =
-  process.env.GOOGLE_APPLICATION_CREDENTIALS ||
-  process.env.GOOGLE_APPLICATION_CREDETIALS ||
-  ""
-const googleApplicationScopes = ["https://www.googleapis.com/auth/spreadsheets"]
-const sheetId = process.env.SHEET_ID || ""
+const googleApplicationCredentials = envConfig.GOOGLE_APPLICATION_CREDENTIALS
+const googleApplicationScopes = envConfig.GOOGLE_APPLICATION_SCOPES
+const sheetId = envConfig.SHEET_ID
 
 function createSheetsAuth() {
   const credentialSource = googleApplicationCredentials.trim()

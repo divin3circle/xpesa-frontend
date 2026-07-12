@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query"
 
-export type KotaniRatesResponse = any
+export type KotaniRatesResponse = unknown
 
 export function useKotaniRates(
   destinationCurrency?: string,

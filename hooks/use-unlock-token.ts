@@ -39,29 +39,33 @@ export function useUnlockToken(
   walletAddress?: string
 ) {
   const signSession = useWalletSessionSignature()
+  const isTokenOnlyAccess =
+    walletAddress?.startsWith("kotani:") || walletAddress?.startsWith("free:")
 
   const unlock = useMutation({
     mutationFn: async (): Promise<UnlockResult> => {
       if (!tokenId) throw new Error("Token id is required")
       if (!linkType) throw new Error("Link type is required")
 
-      const signed = await signSession.mutateAsync({
-        tokenId,
-        expectedWalletAddress: walletAddress,
-      })
-
       const endpoint =
         linkType === "pack"
           ? `/api/packs/open/${tokenId}`
           : `/api/docs/open/${tokenId}`
 
+      const signed = isTokenOnlyAccess
+        ? null
+        : await signSession.mutateAsync({
+            tokenId,
+            expectedWalletAddress: walletAddress,
+          })
+
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          walletAddress: walletAddress ?? signed.walletAddress,
-          signingWalletAddress: signed.signingWalletAddress,
-          signature: signed.signature,
+          walletAddress: walletAddress ?? signed?.walletAddress,
+          signingWalletAddress: signed?.signingWalletAddress,
+          signature: signed?.signature,
         }),
       })
 
@@ -97,6 +101,7 @@ export function useUnlockToken(
 
   return {
     ...unlock,
-    isAuthorizing: unlock.isPending || signSession.isPending,
+    isAuthorizing:
+      unlock.isPending || (!isTokenOnlyAccess && signSession.isPending),
   }
 }

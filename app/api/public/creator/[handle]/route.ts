@@ -1,5 +1,6 @@
 // app/api/public/creator/[handle]/route.ts
 import { createAdminClient } from "@/lib/supabase/admin"
+import { envConfig } from "@/lib/env"
 import { NextRequest, NextResponse } from "next/server"
 
 export interface CreatorPublicProfile {
@@ -110,6 +111,7 @@ export async function GET(
       )
       .eq("creator_id", creator.id)
       .eq("is_active", true)
+      .eq("moderation_status", "approved")
       .order("created_at", { ascending: false })
 
     if (linksError) {
@@ -118,7 +120,7 @@ export async function GET(
 
     const links = linksData ?? []
 
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseUrl = envConfig.SUPABASE_URL
     if (!supabaseUrl) {
       console.error("[creator-route] NEXT_PUBLIC_SUPABASE_URL not set")
       return NextResponse.json(
