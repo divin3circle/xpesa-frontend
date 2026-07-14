@@ -21,9 +21,11 @@ import { VideoOverlay } from "./unified-file-explorer/video-overlay"
 import { useUnlockToken } from "@/hooks/use-unlock-token"
 import { FanWalletConnectModal } from "@/components/fan-wallet-connect-modal"
 import { useFanWalletContext } from "@/components/fan-wallet-context"
+import { QuestEntryCard } from "@/components/quests/quest-entry-card"
 
 interface UnifiedFileExplorerProps {
   tokenId: string
+  linkId: string
   title: string
   files: FileItem[]
   linkType: "document" | "pack"
@@ -32,6 +34,7 @@ interface UnifiedFileExplorerProps {
 
 export function UnifiedFileExplorer({
   tokenId,
+  linkId,
   title,
   files,
   linkType,
@@ -169,6 +172,13 @@ export function UnifiedFileExplorer({
         }
         isAuthorizing={unlock.isAuthorizing}
         isDownloading={download.isDownloading}
+      />
+
+      <QuestEntryCard
+        linkId={linkId}
+        accessToken={tokenId}
+        walletAddress={effectiveFanAddress ?? fanWalletAddress}
+        isAuthorized={isAuthorized}
       />
 
       <FileList

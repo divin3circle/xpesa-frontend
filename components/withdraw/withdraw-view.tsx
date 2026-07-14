@@ -100,7 +100,7 @@ function ProgressHeader({ currentStep }: { currentStep: number }) {
       {KOTANI_OFFRAMP_STEPS.map((step) => (
         <div
           key={step.step}
-          className={`h-1 w-1/4 rounded-lg ${currentStep >= step.step ? "bg-chart-1" : "bg-foreground/30"}`}
+          className={`h-1 w-1/4 rounded-2xl ${currentStep >= step.step ? "bg-chart-1" : "bg-foreground/30"}`}
         />
       ))}
     </div>

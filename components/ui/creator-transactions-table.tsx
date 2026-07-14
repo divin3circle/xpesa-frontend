@@ -231,7 +231,7 @@ export function CreatorTransactionsTable({
                         <div className="flex justify-center">
                           {isObject && (
                             <span
-                              className={`inline-flex items-center justify-center rounded-lg border px-2.5 py-1 text-xs font-medium capitalize ${status.bg} ${status.border} ${status.text}`}
+                              className={`inline-flex items-center justify-center rounded-2xl border px-2.5 py-1 text-xs font-medium capitalize ${status.bg} ${status.border} ${status.text}`}
                             >
                               {tx.status}
                             </span>

@@ -106,7 +106,7 @@ function SortablePackItem({
       style={style}
       {...attributes}
       {...listeners}
-      className="flex items-center justify-between gap-3 rounded-lg border p-2"
+      className="flex items-center justify-between gap-3 rounded-2xl border p-2"
     >
       <div>
         <p className="text-sm font-medium">{file.originalFilename}</p>

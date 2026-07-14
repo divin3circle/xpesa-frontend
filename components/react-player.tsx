@@ -7,7 +7,7 @@ function ReactVideoPlayer({
   url: string
 }) {
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border/80 bg-card/40">
+    <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border/80 bg-card/40">
       <ReactPlayer
         src={url}
         className="absolute top-0 left-0 h-full w-full"

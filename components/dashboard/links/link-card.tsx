@@ -39,6 +39,12 @@ export function LinkCard({ item }: { item: LinkItem }) {
         <div className="flex flex-wrap gap-2">
           <Button
             size="sm"
+            onClick={() => router.push(`/dashboard/links/${item.id}`)}
+          >
+            Manage
+          </Button>
+          <Button
+            size="sm"
             variant="secondary"
             disabled={!approved}
             onClick={() => router.push(`/pay/${item.id}`)}

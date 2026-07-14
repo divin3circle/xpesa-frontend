@@ -90,6 +90,11 @@ export const navigationConfig: NavGroup[] = [
         iconName: "analytics",
       },
       {
+        title: "Quests",
+        url: "/dashboard/quests",
+        iconName: "quest",
+      },
+      {
         title: "Moderation",
         url: "/dashboard/admin/moderation",
         iconName: "settings",

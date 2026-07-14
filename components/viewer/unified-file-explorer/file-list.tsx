@@ -109,7 +109,7 @@ export function FileList({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="h-8 w-8 rounded-lg opacity-100 group-hover:opacity-100 md:opacity-0"
+                    className="h-8 w-8 rounded-2xl opacity-100 group-hover:opacity-100 md:opacity-0"
                     onClick={(event) => {
                       event.stopPropagation()
                       onDownload?.(file)

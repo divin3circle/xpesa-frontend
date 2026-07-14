@@ -55,7 +55,7 @@ export function FanWalletConnectModal({
         <div className="space-y-4 py-4">
           {fanSmartAccountAddress ? (
             <>
-              <div className="rounded-lg bg-green-50 p-4">
+              <div className="rounded-2xl bg-green-50 p-4">
                 <p className="text-sm font-medium text-green-900">
                   ✓ Connected
                 </p>
@@ -74,7 +74,7 @@ export function FanWalletConnectModal({
             </>
           ) : (
             <>
-              <div className="rounded-lg p-4 text-sm">
+              <div className="rounded-2xl p-4 text-sm">
                 <p className="font-medium">What is a smart account?</p>
                 <ul className="mt-2 space-y-1 text-muted-foreground">
                   <li>• Contract-based wallet for gasless transactions</li>

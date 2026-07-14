@@ -3,13 +3,16 @@ type PaymentNetworkFamily = "hedera" | "avalanche"
 
 const DEFAULT_PAYMENT_CHAIN: SupportedPaymentChain = "A"
 const DEFAULT_HEDERA_TESTNET_RPC_URL = "https://testnet.hashio.io/api"
-const DEFAULT_AVAX_TESTNET_RPC_URL = "https://api.avax-test.network/ext/bc/C/rpc"
+const DEFAULT_AVAX_TESTNET_RPC_URL =
+  "https://api.avax-test.network/ext/bc/C/rpc"
 const DEFAULT_AVAX_MAINNET_RPC_URL = "https://api.avax.network/ext/bc/C/rpc"
 const DEFAULT_HEDERA_TESTNET_USDC = "0x00000000000000000000000000000000006E4dc3"
 const DEFAULT_AVAX_TESTNET_USDC = "0x5425890298aed601595a70AB815c96711a31Bc65"
 const DEFAULT_AVAX_MAINNET_USDC = "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E"
 
-function normalizePaymentChain(chain: string | undefined): SupportedPaymentChain {
+function normalizePaymentChain(
+  chain: string | undefined
+): SupportedPaymentChain {
   const normalized = chain?.trim().toUpperCase()
   if (normalized === "A" || normalized === "H") return normalized
   return DEFAULT_PAYMENT_CHAIN
@@ -65,8 +68,14 @@ export function resolvePaymentRpcUrl(): string {
 
   if (chain === "A") {
     return isDev
-      ? getEnvValue("NEXT_PUBLIC_AVAX_TESTNET_RPC_URL", "AVAX_TESTNET_RPC_URL") || DEFAULT_AVAX_TESTNET_RPC_URL
-      : getEnvValue("NEXT_PUBLIC_AVAX_MAINNET_RPC_URL", "AVAX_MAINNET_RPC_URL") || DEFAULT_AVAX_MAINNET_RPC_URL
+      ? getEnvValue(
+          "NEXT_PUBLIC_AVAX_TESTNET_RPC_URL",
+          "AVAX_TESTNET_RPC_URL"
+        ) || DEFAULT_AVAX_TESTNET_RPC_URL
+      : getEnvValue(
+          "NEXT_PUBLIC_AVAX_MAINNET_RPC_URL",
+          "AVAX_MAINNET_RPC_URL"
+        ) || DEFAULT_AVAX_MAINNET_RPC_URL
   }
 
   return isDev
@@ -83,13 +92,11 @@ export function resolvePaymentUsdcContractAddress(): string {
       ? getEnvValue(
           "NEXT_PUBLIC_AVAX_TESTNET_USDC_CONTRACT_ADDRESS",
           "AVAX_TESTNET_USDC_CONTRACT_ADDRESS"
-        ) ||
-          DEFAULT_AVAX_TESTNET_USDC
+        ) || DEFAULT_AVAX_TESTNET_USDC
       : getEnvValue(
           "NEXT_PUBLIC_AVAX_MAINNET_USDC_CONTRACT_ADDRESS",
           "AVAX_MAINNET_USDC_CONTRACT_ADDRESS"
-        ) ||
-          DEFAULT_AVAX_MAINNET_USDC
+        ) || DEFAULT_AVAX_MAINNET_USDC
   }
 
   return isDev
@@ -110,8 +117,14 @@ export function resolvePaymentChainId(): number {
   if (chain === "A") {
     return Number(
       isDev
-        ? getEnvValue("NEXT_PUBLIC_AVAX_TESTNET_CHAIN_ID", "AVAX_TESTNET_CHAIN_ID") || 43113
-        : getEnvValue("NEXT_PUBLIC_AVAX_MAINNET_CHAIN_ID", "AVAX_MAINNET_CHAIN_ID") || 43114
+        ? getEnvValue(
+            "NEXT_PUBLIC_AVAX_TESTNET_CHAIN_ID",
+            "AVAX_TESTNET_CHAIN_ID"
+          ) || 43113
+        : getEnvValue(
+            "NEXT_PUBLIC_AVAX_MAINNET_CHAIN_ID",
+            "AVAX_MAINNET_CHAIN_ID"
+          ) || 43114
     )
   }
 
@@ -123,9 +136,7 @@ export function resolveExplorerUrl(txHash: string): string {
   const isDev = isDevEnvironment(envConfig.ENV)
 
   if (chain === "A") {
-    return isDev
-      ? `${process.env.AVAX_TESTNET_EXPLORER_URL || "https://testnet.snowtrace.io/tx/"}${txHash}`
-      : `${process.env.AVAX_MAINNET_EXPLORER_URL || "https://snowtrace.io/tx/"}${txHash}`
+    return `${process.env.AVAX_MAINNET_EXPLORER_URL || "https://snowtrace.io/tx/"}${txHash}`
   }
 
   const baseUrl = isDev
@@ -161,12 +172,16 @@ export function getKotaniWebhookUrl(): string {
 export const envConfig = {
   THIRDWEB_CLIENT_ID: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID || "",
   SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "",
+  SUPABASE_PUBLISHABLE_KEY:
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "",
   APP_URL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-  AVATARS_URL: process.env.NEXT_PUBLIC_SUPABASE_URL + "/storage/v1/object/public/",
+  AVATARS_URL:
+    process.env.NEXT_PUBLIC_SUPABASE_URL + "/storage/v1/object/public/",
   CF_ACCOUNT_ID: process.env.CF_ACCOUNT_ID || "",
-  AVAX_TESTNET_RPC_URL: process.env.AVAX_TESTNET_RPC_URL || DEFAULT_AVAX_TESTNET_RPC_URL,
-  AVAX_MAINNET_RPC_URL: process.env.AVAX_MAINNET_RPC_URL || DEFAULT_AVAX_MAINNET_RPC_URL,
+  AVAX_TESTNET_RPC_URL:
+    process.env.AVAX_TESTNET_RPC_URL || DEFAULT_AVAX_TESTNET_RPC_URL,
+  AVAX_MAINNET_RPC_URL:
+    process.env.AVAX_MAINNET_RPC_URL || DEFAULT_AVAX_MAINNET_RPC_URL,
   R2_ACCESS_KEY_ID: process.env.R2_ACCESS_KEY_ID || "",
   R2_SECRET_ACCESS_KEY: process.env.R2_SECRET_ACCESS_KEY || "",
   R2_TOKEN_VALUE: process.env.R2_TOKEN_VALUE || "",
@@ -177,32 +192,49 @@ export const envConfig = {
   IS_PROD: isProductionEnvironment(getRuntimeEnv()),
   FEE: process.env.FEE || "5",
   PREVIEW_RATE_LIMIT: Number(process.env.PREVIEW_RATE_LIMIT || 2),
-  PREVIEW_RATE_LIMIT_WINDOW_SECONDS: Number(process.env.PREVIEW_RATE_LIMIT_WINDOW_SECONDS || 60),
+  PREVIEW_RATE_LIMIT_WINDOW_SECONDS: Number(
+    process.env.PREVIEW_RATE_LIMIT_WINDOW_SECONDS || 60
+  ),
   DOWNLOAD_RATE_LIMIT: Number(process.env.DOWNLOAD_RATE_LIMIT || 1),
-  DOWNLOAD_RATE_LIMIT_WINDOW_SECONDS: Number(process.env.DOWNLOAD_RATE_LIMIT_WINDOW_SECONDS || 60),
-  SENSITIVE_ROUTE_RATE_LIMIT: Number(process.env.SENSITIVE_ROUTE_RATE_LIMIT || 10),
+  DOWNLOAD_RATE_LIMIT_WINDOW_SECONDS: Number(
+    process.env.DOWNLOAD_RATE_LIMIT_WINDOW_SECONDS || 60
+  ),
+  SENSITIVE_ROUTE_RATE_LIMIT: Number(
+    process.env.SENSITIVE_ROUTE_RATE_LIMIT || 10
+  ),
   SENSITIVE_ROUTE_RATE_LIMIT_WINDOW_SECONDS: Number(
     process.env.SENSITIVE_ROUTE_RATE_LIMIT_WINDOW_SECONDS || 60
   ),
   UPLOAD_RATE_LIMIT: Number(process.env.UPLOAD_RATE_LIMIT || 20),
-  UPLOAD_RATE_LIMIT_WINDOW_SECONDS: Number(process.env.UPLOAD_RATE_LIMIT_WINDOW_SECONDS || 60),
-  MAX_CREATOR_STORAGE_BYTES: Number(process.env.MAX_CREATOR_STORAGE_BYTES || 1024 * 1024 * 1024),
-  PREVIEW_SESSION_MAX_AGE_SECONDS: Number(process.env.PREVIEW_SESSION_MAX_AGE_SECONDS || 60 * 60),
+  UPLOAD_RATE_LIMIT_WINDOW_SECONDS: Number(
+    process.env.UPLOAD_RATE_LIMIT_WINDOW_SECONDS || 60
+  ),
+  MAX_CREATOR_STORAGE_BYTES: Number(
+    process.env.MAX_CREATOR_STORAGE_BYTES || 1024 * 1024 * 1024
+  ),
+  PREVIEW_SESSION_MAX_AGE_SECONDS: Number(
+    process.env.PREVIEW_SESSION_MAX_AGE_SECONDS || 60 * 60
+  ),
   CHAIN: getActivePaymentChain(),
   PAYMENT_NETWORK: resolvePaymentNetworkFamily(),
   PAYMENT_NETWORK_LABEL: getPaymentNetworkLabel(),
   RPC_URL: resolvePaymentRpcUrl(),
   USDC_CONTRACT_ADDRESS: resolvePaymentUsdcContractAddress(),
   CHAIN_ID: resolvePaymentChainId(),
-  GOOGLE_APPLICATION_CREDENTIALS: process.env.GOOGLE_APPLICATION_CREDENTIALS ||
-    process.env.GOOGLE_APPLICATION_CREDETIALS || "",
+  GOOGLE_APPLICATION_CREDENTIALS:
+    process.env.GOOGLE_APPLICATION_CREDENTIALS ||
+    process.env.GOOGLE_APPLICATION_CREDETIALS ||
+    "",
   SHEET_ID: process.env.SHEET_ID || "",
   GOOGLE_APPLICATION_SCOPES: ["https://www.googleapis.com/auth/spreadsheets"],
   SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY || "",
-  PLATFORM_WALLET_ADDRESS: process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || "",
-  LINK_ENCRYPTION_KEY: process.env.LINK_ENCRYPTION_KEY || process.env.ENCRYPTION_KEY || "",
+  PLATFORM_WALLET_ADDRESS:
+    process.env.NEXT_PUBLIC_PLATFORM_WALLET_ADDRESS || "",
+  LINK_ENCRYPTION_KEY:
+    process.env.LINK_ENCRYPTION_KEY || process.env.ENCRYPTION_KEY || "",
   OPENAI_API_KEY: process.env.OPENAI_API_KEY || "",
-  OPENAI_MODERATION_MODEL: process.env.OPENAI_MODERATION_MODEL || "omni-moderation-latest",
+  OPENAI_MODERATION_MODEL:
+    process.env.OPENAI_MODERATION_MODEL || "omni-moderation-latest",
   ADMIN_EMAILS: process.env.ADMIN_EMAILS || "",
   KOTANI_SECRET: process.env.KOTANI_SECRET || "",
   KOTANI_KEY: process.env.KOTANI_KEY || "",
@@ -215,10 +247,23 @@ export const envConfig = {
   KOTANI_WEBHOOK_SECRET: process.env.KOTANI_WEBHOOK_SECRET || "",
   PLATFORM_WALLET_PRIVATE_KEY: process.env.PLATFORM_WALLET_PRIVATE_KEY || "",
   XPESA_RECEIPT_NFT_ADDRESS: process.env.XPESA_RECEIPT_NFT_ADDRESS || "",
-  XPESA_RECEIPT_MINTER_PRIVATE_KEY: process.env.XPESA_RECEIPT_MINTER_PRIVATE_KEY || "",
+  XPESA_RECEIPT_MINTER_PRIVATE_KEY:
+    process.env.XPESA_RECEIPT_MINTER_PRIVATE_KEY || "",
   XPESA_RECEIPT_CHAIN_ID: Number(
     process.env.XPESA_RECEIPT_CHAIN_ID || resolvePaymentChainId()
   ),
-  XPESA_RECEIPT_PAYMENT_TOKEN: process.env.XPESA_RECEIPT_PAYMENT_TOKEN || resolvePaymentUsdcContractAddress(),
+  XPESA_RECEIPT_PAYMENT_TOKEN:
+    process.env.XPESA_RECEIPT_PAYMENT_TOKEN ||
+    resolvePaymentUsdcContractAddress(),
+  XPESA_QUEST_NFT_ADDRESS: process.env.XPESA_QUEST_NFT_ADDRESS || "",
+  XPESA_QUEST_NFT_MINTER_PRIVATE_KEY:
+    process.env.XPESA_QUEST_NFT_MINTER_PRIVATE_KEY ||
+    process.env.XPESA_RECEIPT_MINTER_PRIVATE_KEY ||
+    "",
+  XPESA_QUEST_NFT_CHAIN_ID: Number(
+    process.env.XPESA_QUEST_NFT_CHAIN_ID ||
+      process.env.XPESA_RECEIPT_CHAIN_ID ||
+      resolvePaymentChainId()
+  ),
   R2_PUBLIC_BASE_URL: process.env.R2_PUBLIC_BASE_URL || "",
 }

@@ -47,7 +47,7 @@ export function MobileMenu({ navItems }: MobileMenuProps) {
               <Link
                 key={item.label}
                 href={item.href}
-                className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
+                className="block rounded-2xl px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
               >
                 {item.label}
               </Link>

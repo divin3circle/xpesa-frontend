@@ -4,10 +4,11 @@ import { PayLinkTransactions } from "@/components/pay/pay-link-transactions"
 import PayPreview from "@/components/pay/pay-preview"
 import { PaymentAccessDetails } from "@/components/pay/payment-access-details"
 import { PayPurchaseCard } from "@/components/pay/pay-purchase-card"
+import { QuestTeaserCard } from "@/components/quests/quest-teaser-card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
-import { useRouter } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 
 export default function PayPage() {
   const router = useRouter()
@@ -40,8 +41,14 @@ export default function PayPage() {
         </div>
         <PayPurchaseCard />
       </section>
+      <QuestTeaserFromRoute />
       <PayPreview />
       <PayLinkTransactions />
     </div>
   )
+}
+
+function QuestTeaserFromRoute() {
+  const params = useParams<{ linkId: string }>()
+  return <QuestTeaserCard linkId={params.linkId} />
 }

@@ -1,0 +1,14 @@
+{
+  "address": "0x74F1Baf16739EBA08ce7C8AD19529247FB4D6EDe",
+  "admin": "0x7dAf1811c745e39a81A25b1995a4B876A7FfEE5d",
+  "blockNumber": 90300819,
+  "chainId": 43114,
+  "compilerVersion": "0.8.24",
+  "contract": "XpesaQuestCompletionBadgeNFT",
+  "deployedAt": 1784044457,
+  "deployer": "0x7dAf1811c745e39a81A25b1995a4B876A7FfEE5d",
+  "minter": "0x7dAf1811c745e39a81A25b1995a4B876A7FfEE5d",
+  "network": "avalanche-c-chain",
+  "openzeppelinVersion": "v5.4.0",
+  "transactionHash": "0x7bfa30a65e5a5bbd358ecad855f15c44ac5b0bb1386b3361df3c8fe85d2d75a2"
+}

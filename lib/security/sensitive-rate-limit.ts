@@ -14,6 +14,13 @@ export type SensitiveRateLimitScope =
   | "pack_file"
   | "upload_sign"
   | "upload_finalize"
+  | "quest_ai"
+  | "quest_enter"
+  | "quest_attempt"
+  | "quest_score"
+  | "quest_submit"
+  | "quest_nft_claim"
+  | "quest_review_ai"
 
 type SensitiveRateLimitOptions = {
   request: Request

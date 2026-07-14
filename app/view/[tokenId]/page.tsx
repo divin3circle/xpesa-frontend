@@ -74,6 +74,7 @@ export default function ViewTokenPage() {
       </div>
       <UnifiedFileExplorer
         tokenId={tokenId!}
+        linkId={data.link.id}
         title={data.link.title}
         files={data.files}
         linkType={data.link.type}
