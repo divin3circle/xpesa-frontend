@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import type { LeaderboardEntry, QuestTeaser } from "@/lib/quests/types"
+import type { CreatorLeaderboardResponse } from "@/app/api/public/creator/[handle]/leaderboard/route"
 
 export type CreatorQuestDetail = {
   id: string
@@ -139,5 +140,16 @@ export function useQuestLeaderboard(id?: string) {
         leaderboard: LeaderboardEntry[]
       }>(`/api/public/quests/${id}/leaderboard`),
     enabled: Boolean(id),
+  })
+}
+
+export function useCreatorLeaderboard(handle?: string | null) {
+  return useQuery({
+    queryKey: ["creator-leaderboard", handle],
+    queryFn: () =>
+      jsonFetch<CreatorLeaderboardResponse>(
+        `/api/public/creator/${handle}/leaderboard`
+      ),
+    enabled: Boolean(handle),
   })
 }

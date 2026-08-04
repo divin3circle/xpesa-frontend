@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import { CreateQuestDialog } from "@/components/quests/create-quest-dialog"
@@ -28,7 +29,12 @@ export default function QuestsPage() {
             Turn unlocked content into competitive challenges and leaderboards.
           </p>
         </div>
-        <Button onClick={() => setOpen(true)}>Create Quest</Button>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline">
+            <Link href="/dashboard/quests/leaderboard">Global Leaderboard</Link>
+          </Button>
+          <Button onClick={() => setOpen(true)}>Create Quest</Button>
+        </div>
       </section>
 
       <QuestStatsRow quests={quests} />

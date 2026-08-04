@@ -1,7 +1,9 @@
 import Image from "next/image"
+import Link from "next/link"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import type { CreatorPublicProfile } from "@/app/api/public/creator/[handle]/route"
 import { getUserAvatarURL } from "@/lib/utils"
@@ -69,6 +71,12 @@ export function CreatorHeroCard({ creator }: CreatorHeroCardProps) {
               <Badge variant="outline">Active Creator</Badge>
               <Badge variant="outline">Wallet Ready</Badge>
             </div>
+
+            <Button asChild variant="outline" size="sm" className="w-fit">
+              <Link href={`/creator/${creator.handle}/leaderboard`}>
+                View Leaderboard
+              </Link>
+            </Button>
           </div>
         </div>
       </div>
