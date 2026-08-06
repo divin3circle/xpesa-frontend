@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import { redirect } from "next/navigation"
 
 import { AppSidebar } from "@/components/app-sidebar"
+import { NotificationBell } from "@/components/notifications/notification-bell"
 import { Separator } from "@/components/ui/separator"
 import {
   SidebarInset,
@@ -41,6 +42,9 @@ export default async function DashboardLayout({
             <p className="text-xs text-muted-foreground">
               Build, track, and withdraw from one place
             </p>
+          </div>
+          <div className="ml-auto">
+            <NotificationBell />
           </div>
         </header>
         <main className="flex-1 p-4 md:p-6">{children}</main>

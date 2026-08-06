@@ -66,6 +66,7 @@ export function QuestAttemptReviewSheet({
           {attempt && questions.map((question) => (
             <QuestAnswerReviewCard
               key={question.id}
+              questId={questId}
               question={question}
               answer={answerFor(attempt, question.id)}
               review={reviewFor(attempt, question.id)}

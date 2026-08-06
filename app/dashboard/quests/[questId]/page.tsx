@@ -6,7 +6,9 @@ import { Download } from "lucide-react"
 import { useParams } from "next/navigation"
 
 import { QuestAttemptReviewSheet } from "@/components/quests/quest-attempt-review-sheet"
+import { QuestIntegrationsCard } from "@/components/quests/quest-integrations-card"
 import { QuestReviewStats } from "@/components/quests/quest-review-stats"
+import { QuestShareCard } from "@/components/quests/quest-share-card"
 import { QuestSubmissionsTable } from "@/components/quests/quest-submissions-table"
 import { Button } from "@/components/ui/button"
 import LoadingSpinner from "@/components/ui/loading-spinner"
@@ -65,6 +67,19 @@ export default function QuestReviewPage() {
       </section>
 
       <QuestReviewStats attempts={data.attempts} />
+
+      <section className="grid gap-4 lg:grid-cols-2">
+        {data.quest.link_id ? (
+          <QuestShareCard
+            questId={questId}
+            linkId={data.quest.link_id}
+            title={data.quest.title}
+            thumbnailUrl={data.quest.link?.thumbnail_url}
+          />
+        ) : null}
+        <QuestIntegrationsCard questId={questId} />
+      </section>
+
       <QuestSubmissionsTable attempts={data.attempts} onSelect={setSelected} />
       <QuestAttemptReviewSheet
         questId={questId}

@@ -175,6 +175,10 @@ export const envConfig = {
   SUPABASE_PUBLISHABLE_KEY:
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "",
   APP_URL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  RESEND_API_KEY: process.env.RESEND_API_KEY || "",
+  EMAIL_FROM: process.env.EMAIL_FROM || "Xpesa <onboarding@resend.dev>",
+  // Base URL used for links inside emails — always the public domain, even in dev.
+  EMAIL_APP_URL: process.env.EMAIL_APP_URL || "https://xpesacreators.xyz",
   AVATARS_URL:
     process.env.NEXT_PUBLIC_SUPABASE_URL + "/storage/v1/object/public/",
   CF_ACCOUNT_ID: process.env.CF_ACCOUNT_ID || "",

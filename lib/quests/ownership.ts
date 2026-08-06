@@ -13,7 +13,7 @@ export async function requireOwnedQuest(questId: string) {
   const creatorId = await getCreatorIdForUser(supabase, data.user.id)
   const { data: quest, error } = await supabase
     .from("quests")
-    .select("*, link:links(id,title,type,description)")
+    .select("*, link:links(id,title,type,description,thumbnail_url)")
     .eq("id", questId)
     .eq("creator_id", creatorId)
     .single()

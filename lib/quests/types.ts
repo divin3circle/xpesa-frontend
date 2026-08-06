@@ -1,5 +1,9 @@
 export type QuestStatus = "draft" | "active" | "ended"
-export type QuestionType = "multiple_choice" | "true_false" | "open_ended"
+export type QuestionType =
+  | "multiple_choice"
+  | "true_false"
+  | "open_ended"
+  | "file"
 export type AttemptStatus = "started" | "scored" | "submitted"
 export type RewardMode = "none" | "top_1" | "top_3"
 

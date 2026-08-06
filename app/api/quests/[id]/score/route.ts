@@ -13,7 +13,7 @@ const scoreSchema = z.object({
   answers: z.array(
     z.object({
       questionId: z.string().uuid(),
-      answer: z.string().trim().min(1).max(1800),
+      answer: z.string().trim().min(1).max(4000),
     })
   ),
 })

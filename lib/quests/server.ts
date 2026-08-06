@@ -70,7 +70,7 @@ export function scoreQuestAnswers(
 
   const explanations = questions.map((question) => {
     const provided = byQuestion.get(question.id)
-    if (question.type === "open_ended") {
+    if (question.type === "open_ended" || question.type === "file") {
       const complete = Boolean(provided?.trim())
       if (complete) {
         correctCount += 1

@@ -9,6 +9,7 @@ import { QuestQuestionList } from "@/components/quests/quest-question-list"
 import {
   blankQuestion,
   blankOpenQuestion,
+  blankFileQuestion,
   type DraftQuestion,
   initialQuestions,
   prepareQuestionsForSave,
@@ -62,6 +63,7 @@ export function QuestBuilderForm({
         generating={generate.isPending}
         onAddQuestion={() => setQuestions((q) => [...q, blankQuestion()])}
         onAddOpenQuestion={() => setQuestions((q) => [...q, blankOpenQuestion()])}
+        onAddFileQuestion={() => setQuestions((q) => [...q, blankFileQuestion()])}
         onGenerate={generateDraft}
       />
 

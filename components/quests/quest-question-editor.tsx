@@ -26,7 +26,8 @@ export function QuestQuestionEditor({
     options[optionIndex] = value
     onChange({ options })
   }
-  const isOpenEnded = question.type === "open_ended"
+  const isFile = question.type === "file"
+  const isOpenEnded = question.type === "open_ended" || isFile
 
   return (
     <section className="space-y-3 rounded-2xl border bg-background p-4">
@@ -56,6 +57,12 @@ export function QuestQuestionEditor({
           placeholder="Points"
         />
       </div>
+      {isFile && (
+        <p className="rounded-2xl bg-muted/40 p-3 text-xs text-muted-foreground">
+          Respondents upload up to 3 files (10MB each) — images or documents. You
+          review each submission and approve or reject it.
+        </p>
+      )}
       {!isOpenEnded && (
         <>
           {question.options.map((option, optionIndex) => (
