@@ -5,7 +5,7 @@ import type { CreatorQuestDetail } from "@/hooks/use-quests"
 
 export type QuestReviewQuestion = {
   id: string
-  type: "multiple_choice" | "true_false" | "open_ended"
+  type: "multiple_choice" | "true_false" | "open_ended" | "file"
   prompt: string
   options: string[]
   correct_answer: string

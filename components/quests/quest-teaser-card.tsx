@@ -5,11 +5,14 @@ import { Trophy, UsersRound } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { useQuestTeaser } from "@/hooks/use-quests"
+import { useQuestVisit } from "@/hooks/use-quest-visit"
 
 export function QuestTeaserCard({ linkId }: { linkId: string }) {
   const { data, isLoading } = useQuestTeaser(linkId)
   const quest = data?.quest
   const leader = quest?.leaderboard[0]
+
+  useQuestVisit(quest?.id, linkId)
 
   if (isLoading) return <div className="h-32 rounded-2xl border bg-muted/30" />
   if (!quest) return null

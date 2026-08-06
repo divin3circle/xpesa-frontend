@@ -4,6 +4,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import type { LeaderboardEntry, QuestTeaser } from "@/lib/quests/types"
 import type { CreatorLeaderboardResponse } from "@/app/api/public/creator/[handle]/leaderboard/route"
+import type { QuestAnalyticsResponse } from "@/app/api/quests/[id]/analytics/route"
+import type { QuestsOverviewResponse } from "@/app/api/quests/analytics/overview/route"
 
 export type CreatorQuestDetail = {
   id: string
@@ -30,7 +32,7 @@ export type CreatorQuestDetail = {
   } | null
   quest_questions?: {
     id?: string
-    type: "multiple_choice" | "true_false" | "open_ended"
+    type: "multiple_choice" | "true_false" | "open_ended" | "file"
     prompt: string
     options: string[]
     correct_answer: string
@@ -48,7 +50,7 @@ export type QuestUpdateInput = {
   maxAttempts?: number
   leaderboardVisible?: boolean
   questions?: {
-    type: "multiple_choice" | "true_false" | "open_ended"
+    type: "multiple_choice" | "true_false" | "open_ended" | "file"
     prompt: string
     options: string[]
     correctAnswer: string
@@ -151,5 +153,35 @@ export function useCreatorLeaderboard(handle?: string | null) {
         `/api/public/creator/${handle}/leaderboard`
       ),
     enabled: Boolean(handle),
+  })
+}
+
+export function useQuestsAnalyticsOverview(
+  period = "all",
+  ownerId?: string | null
+) {
+  const suffix = ownerId ? `&ownerId=${ownerId}` : ""
+  return useQuery({
+    queryKey: ["quests-analytics-overview", period, ownerId ?? "self"],
+    queryFn: () =>
+      jsonFetch<QuestsOverviewResponse>(
+        `/api/quests/analytics/overview?period=${period}${suffix}`
+      ),
+  })
+}
+
+export function useQuestAnalytics(
+  questId?: string | null,
+  period = "all",
+  ownerId?: string | null
+) {
+  const suffix = ownerId ? `&ownerId=${ownerId}` : ""
+  return useQuery({
+    queryKey: ["quest-analytics", questId, period, ownerId ?? "self"],
+    queryFn: () =>
+      jsonFetch<QuestAnalyticsResponse>(
+        `/api/quests/${questId}/analytics?period=${period}${suffix}`
+      ),
+    enabled: Boolean(questId),
   })
 }

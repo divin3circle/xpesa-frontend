@@ -24,12 +24,17 @@ export function QuestQuestionTypeSelect({
         onChange({
           type: nextType,
           options:
-            nextType === "open_ended"
+            nextType === "open_ended" || nextType === "file"
               ? []
               : nextType === "true_false"
                 ? ["True", "False"]
                 : ["", "", "", ""],
-          correctAnswer: nextType === "open_ended" ? "__open_ended__" : "",
+          correctAnswer:
+            nextType === "open_ended"
+              ? "__open_ended__"
+              : nextType === "file"
+                ? "__file__"
+                : "",
         })
       }}
     >
@@ -40,6 +45,7 @@ export function QuestQuestionTypeSelect({
         <SelectItem value="multiple_choice">Multiple choice</SelectItem>
         <SelectItem value="true_false">True or false</SelectItem>
         <SelectItem value="open_ended">Open-ended</SelectItem>
+        <SelectItem value="file">File upload</SelectItem>
       </SelectContent>
     </Select>
   )

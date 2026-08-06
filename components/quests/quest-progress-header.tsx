@@ -1,30 +1,36 @@
 "use client"
 
+import { cn } from "@/lib/utils"
+
 export function QuestProgressHeader({
   title,
-  completed,
+  current,
   total,
 }: {
   title: string
-  completed: number
+  current: number
   total: number
 }) {
-  const percent = Math.round((completed / total) * 100)
-
   return (
-    <div className="border-b bg-foreground p-6 text-background">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs uppercase tracking-[0.2em] text-background/70">Live quest</p>
-        <span className="rounded-full bg-background/10 px-3 py-1 text-xs font-medium">
-          {percent}% complete
-        </span>
+    <div className="space-y-3">
+      <div className="flex items-center justify-between gap-3">
+        <p className="truncate text-xs tracking-[0.18em] text-muted-foreground uppercase">
+          {title}
+        </p>
+        <p className="shrink-0 text-xs font-medium text-muted-foreground">
+          Question {Math.min(current + 1, total)} of {total}
+        </p>
       </div>
-      <h1 className="mt-2 font-heading text-3xl font-semibold">{title}</h1>
-      <div className="mt-5 h-3 rounded-full bg-background/15">
-        <div
-          className="h-full rounded-full bg-background transition-all"
-          style={{ width: `${percent}%` }}
-        />
+      <div className="flex gap-1.5">
+        {Array.from({ length: total }).map((_, i) => (
+          <div
+            key={i}
+            className={cn(
+              "h-1.5 flex-1 rounded-full transition-colors",
+              i <= current ? "bg-foreground" : "bg-muted"
+            )}
+          />
+        ))}
       </div>
     </div>
   )

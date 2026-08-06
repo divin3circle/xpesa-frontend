@@ -18,14 +18,14 @@ const updateQuestSchema = z.object({
     .array(
       z.object({
         id: z.string().uuid().optional(),
-        type: z.enum(["multiple_choice", "true_false", "open_ended"]),
+        type: z.enum(["multiple_choice", "true_false", "open_ended", "file"]),
         prompt: z.string().trim().min(1).max(500),
         options: z.array(z.string().trim().min(1).max(160)).max(4),
         correctAnswer: z.string().trim().max(160),
         explanation: z.string().trim().max(500).optional(),
         points: z.coerce.number().int().min(1).max(10).default(1),
       }).superRefine((question, ctx) => {
-        if (question.type === "open_ended") return
+        if (question.type === "open_ended" || question.type === "file") return
         if (question.options.length < 2) {
           ctx.addIssue({
             code: "custom",
@@ -101,9 +101,16 @@ export async function PATCH(
         quest_id: quest.id,
         type: question.type,
         prompt: question.prompt,
-        options: question.type === "open_ended" ? [] : question.options,
+        options:
+          question.type === "open_ended" || question.type === "file"
+            ? []
+            : question.options,
         correct_answer:
-          question.type === "open_ended" ? "__open_ended__" : question.correctAnswer,
+          question.type === "open_ended"
+            ? "__open_ended__"
+            : question.type === "file"
+              ? "__file__"
+              : question.correctAnswer,
         explanation: question.explanation ?? null,
         points: question.points,
         sort_order: index + 1,
@@ -116,6 +123,7 @@ export async function PATCH(
 
     return NextResponse.json({ quest: data })
   } catch (error) {
+    console.error("PATCH /api/quests/[id] failed:", error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to update quest" },
       { status: 400 }

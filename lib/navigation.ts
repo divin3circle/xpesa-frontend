@@ -67,6 +67,11 @@ export const navigationConfig: NavGroup[] = [
         url: "/dashboard/profile",
         iconName: "profile",
       },
+      {
+        title: "Team",
+        url: "/dashboard/team",
+        iconName: "team",
+      },
     ],
   },
   {

@@ -53,10 +53,10 @@ export function recalculateReviewedScore({
   const explanations = questions.map((question) => {
     const answer = answerMap.get(question.id)
     const review = reviewMap.get(question.id)
-    const correct =
-      question.type === "open_ended"
-        ? Boolean(answer?.trim()) && review?.status !== "rejected"
-        : answer === question.correct_answer
+    const reviewable = question.type === "open_ended" || question.type === "file"
+    const correct = reviewable
+      ? Boolean(answer?.trim()) && review?.status !== "rejected"
+      : answer === question.correct_answer
 
     if (correct) {
       correctCount += 1
@@ -66,7 +66,7 @@ export function recalculateReviewedScore({
     return {
       questionId: question.id,
       correct,
-      correctAnswer: question.type === "open_ended" ? "" : question.correct_answer,
+      correctAnswer: reviewable ? "" : question.correct_answer,
       explanation: question.explanation,
       review,
     }

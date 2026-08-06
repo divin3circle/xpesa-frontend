@@ -34,6 +34,7 @@ import {
 import { navigationConfig, type NavItem } from "@/lib/navigation"
 import { useActiveLink } from "@/hooks/use-active-link"
 import { useAdminAccess } from "@/hooks/use-admin-access"
+import { useMyTeams } from "@/hooks/use-teams"
 
 const versions = ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"]
 
@@ -53,6 +54,7 @@ function resolveIcon(iconName?: string): React.ReactNode {
     dashboard: DashboardSquare02Icon,
     user: User02Icon,
     profile: AccountSetting01Icon,
+    team: User02Icon,
     link: Link01Icon,
     "link-create": Link02Icon,
     analytics: Analytics01Icon,
@@ -96,9 +98,40 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarGroupContent>
           </SidebarGroup>
         ))}
+        <TeamsNavGroup />
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
+  )
+}
+
+/**
+ * TeamsNavGroup - Dynamic sidebar group listing teams the creator has joined
+ * (teams owned by others). Their own team lives under Analytics → Team.
+ */
+function TeamsNavGroup() {
+  const { data } = useMyTeams()
+  const memberships = data?.memberships ?? []
+  if (memberships.length === 0) return null
+
+  return (
+    <SidebarGroup>
+      <SidebarGroupLabel>Teams</SidebarGroupLabel>
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {memberships.map((m) => (
+            <NavItemComponent
+              key={m.team_id}
+              item={{
+                title: m.owner.display_name,
+                url: `/dashboard/teams/${m.team_id}`,
+                iconName: "team",
+              }}
+            />
+          ))}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
   )
 }
 

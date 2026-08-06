@@ -20,6 +20,15 @@ export const blankOpenQuestion = (): DraftQuestion => ({
   points: 1,
 })
 
+export const blankFileQuestion = (): DraftQuestion => ({
+  type: "file",
+  prompt: "",
+  options: [],
+  correctAnswer: "__file__",
+  explanation: "",
+  points: 1,
+})
+
 export function initialQuestions(
   questions?: CreatorQuestDetail["quest_questions"]
 ): DraftQuestion[] {
@@ -35,7 +44,7 @@ export function initialQuestions(
 }
 
 export function isBlankQuestion(question: DraftQuestion) {
-  if (question.type === "open_ended") {
+  if (question.type === "open_ended" || question.type === "file") {
     return !question.prompt.trim() && !question.explanation.trim()
   }
 
@@ -47,7 +56,7 @@ export function isBlankQuestion(question: DraftQuestion) {
 }
 
 export function isCompleteQuestion(question: DraftQuestion) {
-  if (question.type === "open_ended") {
+  if (question.type === "open_ended" || question.type === "file") {
     return question.prompt.trim().length > 0
   }
 

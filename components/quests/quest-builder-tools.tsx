@@ -6,6 +6,7 @@ type Props = {
   generating: boolean
   onAddQuestion: () => void
   onAddOpenQuestion: () => void
+  onAddFileQuestion: () => void
   onGenerate: () => void
 }
 
@@ -13,6 +14,7 @@ export function QuestBuilderTools({
   generating,
   onAddQuestion,
   onAddOpenQuestion,
+  onAddFileQuestion,
   onGenerate,
 }: Props) {
   return (
@@ -22,6 +24,9 @@ export function QuestBuilderTools({
       </Button>
       <Button type="button" variant="outline" onClick={onAddOpenQuestion}>
         Add open-ended
+      </Button>
+      <Button type="button" variant="outline" onClick={onAddFileQuestion}>
+        Add file upload
       </Button>
       <Button type="button" variant="outline" onClick={onGenerate} disabled={generating}>
         Generate with AI

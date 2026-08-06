@@ -19,6 +19,8 @@ export type SensitiveRateLimitScope =
   | "quest_attempt"
   | "quest_score"
   | "quest_submit"
+  | "quest_progress"
+  | "quest_answer_upload"
   | "quest_nft_claim"
   | "quest_review_ai"
 
