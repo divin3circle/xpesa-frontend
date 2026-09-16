@@ -55,7 +55,7 @@ export function PaidCheckoutActions({
         selectedMethod={selectedMethod}
         onSelectMethod={onSelectMethod}
       />
-      {selectedMethod === "mobile" ? (
+      {selectedMethod === "mobile" && envConfig.KOTANI_ENABLED ? (
         <FiatPayButton link={link} amount={amount} method="mobile_money" />
       ) : selectedMethod === "multichain" ? (
         <MultichainPayButton

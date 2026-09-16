@@ -195,6 +195,9 @@ export const envConfig = {
   IS_DEV: isDevEnvironment(getRuntimeEnv()),
   IS_PROD: isProductionEnvironment(getRuntimeEnv()),
   FEE: process.env.FEE || "12",
+  // Gates the Kotani-backed fiat features (M-Pesa pay + creator offramp). Off by default
+  // until Kotani grants the off-ramp corridor; flip to "true" to enable.
+  KOTANI_ENABLED: process.env.NEXT_PUBLIC_KOTANI_ENABLED === "true",
   PREVIEW_RATE_LIMIT: Number(process.env.PREVIEW_RATE_LIMIT || 2),
   PREVIEW_RATE_LIMIT_WINDOW_SECONDS: Number(
     process.env.PREVIEW_RATE_LIMIT_WINDOW_SECONDS || 60

@@ -8,6 +8,8 @@ import React from "react"
 import ExportAction, { ExportActionFooter } from "@/components/withdraw/export-action"
 import EarnAction, { EarnActionFooter } from "@/components/withdraw/earn-action"
 import WithdrawAction from "@/components/withdraw/withdraw-view"
+import { WithdrawComingSoon } from "@/components/withdraw/withdraw-coming-soon"
+import { envConfig } from "@/lib/env"
 
 const quickActions: IQuickAction[] = [
   {
@@ -25,7 +27,7 @@ const quickActions: IQuickAction[] = [
     description:
       "Get your USDC where you want, when your want via our off-ramp services.",
     onClick: () => {},
-    content: <WithdrawAction />,
+    content: envConfig.KOTANI_ENABLED ? <WithdrawAction /> : <WithdrawComingSoon />,
     footer: <></>,
   },
   {
