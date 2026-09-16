@@ -25,7 +25,7 @@ export type FooterLinkGroup = {
 }
 
 export const footerSocialLinks = [
-  { title: "Twitter/X", href: "#", icon: IconBrandTwitter },
+  { title: "Twitter/X", href: "https://x.com/XpesaCreators", icon: IconBrandTwitter },
   { title: "LinkedIn", href: "#", icon: IconBrandLinkedin },
   { title: "YouTube", href: "#", icon: IconBrandYoutube },
 ]

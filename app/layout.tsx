@@ -29,7 +29,7 @@ const fontMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "X-Pesa",
-  description: "A creator tools platform",
+  description: "Sell what you know and get paid to M-Pesa — the creator platform for Africa.",
 }
 
 export default function RootLayout({

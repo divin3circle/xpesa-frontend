@@ -1,6 +1,12 @@
 "use client"
 
-import { CheckCircle2, Lock, HeartHandshake } from "lucide-react"
+import {
+  CheckCircle2,
+  Lock,
+  HeartHandshake,
+  FileText,
+  Package,
+} from "lucide-react"
 import { motion } from "motion/react"
 
 import { AsteriskRevealHeading } from "@/components/ui/asterisk-reveal-heading"
@@ -8,6 +14,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { modesContent } from "@/lib/landing/modes-content"
 import React from "react"
+
+const MODE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
+  document: FileText,
+  pack: Package,
+  gate: Lock,
+  tip: HeartHandshake,
+}
 
 function FanMockup({
   heading,
@@ -78,8 +91,6 @@ function FanMockup({
 }
 
 export function ModesSection() {
-  const [gateMode, tipMode] = modesContent
-
   return (
     <section id="modes" className="py-24">
       <div className="mx-auto w-full max-w-6xl px-6 lg:px-10">
@@ -91,17 +102,17 @@ export function ModesSection() {
           className="mb-10 flex flex-col items-start gap-4 md:max-w-2xl"
         >
           <Badge variant="outline" className="font-sans text-foreground/90">
-            Two modes
+            Four ways to sell
           </Badge>
           <AsteriskRevealHeading
             as="h2"
             delayMs={800}
-            text="Gate a link or accept tips"
+            text="Sell a document, pack, gated link, or tip"
             className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-5xl"
           />
           <p className="font-sans text-base leading-relaxed text-foreground/75 md:text-lg">
-            Keep it simple for fans: they either pay to open something specific,
-            or they send appreciation directly to you.
+            Pick the format that fits — a single file, a bundled pack, a gated
+            link, or a tip jar. Fans get one clean checkout either way.
           </p>
         </motion.div>
 
@@ -115,117 +126,67 @@ export function ModesSection() {
             visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
           }}
         >
-          <motion.article
-            variants={{
-              hidden: { opacity: 0, y: 24 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
-            className="rounded-[2rem] border border-muted-foreground px-2 py-6 shadow-sm md:p-6"
-          >
-            <div className="mb-3 flex items-center gap-2">
-              <div className="grid size-11 place-items-center rounded-2xl text-chart-1">
-                <Lock className="size-5" />
-              </div>
-              <div>
-                <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
-                  {gateMode.eyebrow}
+          {modesContent.map((mode) => {
+            const Icon = MODE_ICONS[mode.value] ?? Lock
+            return (
+              <motion.article
+                key={mode.value}
+                variants={{
+                  hidden: { opacity: 0, y: 24 },
+                  visible: { opacity: 1, y: 0 },
+                }}
+                transition={{ duration: 0.45, ease: "easeOut" }}
+                className="rounded-[2rem] border border-muted-foreground/70 px-2 py-6 shadow-sm md:p-6"
+              >
+                <div className="mb-3 flex items-center gap-2">
+                  <div className="grid size-11 place-items-center rounded-2xl text-chart-1">
+                    <Icon className="size-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground uppercase">
+                      {mode.eyebrow}
+                    </p>
+                    <h3 className="font-heading text-2xl font-semibold text-foreground">
+                      {mode.label}
+                    </h3>
+                  </div>
+                </div>
+
+                <p className="max-w-xl font-sans text-base leading-relaxed text-foreground/75">
+                  {mode.title}
                 </p>
-                <h3 className="font-heading text-2xl font-semibold text-foreground">
-                  {gateMode.label}
-                </h3>
-              </div>
-            </div>
 
-            <p className="max-w-xl font-sans text-base leading-relaxed text-foreground/75">
-              {gateMode.title}
-            </p>
+                <div className="mt-6 grid gap-4">
+                  <div>
+                    <ul className="space-y-3">
+                      {mode.bullets.map((bullet) => (
+                        <li
+                          key={bullet}
+                          className="flex items-start gap-2 text-sm text-foreground/75"
+                        >
+                          <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-chart-1" />
+                          <span>{bullet}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <p className="mt-5 text-sm leading-relaxed text-foreground/55">
+                      {mode.description}
+                    </p>
+                  </div>
 
-            <div className="mt-6 grid gap-4">
-              <div>
-                <ul className="space-y-3">
-                  {gateMode.bullets.map((bullet) => (
-                    <li
-                      key={bullet}
-                      className="flex items-start gap-2 text-sm text-foreground/75"
-                    >
-                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-chart-1" />
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-5 text-sm leading-relaxed text-foreground/55">
-                  {gateMode.description}
-                </p>
-              </div>
-
-              <FanMockup
-                heading={gateMode.mockup.heading}
-                subheading={gateMode.mockup.subheading}
-                amount={gateMode.mockup.amount}
-                localAmount={gateMode.mockup.localAmount}
-                accent={gateMode.mockup.accent}
-                buttonLabel={gateMode.mockup.buttonLabel}
-                icon={<Lock className="size-3.5" />}
-              />
-            </div>
-          </motion.article>
-
-          <motion.article
-            variants={{
-              hidden: { opacity: 0, y: 24 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            transition={{ duration: 0.45, ease: "easeOut" }}
-            className="rounded-[2rem] border border-muted-foreground/70 px-2 py-6 shadow-sm md:p-6"
-          >
-            <div className="mb-3 flex items-center gap-3">
-              <div className="grid size-11 place-items-center rounded-2xl text-chart-1">
-                <HeartHandshake className="size-5" />
-              </div>
-              <div>
-                <p className="text-xs tracking-[0.2em] text-muted-foreground uppercase">
-                  {tipMode.eyebrow}
-                </p>
-                <h3 className="font-heading text-2xl font-semibold text-foreground">
-                  {tipMode.label}
-                </h3>
-              </div>
-            </div>
-
-            <p className="max-w-xl font-sans text-base leading-relaxed text-foreground/75">
-              {tipMode.title}
-            </p>
-
-            <div className="mt-6 grid gap-4">
-              <div>
-                <ul className="space-y-3">
-                  {tipMode.bullets.map((bullet) => (
-                    <li
-                      key={bullet}
-                      className="flex items-start gap-2 text-sm text-foreground/75"
-                    >
-                      <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-chart-1" />
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-5 text-sm leading-relaxed text-foreground/55">
-                  {tipMode.description}
-                </p>
-              </div>
-
-              <FanMockup
-                heading={tipMode.mockup.heading}
-                subheading={tipMode.mockup.subheading}
-                amount={tipMode.mockup.amount}
-                localAmount={tipMode.mockup.localAmount}
-                accent={tipMode.mockup.accent}
-                buttonLabel={tipMode.mockup.buttonLabel}
-                icon={<HeartHandshake className="size-3.5" />}
-              />
-            </div>
-          </motion.article>
+                  <FanMockup
+                    heading={mode.mockup.heading}
+                    subheading={mode.mockup.subheading}
+                    amount={mode.mockup.amount}
+                    localAmount={mode.mockup.localAmount}
+                    accent={mode.mockup.accent}
+                    buttonLabel={mode.mockup.buttonLabel}
+                    icon={<Icon className="size-3.5" />}
+                  />
+                </div>
+              </motion.article>
+            )
+          })}
         </motion.div>
       </div>
     </section>

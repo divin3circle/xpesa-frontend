@@ -15,12 +15,12 @@ export const heroNavItems: HeroNavItem[] = [
 ]
 
 export const heroCopy = {
-  eyebrow: "Creator monetization for Africa",
-  headingLead: "Your Audience is Global, Your",
-  headingAccent: "Monetization",
-  headingTail: "Should Be Too.",
+  eyebrow: "Monetize what you know, in Africa",
+  headingLead: "Turn your content and courses into",
+  headingAccent: "income",
+  headingTail: "— paid straight to M-Pesa.",
   description:
-    "Your content. Your price. Get paid in dollars, withdrawn to your local currency. No more middlemen, no more payment headaches.",
+    "Sell documents, packs, and gated resources, or take tips — and add quizzes and rewards that keep learners coming back. Get paid in USDC and cash out straight to M-Pesa. A flat 5%, no middlemen, no payment headaches.",
   secondaryCta: "See the V1 scope",
 }
 
@@ -29,7 +29,7 @@ export const heroStats: HeroStat[] = [
     label: "On-Chain Settlement",
     value: "Smart account stablecoin(USDC) settlements",
   },
-  { label: "Core Models", value: "Paywall premium content and customizable tips" },
+  { label: "Core Models", value: "Sell documents, packs, gated links, and tips" },
   { label: "Custody", value: "Creators retain 100% control of their funds" },
   {
     label: "Off-chain Redemption",
