@@ -194,7 +194,7 @@ export const envConfig = {
   ENV: getRuntimeEnv() || "DEV",
   IS_DEV: isDevEnvironment(getRuntimeEnv()),
   IS_PROD: isProductionEnvironment(getRuntimeEnv()),
-  FEE: process.env.FEE || "5",
+  FEE: process.env.FEE || "12",
   PREVIEW_RATE_LIMIT: Number(process.env.PREVIEW_RATE_LIMIT || 2),
   PREVIEW_RATE_LIMIT_WINDOW_SECONDS: Number(
     process.env.PREVIEW_RATE_LIMIT_WINDOW_SECONDS || 60

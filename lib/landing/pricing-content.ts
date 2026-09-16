@@ -5,11 +5,11 @@ export const pricingContent = {
     icon: Sparkles,
     text: "All you need.",
   },
-  heading: "Free to start. We take 5% on transactions. That's it.",
+  heading: "Free to start. We take 12% on transactions. That's it.",
   subtitle:
     "No monthly plans, no locked tiers. Start publishing links immediately and pay only when money comes in.",
   price: {
-    current: "5%",
+    current: "12%",
     original: "No subscription",
     discount: "Free to start",
   },
@@ -28,7 +28,7 @@ export const pricingContent = {
     { text: "M-Pesa offramp via Kotani Pay" },
     { text: "AI link description writer (3 uses/day)" },
     { text: '"Powered by xpesa" branding on public/payment pages' },
-    { text: "Transaction fee: 5%" },
+    { text: "Transaction fee: 12%" },
   ],
   testimonials: [
     {
@@ -44,7 +44,7 @@ export const pricingContent = {
       name: "X Educator",
       role: "Career creator",
       content:
-        "The 5% fee is clear and predictable, and local payout is the part that matters most.",
+        "The 12% fee is clear and predictable, and local payout is the part that matters most.",
       rating: 5,
     },
   ],

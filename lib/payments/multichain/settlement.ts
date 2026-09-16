@@ -50,7 +50,7 @@ export async function settleMultichainPayment({
   }
 
   const amountUsdc = Number(intent.amount_usdc)
-  const platformFeeUsdc = roundUsdc(amountUsdc * 0.05)
+  const platformFeeUsdc = roundUsdc(amountUsdc * 0.12)
   const creatorNetUsdc = roundUsdc(amountUsdc - platformFeeUsdc)
   const creatorWallet = getCreatorWallet(link)
   if (!creatorWallet) throw new Error("Creator wallet is not configured")

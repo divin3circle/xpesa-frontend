@@ -211,7 +211,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const platformFee = grossUsdc * 0.05
+  const platformFee = grossUsdc * 0.12
   const creatorNet = grossUsdc - platformFee
   const creatorTransferFound = hasTransferTo({
     logs: receipt.logs,
