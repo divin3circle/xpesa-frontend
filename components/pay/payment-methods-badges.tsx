@@ -86,17 +86,25 @@ export function PaymentMethodsBadges({
         <div className="grid grid-cols-3 gap-2" role="radiogroup">
           {methods.map((method) => {
             const isSelected = selectedMethod === method.value
+            const disabled =
+              method.value === "mobile" && !envConfig.KOTANI_ENABLED
             return (
               <button
                 key={method.value}
                 type="button"
                 role="radio"
                 aria-checked={isSelected}
-                onClick={() => onSelectMethod(method.value)}
+                disabled={disabled}
+                title={disabled ? "Coming soon" : undefined}
+                onClick={() => {
+                  if (!disabled) onSelectMethod(method.value)
+                }}
                 className={`flex items-center justify-center gap-1 rounded-full border px-3 py-1 text-sm font-semibold transition-colors ${
-                  isSelected
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border/70 text-muted-foreground hover:text-foreground"
+                  disabled
+                    ? "cursor-not-allowed border-border/50 text-muted-foreground/50"
+                    : isSelected
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border/70 text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <Image
@@ -107,6 +115,9 @@ export function PaymentMethodsBadges({
                   height={24}
                 />
                 <span>{method.label}</span>
+                {disabled ? (
+                  <span className="text-[10px] opacity-70">soon</span>
+                ) : null}
               </button>
             )
           })}
