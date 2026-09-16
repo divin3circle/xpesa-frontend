@@ -24,9 +24,9 @@ export type AudienceArchetype = {
 
 export const audienceContent = {
   badge: "Who it is for",
-  heading: "Built for creators who feel the payment pain most",
+  heading: "Built for educators and creators who sell what they know",
   description:
-    "Our earliest users are practical sellers who already have demand and need a better way to get paid than manual M-Pesa DMs.",
+    "Our earliest users are knowledge entrepreneurs who already have an audience — and need a better way to get paid than manual M-Pesa DMs.",
   archetypes: [
     {
       title: "Campus tutors",
@@ -51,9 +51,9 @@ export const audienceContent = {
       text: "background",
     },
     {
-      title: "Freelancers selling templates",
+      title: "Skills & exam instructors",
       description:
-        "Developers, designers, and VAs monetizing reusable templates, packs, and digital assets.",
+        "Coding, design, finance, and exam-prep instructors turning expertise into paid courses, resources, and packs.",
       href: "https://xpesa.mintlify.app/creators/creating-your-account",
       icon: BriefcaseBusiness,
       imageSrc: freelancersImage.src,
@@ -64,7 +64,7 @@ export const audienceContent = {
     {
       title: "Coaches and consultants",
       description:
-        "Micro-consultants like nutritionists, fitness coaches, and therapists selling one resource or receiving appreciation tips.",
+        "Career, fitness, and finance coaches selling programs, sessions, and single resources.",
       href: "https://xpesa.mintlify.app/creators/creating-your-account",
       icon: Stethoscope,
       imageSrc: coachesImage.src,

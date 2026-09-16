@@ -43,8 +43,9 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
               <AnimatedContainer className="w-full max-w-sm min-w-2xs space-y-4">
                 <BrandLogo />
                 <p className="mt-8 text-sm text-foreground/75 md:mt-0">
-                  xpesa helps creators in Africa monetize links and tips, then
-                  withdraw earnings to local mobile money rails like M-Pesa.
+                  xpesa helps creators and educators in Africa sell documents,
+                  packs, gated links, and tips — then withdraw earnings to local
+                  mobile money like M-Pesa.
                 </p>
                 <div className="flex gap-2">
                   {footerSocialLinks.map((link) => {

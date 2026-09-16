@@ -21,8 +21,8 @@ export const pricingContent = {
   featuresTitle: "Included FREE!",
   features: [
     { text: "Custom creator page at xpesa.com/[handle]" },
-    { text: "Up to 5 active links (gate + tip combined)" },
-    { text: "Both link modes: Gate and Tip" },
+    { text: "Up to 5 active links (any type)" },
+    { text: "All four ways to sell: Document, Pack, Gate, and Tip" },
     { text: "Access expiry controls: one-time, timed, forever" },
     { text: "Basic dashboard: earnings, transactions, active links" },
     { text: "M-Pesa offramp via Kotani Pay" },

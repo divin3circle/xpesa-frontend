@@ -25,7 +25,7 @@ export const howItWorksContent = {
       icon: "create",
       label: "Create a link + set price",
       shortDescription:
-        "Paste your destination URL, choose gate or tip mode, and set your price in seconds.",
+        "Paste your destination URL, choose how to sell — document, pack, gate, or tip, and set your price in seconds.",
       content: {
         badge: "Step 1",
         title: "Create a paid link in under 3 minutes",
@@ -66,7 +66,7 @@ export const howItWorksContent = {
         badge: "Step 3",
         title: "Collect earnings and withdraw smoothly",
         description:
-          "Your earnings settle on Hedera as USDC, then xpesa routes your offramp via Kotani Pay so you can receive funds in M-Pesa.",
+          "Your earnings settle on Avalanche as USDC, then xpesa routes your offramp via Kotani Pay so you can receive funds in M-Pesa.",
         buttonText: "View payout path",
         imageSrc:
           "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=1200&q=80",

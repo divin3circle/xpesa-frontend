@@ -40,7 +40,7 @@ export function MobileMenu({ navItems }: MobileMenuProps) {
             <BrandLogo tone="default" />
           </DrawerTitle>
           <DrawerDescription className="text-left font-sans text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-            A creator tools platform
+            Sell what you know and get paid to M-Pesa
           </DrawerDescription>
           <div className="flex w-full flex-col gap-2">
             {navItems.map((item) => (

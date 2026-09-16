@@ -17,6 +17,48 @@ export type ModeCardContent = {
 
 export const modesContent: ModeCardContent[] = [
   {
+    value: "document",
+    label: "Sell a document",
+    eyebrow: "For single files — notes, PDFs, templates",
+    title: "Sell a single file with one paid link.",
+    description:
+      "Upload a document — notes, past papers, a template — and let people pay once to download it.",
+    bullets: [
+      "Perfect for a single PDF or file",
+      "Instant delivery after payment",
+      "Great for notes, past papers, and templates",
+    ],
+    mockup: {
+      heading: "Data Structures Notes (PDF)",
+      subheading: "Preview before unlock",
+      amount: "USDC 3.50",
+      localAmount: "KSH 500",
+      accent: "Download after pay",
+      buttonLabel: "Pay to download",
+    },
+  },
+  {
+    value: "pack",
+    label: "Sell a pack",
+    eyebrow: "For bundles — sell a set of files together",
+    title: "Bundle several files into one purchase.",
+    description:
+      "Group related files into a single pack and sell them together at one price.",
+    bullets: [
+      "Sell multiple files as one product",
+      "One price, one checkout",
+      "Great for full courses and revision bundles",
+    ],
+    mockup: {
+      heading: "CPA Section 1 — Full Pack",
+      subheading: "Preview before unlock",
+      amount: "USDC 3.50",
+      localAmount: "KSH 500",
+      accent: "Download after pay",
+      buttonLabel: "Pay to download",
+    },
+  },
+  {
     value: "gate",
     label: "Gate a link",
     eyebrow: "For files, invites, and premium resources",
