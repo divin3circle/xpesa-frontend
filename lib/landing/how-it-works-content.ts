@@ -25,7 +25,7 @@ export const howItWorksContent = {
       icon: "create",
       label: "Create a link + set price",
       shortDescription:
-        "Paste your destination URL, choose how to sell — document, pack, gate, or tip, and set your price in seconds.",
+        "Paste your destination URL, choose how to sell (document, pack, gate, or tip), and set your price in seconds.",
       content: {
         badge: "Step 1",
         title: "Create a paid link in under 3 minutes",

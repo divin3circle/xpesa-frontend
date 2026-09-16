@@ -26,7 +26,7 @@ export const audienceContent = {
   badge: "Who it is for",
   heading: "Built for educators and creators who sell what they know",
   description:
-    "Our earliest users are knowledge entrepreneurs who already have an audience — and need a better way to get paid than manual M-Pesa DMs.",
+    "Our earliest users are knowledge entrepreneurs who already have an audience, and need a better way to get paid than manual M-Pesa DMs.",
   archetypes: [
     {
       title: "Campus tutors",

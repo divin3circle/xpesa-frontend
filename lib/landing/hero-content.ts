@@ -18,9 +18,9 @@ export const heroCopy = {
   eyebrow: "Monetize what you know, in Africa",
   headingLead: "Turn your content and courses into",
   headingAccent: "income",
-  headingTail: "— paid straight to M-Pesa.",
+  headingTail: "paid straight to M-Pesa.",
   description:
-    "Sell documents, packs, and gated resources, or take tips — and add quizzes and rewards that keep learners coming back. Get paid in USDC and cash out straight to M-Pesa. A flat 12%, no middlemen, no payment headaches.",
+    "Sell documents, packs, and gated resources, or take tips, and add quizzes and rewards that keep learners coming back. Get paid in USDC and cash out straight to M-Pesa. A flat 12%, no middlemen, no payment headaches.",
   secondaryCta: "See the V1 scope",
 }
 
