@@ -15,11 +15,11 @@ import { Input } from "../ui/input"
 import { useForm, Controller, useWatch, type Resolver } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { toast } from "sonner"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { StarsFreeIcons } from "@hugeicons/core-free-icons"
 import { useKotaniOfframp } from "@/hooks/use-kotani-offramp"
 import { useKotaniRates } from "@/hooks/use-kotani-rates"
+import { useWithdrawalFlow } from "@/hooks/use-withdrawal-flow"
 import {
   KOTANI_COUNTRY_OPTIONS,
   KOTANI_CURRENCY_OPTIONS,
@@ -661,16 +661,31 @@ export function EnterAmount({
   )
 }
 
+const WITHDRAW_STATUS_LABELS: Record<string, string> = {
+  creating: "Preparing withdrawal…",
+  signing: "Awaiting your signature…",
+  authorizing: "Submitting on-chain…",
+  processing: "Sending to M-Pesa…",
+}
+
 function Summary({
   draft,
   quote,
   onBack,
   onConfirm,
+  status = "idle",
+  isSubmitting = false,
+  receipt = null,
+  flowError = null,
 }: {
   draft: KotaniOfframpDraft
   quote: KotaniOfframpQuote | null
   onBack: () => void
   onConfirm: () => void
+  status?: string
+  isSubmitting?: boolean
+  receipt?: string | null
+  flowError?: string | null
 }) {
   const amountText = draft.amountUsdc
     ? formatNumber(Number(draft.amountUsdc))
@@ -760,12 +775,36 @@ function Summary({
           </div>
         </div>
       </div>
+      {status !== "idle" ? (
+        <div className="mt-4 rounded-2xl border border-foreground/15 px-3 py-2 text-sm">
+          {status === "paid" ? (
+            <p className="text-chart-1">
+              Sent to {receiver}
+              {receipt ? ` · M-Pesa ${receipt}` : ""}. 🎉
+            </p>
+          ) : status === "failed" ? (
+            <p className="text-red-500">{flowError || "Withdrawal failed."}</p>
+          ) : (
+            <p className="text-foreground/70">
+              {WITHDRAW_STATUS_LABELS[status] ?? "Processing…"}
+            </p>
+          )}
+        </div>
+      ) : null}
       <div className="mt-6 flex items-center justify-between">
-        <Button variant="outline" onClick={onBack}>
+        <Button variant="outline" onClick={onBack} disabled={isSubmitting}>
           Previous
         </Button>
-        <Button className="w-2/3" onClick={onConfirm}>
-          Confirm & Withdraw
+        <Button
+          className="w-2/3"
+          onClick={onConfirm}
+          disabled={isSubmitting || status === "paid"}
+        >
+          {status === "paid"
+            ? "Withdrawn"
+            : isSubmitting
+              ? (WITHDRAW_STATUS_LABELS[status] ?? "Processing…")
+              : "Confirm & Withdraw"}
         </Button>
       </div>
     </div>
@@ -786,6 +825,7 @@ export default function WithdrawAction() {
     setQuoteLoading,
     setQuoteError,
   } = offramp
+  const flow = useWithdrawalFlow()
 
   const safeStep = Math.min(Math.max(currentStep, 1), 4)
   const stepMeta = KOTANI_OFFRAMP_STEPS.find((step) => step.step === safeStep)
@@ -847,10 +887,25 @@ export default function WithdrawAction() {
           draft={draft}
           quote={quote}
           onBack={() => goToStep(3)}
+          status={flow.status}
+          isSubmitting={flow.isSubmitting}
+          receipt={flow.receipt}
+          flowError={flow.error}
           onConfirm={() => {
-            void draft
-            void quote
-            toast.info("Withdrawal submission is not live yet.")
+            const dial = (draft.mobileCountryCode ?? "")
+              .toString()
+              .replace(/\D/g, "")
+            const local = (draft.mobileNumber ?? "")
+              .replace(/\D/g, "")
+              .replace(/^0+/, "")
+            const mpesaNumber = dial ? `${dial}${local}` : draft.mobileNumber
+            void flow.submit({
+              amountUsdc: Number(draft.amountUsdc),
+              mpesaNumber,
+              network: draft.network,
+              accountName: draft.accountName,
+              fiatCurrency: draft.currencyCode,
+            })
           }}
         />
       ) : null}
