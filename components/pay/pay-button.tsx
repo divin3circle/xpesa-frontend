@@ -101,7 +101,7 @@ export function PayButton({
     setIsPayingAction(true)
 
     try {
-      const PLATFORM_FEE = 0.05
+      const PLATFORM_FEE = 0.12
       const creatorAmount = amount * (1 - PLATFORM_FEE)
       const platformAmount = amount * PLATFORM_FEE
 

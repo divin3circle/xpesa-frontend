@@ -19,7 +19,7 @@ export const FIAT_PAYMENT_STATUSES = [
 export type FiatPaymentMethod = (typeof FIAT_PAYMENT_METHODS)[number]
 export type FiatPaymentStatus = (typeof FIAT_PAYMENT_STATUSES)[number]
 
-export const XPESA_PLATFORM_FEE_RATE = 0.05
+export const XPESA_PLATFORM_FEE_RATE = 0.12
 
 const positiveMoney = z.coerce
   .number()

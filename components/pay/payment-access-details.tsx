@@ -46,7 +46,7 @@ export function PaymentAccessDetails() {
 
   const link = data?.link
   const amount = Number(link?.price_usdc ?? link?.suggested_amount_usdc ?? 0)
-  const fee = amount * 0.05
+  const fee = amount * 0.12
   const creatorNet = Math.max(amount - fee, 0)
 
   const accessRules = useMemo(() => {
@@ -81,7 +81,7 @@ export function PaymentAccessDetails() {
                 label: "Settle",
                 value: envConfig.PAYMENT_NETWORK_LABEL,
               },
-              { icon: CheckCircle2, label: "Creator", value: "95% net" },
+              { icon: CheckCircle2, label: "Creator", value: "88% net" },
             ].map((item) => {
               const Icon = item.icon
               return (
@@ -117,13 +117,13 @@ export function PaymentAccessDetails() {
           <div className="mt-3 flex items-center justify-between gap-3">
             <span className="text-muted-foreground">XPesa fee</span>
             <span className="font-medium">
-              {amount > 0 ? formatUsdc(fee) : "5%"}
+              {amount > 0 ? formatUsdc(fee) : "12%"}
             </span>
           </div>
           <div className="mt-3 flex items-center justify-between gap-3">
             <span className="text-muted-foreground">Creator receives</span>
             <span className="font-medium">
-              {amount > 0 ? formatUsdc(creatorNet) : "95% of payment"}
+              {amount > 0 ? formatUsdc(creatorNet) : "88% of payment"}
             </span>
           </div>
           <div className="mt-3 flex items-center justify-between gap-3">
