@@ -1,14 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 
-// Keep import-time side effects out of the unit test.
-vi.mock("@/lib/supabase/admin", () => ({ createAdminClient: () => ({}) }))
-vi.mock("@/lib/payments/access", () => ({
-  createAccessForConfirmedPayment: vi.fn(),
-}))
-
 describe("mapKotaniOfframpStatus", () => {
   it("maps provider statuses to withdrawal outcomes", async () => {
-    const { mapKotaniOfframpStatus } = await import("@/lib/payments/kotani")
+    const { mapKotaniOfframpStatus } = await import("@/lib/payments/kotani-offramp")
     expect(mapKotaniOfframpStatus("SUCCESS")).toBe("paid")
     expect(mapKotaniOfframpStatus("COMPLETED")).toBe("paid")
     expect(mapKotaniOfframpStatus("REFUNDED")).toBe("refunded")
@@ -43,7 +37,7 @@ describe("requestKotaniOfframp", () => {
       }),
     } as unknown as Response)
 
-    const { requestKotaniOfframp } = await import("@/lib/payments/kotani")
+    const { requestKotaniOfframp } = await import("@/lib/payments/kotani-offramp")
     const res = await requestKotaniOfframp({
       referenceId: "ref-1",
       amountUsdc: 10,
@@ -78,7 +72,7 @@ describe("requestKotaniOfframp", () => {
       ok: true,
       json: async () => ({ data: {} }),
     } as unknown as Response)
-    const { requestKotaniOfframp } = await import("@/lib/payments/kotani")
+    const { requestKotaniOfframp } = await import("@/lib/payments/kotani-offramp")
     await expect(
       requestKotaniOfframp({
         referenceId: "r",

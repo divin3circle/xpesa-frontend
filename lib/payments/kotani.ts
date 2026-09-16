@@ -4,7 +4,7 @@ import crypto from "crypto"
 import { envConfig } from "@/lib/env"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains"
-import { KOTANI_FALLBACK_RATES, createKotaniReferenceId } from "@/lib/kotani-pay"
+import { createKotaniReferenceId } from "@/lib/kotani-pay"
 import {
   FiatPaymentIntentRequest,
   calculateFiatPaymentAmounts,
@@ -13,6 +13,21 @@ import {
   type FiatPaymentStatus,
 } from "@/lib/payments/fiat"
 import { createAccessForConfirmedPayment } from "@/lib/payments/access"
+import {
+  kotaniHeaders,
+  readString,
+  readNumber,
+  readNestedString,
+  normalizeProviderNetwork,
+  unwrapKotaniData,
+  isSignedKotaniEnvelope,
+  extractKotaniRate,
+  type KotaniWebhookSignatureResult,
+} from "@/lib/payments/kotani-client"
+
+// Re-exported for existing consumers that import these from this module.
+export { extractKotaniRate } from "@/lib/payments/kotani-client"
+export type { KotaniWebhookSignatureResult } from "@/lib/payments/kotani-client"
 
 const ERC20_ABI = [
   "function transfer(address to, uint256 amount) returns (bool)",
@@ -37,122 +52,6 @@ export type KotaniWebhookEvent = {
   failureCode: string | null
   failureMessage: string | null
   payload: Record<string, unknown>
-}
-
-export type KotaniWebhookSignatureResult =
-  | { ok: true }
-  | { ok: false; reason: string }
-
-function signKotaniRequest({
-  method,
-  body,
-  url,
-}: {
-  method: string
-  body?: string
-  url?: string
-}) {
-  if (!envConfig.KOTANI_SECRET) return {}
-
-  const timestamp = Math.floor(Date.now() / 1000).toString()
-  const nonce = crypto.randomUUID()
-  const lastPathSegment = url
-    ? new URL(url).pathname.split("/").filter(Boolean).at(-1) || ""
-    : ""
-  const signingBody = method.toUpperCase() === "GET" ? lastPathSegment : body || "{}"
-  const payload = `${timestamp}.${nonce}.${signingBody}`
-  const signature = crypto
-    .createHmac("sha256", envConfig.KOTANI_SECRET)
-    .update(payload, "utf8")
-    .digest("hex")
-
-  return {
-    "x-timestamp": timestamp,
-    "x-nonce": nonce,
-    "x-signature": signature,
-  }
-}
-
-function kotaniHeaders({
-  method = "GET",
-  body,
-  url,
-}: {
-  method?: string
-  body?: string
-  url?: string
-} = {}) {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  }
-  if (envConfig.KOTANI_KEY) {
-    headers.Authorization = `Bearer ${envConfig.KOTANI_KEY}`
-  }
-  Object.assign(headers, signKotaniRequest({ method, body, url }))
-  return headers
-}
-
-function readString(payload: Record<string, unknown>, keys: string[]) {
-  for (const key of keys) {
-    const value = payload[key]
-    if (typeof value === "string" && value.trim()) return value.trim()
-  }
-  return null
-}
-
-function readNumber(payload: Record<string, unknown>, keys: string[]) {
-  for (const key of keys) {
-    const value = payload[key]
-    const numeric = typeof value === "number" ? value : Number(value)
-    if (Number.isFinite(numeric) && numeric > 0) return numeric
-  }
-  return null
-}
-
-function readNestedString(payload: Record<string, unknown>, paths: string[][]) {
-  for (const path of paths) {
-    let value: unknown = payload
-    for (const key of path) {
-      if (!value || typeof value !== "object") {
-        value = null
-        break
-      }
-      value = (value as Record<string, unknown>)[key]
-    }
-    if (typeof value === "string" && value.trim()) return value.trim()
-  }
-  return null
-}
-
-function normalizeProviderNetwork(network: string | undefined) {
-  const normalized = network?.trim().toUpperCase()
-  if (!normalized || normalized === "MPESA" || normalized === "M-PESA") {
-    return "MPESA"
-  }
-  return normalized
-}
-
-function unwrapKotaniData(body: unknown) {
-  if (!body || typeof body !== "object") return {}
-  const record = body as Record<string, unknown>
-  return record.data && typeof record.data === "object"
-    ? (record.data as Record<string, unknown>)
-    : record
-}
-
-function isSignedKotaniEnvelope(payload: unknown): payload is {
-  event: string
-  data: Record<string, unknown>
-  signature?: string
-} {
-  if (!payload || typeof payload !== "object") return false
-  const record = payload as Record<string, unknown>
-  return (
-    typeof record.event === "string" &&
-    record.data !== null &&
-    typeof record.data === "object" &&
-    !Array.isArray(record.data)
-  )
 }
 
 export function verifyKotaniWebhookSignature({
@@ -199,54 +98,6 @@ export function verifyKotaniWebhookSignature({
   } catch {
     return { ok: false, reason: "Invalid Kotani webhook signature" }
   }
-}
-
-export function extractKotaniRate(body: unknown, currency: string) {
-  const fallback =
-    KOTANI_FALLBACK_RATES[currency as keyof typeof KOTANI_FALLBACK_RATES] ??
-    null
-
-  if (!body || typeof body !== "object") return fallback
-  const payload = body as Record<string, unknown>
-  const directRate = readNumber(payload, [
-    "rate",
-    "exchangeRate",
-    "conversionRate",
-    "value",
-  ])
-  if (directRate) return directRate
-
-  const data = payload.data
-  if (Array.isArray(data)) {
-    const match = data.find((item) => {
-      if (!item || typeof item !== "object") return false
-      const record = item as Record<string, unknown>
-      return (
-        record.destination === currency ||
-        record.destinationCurrency === currency ||
-        record.currency === currency
-      )
-    }) as Record<string, unknown> | undefined
-    if (match) {
-      return (
-        readNumber(match, ["rate", "exchangeRate", "conversionRate", "value"]) ??
-        fallback
-      )
-    }
-  }
-
-  if (data && typeof data === "object") {
-    return (
-      readNumber(data as Record<string, unknown>, [
-        "rate",
-        "exchangeRate",
-        "conversionRate",
-        "value",
-      ]) ?? fallback
-    )
-  }
-
-  return fallback
 }
 
 export async function getKotaniFiatQuote({
@@ -660,158 +511,4 @@ export function fiatStatusResponse(status: FiatPaymentStatus) {
     status,
     message: getFiatPaymentStatusMessage(status),
   }
-}
-
-// ---- Creator offramp (crypto → fiat): USDC on Avalanche → KES to M-Pesa ----
-
-/** Offramp rate quote (Kotani `GET /rates/offramp-rate`). */
-export async function getKotaniOfframpQuote({
-  amountUsdc,
-  fiatCurrency,
-}: {
-  amountUsdc: number
-  fiatCurrency: string
-}) {
-  let body: unknown = null
-  if (envConfig.KOTANI_BASE_URL) {
-    const base = envConfig.KOTANI_BASE_URL.replace(/\/$/, "")
-    const path = envConfig.KOTANI_OFFRAMP_RATE_ENDPOINT.startsWith("/")
-      ? envConfig.KOTANI_OFFRAMP_RATE_ENDPOINT
-      : `/${envConfig.KOTANI_OFFRAMP_RATE_ENDPOINT}`
-    const params = new URLSearchParams({ source: "USDC", destination: fiatCurrency })
-    const url = `${base}${path}?${params.toString()}`
-    const response = await fetch(url, {
-      method: "GET",
-      headers: kotaniHeaders({ method: "GET", url }),
-    })
-    body = await response.json().catch(() => null)
-  }
-  const rate = extractKotaniRate(body, fiatCurrency)
-  if (!rate) throw new Error(`No ${fiatCurrency} offramp quote available`)
-  return {
-    amountUsdc: roundUsdc(amountUsdc),
-    fiatCurrency,
-    rate,
-    amountFiat: Number((amountUsdc * rate).toFixed(2)),
-    source: body ? "kotani" : "fallback",
-  }
-}
-
-export type KotaniOfframpResult = {
-  depositAddress: string
-  providerReference: string
-  raw: unknown
-}
-
-/** Initiate an offramp (Kotani `POST /offramp`). Returns the deposit address to send USDC to. */
-export async function requestKotaniOfframp({
-  referenceId,
-  amountUsdc,
-  fiatCurrency,
-  mpesaNumber,
-  accountName,
-  network,
-}: {
-  referenceId: string
-  amountUsdc: number
-  fiatCurrency: string
-  mpesaNumber: string
-  accountName: string
-  network: string
-}): Promise<KotaniOfframpResult> {
-  if (!envConfig.KOTANI_BASE_URL || !envConfig.KOTANI_OFFRAMP_ENDPOINT) {
-    throw new Error("Kotani offramp endpoint is not configured")
-  }
-  const endpoint = envConfig.KOTANI_OFFRAMP_ENDPOINT.startsWith("/")
-    ? envConfig.KOTANI_OFFRAMP_ENDPOINT
-    : `/${envConfig.KOTANI_OFFRAMP_ENDPOINT}`
-  const url = `${envConfig.KOTANI_BASE_URL.replace(/\/$/, "")}${endpoint}`
-  const payload = {
-    cryptoAmount: amountUsdc,
-    currency: fiatCurrency,
-    chain: "AVALANCHE",
-    token: "USDC",
-    referenceId,
-    callbackUrl: envConfig.KOTANI_WEBHOOK_URL,
-    mobileMoneyReceiver: {
-      phoneNumber: mpesaNumber,
-      accountName: accountName || "XPesa Creator",
-      networkProvider: normalizeProviderNetwork(network),
-    },
-  }
-  const body = JSON.stringify(payload)
-  const response = await fetch(url, {
-    method: "POST",
-    headers: kotaniHeaders({ method: "POST", body, url }),
-    body,
-  })
-  const responseBody = await response.json().catch(() => ({}))
-  if (!response.ok) {
-    throw new Error(
-      typeof responseBody?.message === "string"
-        ? responseBody.message
-        : `Kotani offramp failed with ${response.status}`
-    )
-  }
-  const data = unwrapKotaniData(responseBody)
-  const depositAddress = readString(data, [
-    "depositAddress",
-    "deposit_address",
-    "escrowAddress",
-    "escrow_address",
-  ])
-  if (!depositAddress) {
-    throw new Error("Kotani offramp did not return a deposit address")
-  }
-  return {
-    depositAddress,
-    providerReference:
-      readString(data, ["referenceId", "reference", "reference_id"]) ??
-      referenceId,
-    raw: responseBody,
-  }
-}
-
-/** Poll offramp status (Kotani `GET /offramp/:referenceId`) — reconciler source of truth. */
-export async function getKotaniOfframpStatus(referenceId: string) {
-  if (!envConfig.KOTANI_BASE_URL || !envConfig.KOTANI_OFFRAMP_ENDPOINT) {
-    throw new Error("Kotani offramp endpoint is not configured")
-  }
-  const endpoint = envConfig.KOTANI_OFFRAMP_ENDPOINT.startsWith("/")
-    ? envConfig.KOTANI_OFFRAMP_ENDPOINT
-    : `/${envConfig.KOTANI_OFFRAMP_ENDPOINT}`
-  const url = `${envConfig.KOTANI_BASE_URL.replace(/\/$/, "")}${endpoint}/${referenceId}`
-  const response = await fetch(url, {
-    method: "GET",
-    headers: kotaniHeaders({ method: "GET", url }),
-  })
-  const responseBody = await response.json().catch(() => ({}))
-  const data = unwrapKotaniData(responseBody)
-  return {
-    status: readString(data, ["status", "state"]) ?? "unknown",
-    onchainStatus: readString(data, ["onchainStatus", "onchain_status"]),
-    mpesaReceipt: readString(data, [
-      "mpesaReceipt",
-      "receipt",
-      "providerReceipt",
-      "mpesa_receipt",
-    ]),
-    raw: responseBody,
-  }
-}
-
-/** Map a Kotani offramp webhook/status event to our terminal withdrawal outcome. */
-export function mapKotaniOfframpStatus(
-  raw: string | null
-): "paid" | "failed" | "refunded" | "provider_processing" {
-  const normalized = raw?.toUpperCase().replace(/[\s-]+/g, "_")
-  if (!normalized) return "provider_processing"
-  if (["SUCCESS", "SUCCESSFUL", "COMPLETED", "SETTLED", "PAID"].includes(normalized)) {
-    return "paid"
-  }
-  if (["REFUNDED", "REFUND_SUCCESS"].includes(normalized)) return "refunded"
-  if (["FAILED", "REFUND_FAILED", "CANCELLED", "CANCELED", "REJECTED"].includes(normalized)) {
-    return "failed"
-  }
-  return "provider_processing"
 }
