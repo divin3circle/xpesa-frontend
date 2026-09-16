@@ -245,6 +245,12 @@ export const envConfig = {
   KOTANI_ENV: process.env.KOTANI_ENV || "sandbox",
   KOTANI_BASE_URL: getKotaniBaseUrl(),
   KOTANI_COLLECTION_ENDPOINT: process.env.KOTANI_COLLECTION_ENDPOINT || "",
+  KOTANI_OFFRAMP_ENDPOINT: process.env.KOTANI_OFFRAMP_ENDPOINT || "/offramp",
+  KOTANI_OFFRAMP_RATE_ENDPOINT:
+    process.env.KOTANI_OFFRAMP_RATE_ENDPOINT || "/rates/offramp-rate",
+  USDC_TOKEN_NAME: process.env.USDC_TOKEN_NAME || "USD Coin",
+  USDC_TOKEN_VERSION: process.env.USDC_TOKEN_VERSION || "2",
+  PAYMENT_CHAIN_ID: resolvePaymentChainId(),
   KOTANI_PROD_WEBHOOK_URL: process.env.KOTANI_PROD_WEBHOOK_URL || "",
   KOTANI_LOCAL_WEBHOOK_URL: process.env.KOTANI_LOCAL_WEBHOOK_URL || "",
   KOTANI_WEBHOOK_URL: getKotaniWebhookUrl(),
