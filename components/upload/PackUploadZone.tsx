@@ -2,143 +2,26 @@
 
 import { useMemo, useState } from "react"
 import type { ChangeEvent, DragEventHandler } from "react"
-import {
-  DndContext,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core"
-import {
-  SortableContext,
-  arrayMove,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
+import { PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
+import type { DragEndEvent } from "@dnd-kit/core"
+import { arrayMove } from "@dnd-kit/sortable"
 
-import { Button } from "@/components/ui/button"
+import { PackDropzone } from "./pack/PackDropzone"
+import { PackFileList } from "./pack/PackFileList"
+import {
+  MAX_PACK_FILES,
+  getExtension,
+  getPackFileId,
+  normalizeSort,
+  validatePackFile,
+  type PackFileState,
+} from "./pack/utils"
 
-export type PackFileState = {
-  packFileId: string | null
-  originalFilename: string
-  fileType: "pdf" | "image"
-  fileSizeBytes: number
-  pageCount?: number
-  imageWidth?: number
-  imageHeight?: number
-  sortOrder: number
-  status: "uploading" | "converting" | "ready" | "error"
-  progress: number
-  error?: string
-  localId?: string
-}
+export type { PackFileState }
 
 type PackUploadZoneProps = {
   files: PackFileState[]
   onFilesChangeAction: (files: PackFileState[]) => void
-}
-
-const MAX_PACK_FILES = 3
-const MAX_PDF_BYTES = 50 * 1024 * 1024
-const MAX_DOCX_BYTES = 20 * 1024 * 1024
-const MAX_IMAGE_BYTES = 10 * 1024 * 1024
-
-function getExtension(filename: string) {
-  return filename.split(".").pop()?.toLowerCase() ?? ""
-}
-
-function toMbLabel(bytes: number) {
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
-
-function validatePackFile(file: File) {
-  const extension = getExtension(file.name)
-  const imageExtensions = ["png", "jpg", "jpeg", "webp"]
-
-  if (!["pdf", "docx", ...imageExtensions].includes(extension)) {
-    return "Unsupported file type."
-  }
-
-  if (extension === "pdf" && file.size > MAX_PDF_BYTES) {
-    return "PDF exceeds 50MB limit."
-  }
-
-  if (extension === "docx" && file.size > MAX_DOCX_BYTES) {
-    return "DOCX exceeds 20MB limit."
-  }
-
-  if (imageExtensions.includes(extension) && file.size > MAX_IMAGE_BYTES) {
-    return "Image exceeds 10MB limit."
-  }
-
-  return null
-}
-
-function normalizeSort(files: PackFileState[]) {
-  return files.map((file, index) => ({ ...file, sortOrder: index }))
-}
-
-function SortablePackItem({
-  file,
-  onRemove,
-}: {
-  file: PackFileState
-  onRemove: (file: PackFileState) => void
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id:
-        file.localId ??
-        file.packFileId ??
-        `${file.originalFilename}-${file.sortOrder}`,
-    })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  }
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="flex items-center justify-between gap-3 rounded-2xl border p-2"
-    >
-      <div>
-        <p className="text-sm font-medium">{file.originalFilename}</p>
-        <p className="text-xs text-muted-foreground">
-          {file.fileType.toUpperCase()} • {toMbLabel(file.fileSizeBytes)}
-          {file.pageCount ? ` • ${file.pageCount} pages` : ""}
-          {file.imageWidth && file.imageHeight
-            ? ` • ${file.imageWidth}x${file.imageHeight}`
-            : ""}
-        </p>
-        {file.status !== "ready" ? (
-          <p className="text-xs text-muted-foreground">
-            {file.status === "uploading"
-              ? `Uploading ${file.progress}%`
-              : file.status === "converting"
-                ? "Converting to PDF..."
-                : file.status === "error"
-                  ? (file.error ?? "Upload failed")
-                  : "Processing..."}
-          </p>
-        ) : null}
-      </div>
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        onClick={() => onRemove(file)}
-      >
-        Remove
-      </Button>
-    </div>
-  )
 }
 
 export function PackUploadZone({
@@ -152,26 +35,13 @@ export function PackUploadZone({
 
   const slotCount = MAX_PACK_FILES - files.length
 
-  const ids = useMemo(
-    () =>
-      files.map(
-        (file) =>
-          file.localId ??
-          file.packFileId ??
-          `${file.originalFilename}-${file.sortOrder}`
-      ),
-    [files]
-  )
+  const ids = useMemo(() => files.map((file) => getPackFileId(file)), [files])
 
   const patchFile = (localId: string, patch: Partial<PackFileState>) => {
     onFilesChangeAction(
       normalizeSort(
         files.map((file) =>
-          (file.localId ??
-            file.packFileId ??
-            `${file.originalFilename}-${file.sortOrder}`) === localId
-            ? { ...file, ...patch }
-            : file
+          getPackFileId(file) === localId ? { ...file, ...patch } : file
         )
       )
     )
@@ -371,69 +241,21 @@ export function PackUploadZone({
 
   return (
     <div className="space-y-2">
-      <div
-        className={`rounded-xl border border-dashed p-4 text-sm ${
-          zoneError ? "border-destructive" : "border-border"
-        }`}
-        onDragOver={(event) => event.preventDefault()}
+      <PackDropzone
+        files={files}
+        slotCount={slotCount}
+        zoneError={zoneError}
         onDrop={handleDrop}
-      >
-        <div className="mb-2 flex items-center justify-between gap-2">
-          <p>Drop pack files here, or click to browse.</p>
-          <p className="text-xs text-muted-foreground">
-            {files.length} / {MAX_PACK_FILES} files
-          </p>
-        </div>
+        onSelect={handleSelect}
+      />
 
-        <p className="text-xs text-muted-foreground">
-          Accepted: PDF (50MB), DOCX (20MB), PNG/JPG/WEBP (10MB).
-        </p>
-
-        <div className="mt-3">
-          <label className="inline-flex cursor-pointer rounded-md border px-3 py-1.5 text-xs">
-            Browse files
-            <input
-              type="file"
-              className="hidden"
-              multiple
-              accept=".pdf,.docx,.png,.jpg,.jpeg,.webp"
-              disabled={slotCount <= 0}
-              onChange={handleSelect}
-            />
-          </label>
-          {slotCount <= 0 ? (
-            <p className="mt-2 text-xs text-muted-foreground">
-              Pack full (3/3)
-            </p>
-          ) : null}
-        </div>
-
-        {zoneError ? (
-          <p className="mt-2 text-xs text-destructive">{zoneError}</p>
-        ) : null}
-      </div>
-
-      <DndContext
+      <PackFileList
+        files={files}
+        ids={ids}
         sensors={sensors}
-        collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
-      >
-        <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-          <div className="space-y-2">
-            {files.map((file) => (
-              <SortablePackItem
-                key={
-                  file.localId ??
-                  file.packFileId ??
-                  `${file.originalFilename}-${file.sortOrder}`
-                }
-                file={file}
-                onRemove={handleRemove}
-              />
-            ))}
-          </div>
-        </SortableContext>
-      </DndContext>
+        onRemove={handleRemove}
+      />
     </div>
   )
 }
