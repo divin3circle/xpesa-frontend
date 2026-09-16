@@ -19,10 +19,10 @@ export const modesContent: ModeCardContent[] = [
   {
     value: "document",
     label: "Sell a document",
-    eyebrow: "For single files — notes, PDFs, templates",
+    eyebrow: "For single files: notes, PDFs, templates",
     title: "Sell a single file with one paid link.",
     description:
-      "Upload a document — notes, past papers, a template — and let people pay once to download it.",
+      "Upload a document (notes, past papers, a template) and let people pay once to download it.",
     bullets: [
       "Perfect for a single PDF or file",
       "Instant delivery after payment",
@@ -40,7 +40,7 @@ export const modesContent: ModeCardContent[] = [
   {
     value: "pack",
     label: "Sell a pack",
-    eyebrow: "For bundles — sell a set of files together",
+    eyebrow: "For bundles: sell a set of files together",
     title: "Bundle several files into one purchase.",
     description:
       "Group related files into a single pack and sell them together at one price.",
@@ -50,7 +50,7 @@ export const modesContent: ModeCardContent[] = [
       "Great for full courses and revision bundles",
     ],
     mockup: {
-      heading: "CPA Section 1 — Full Pack",
+      heading: "CPA Section 1: Full Pack",
       subheading: "Preview before unlock",
       amount: "USDC 3.50",
       localAmount: "KSH 500",

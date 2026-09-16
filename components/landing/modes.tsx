@@ -111,7 +111,7 @@ export function ModesSection() {
             className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-5xl"
           />
           <p className="font-sans text-base leading-relaxed text-foreground/75 md:text-lg">
-            Pick the format that fits — a single file, a bundled pack, a gated
+            Pick the format that fits: a single file, a bundled pack, a gated
             link, or a tip jar. Fans get one clean checkout either way.
           </p>
         </motion.div>

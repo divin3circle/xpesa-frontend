@@ -44,7 +44,7 @@ export function StickyFooter({ className, ...props }: StickyFooterProps) {
                 <BrandLogo />
                 <p className="mt-8 text-sm text-foreground/75 md:mt-0">
                   xpesa helps creators and educators in Africa sell documents,
-                  packs, gated links, and tips — then withdraw earnings to local
+                  packs, gated links, and tips, then withdraw earnings to local
                   mobile money like M-Pesa.
                 </p>
                 <div className="flex gap-2">
