@@ -122,7 +122,7 @@ All payments on XPesa are processed in USDC (USD Coin) on the Avalanche C-Chain 
 
 ## 5.2 Platform Fee 
 
-XPesa charges a 5% platform fee on all transactions. This fee is: 
+XPesa charges a 12% platform fee on all transactions. This fee is: 
 
 - Deducted automatically at the time of payment 
 
@@ -130,9 +130,9 @@ XPesa charges a 5% platform fee on all transactions. This fee is:
 
 - Applied to the gross transaction amount before the creator receives their portion 
 
-- 95% of each payment is sent directly to the creator's wallet 
+- 88% of each payment is sent directly to the creator's wallet 
 
-Example: if a fan pays 10 USDC, the creator receives 9.50 USDC and XPesa receives 0.50 USDC. 
+Example: if a fan pays 10 USDC, the creator receives 8.80 USDC and XPesa receives 1.20 USDC. 
 
 ## 5.3 Gas Fees 
 
