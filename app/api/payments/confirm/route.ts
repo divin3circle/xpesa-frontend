@@ -5,6 +5,7 @@ import {
   parseAbi,
   decodeEventLog,
   parseUnits,
+  formatEther,
 } from "viem"
 import { avalanche, avalancheFuji, hedera, hederaTestnet } from "viem/chains"
 import { NextRequest } from "next/server"
@@ -238,6 +239,12 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  // Gas the platform sponsored for this payment (paymaster covers the fan's
+  // UserOp). Stored in AVAX; see the "12% - gas" accounting migration.
+  const gasCostAvax = Number(
+    formatEther(receipt.gasUsed * receipt.effectiveGasPrice)
+  )
+
   const { accessToken, linkType, transactionId } =
     await createAccessForConfirmedPayment({
       supabase,
@@ -248,6 +255,7 @@ export async function POST(request: NextRequest) {
       amountUsdc: grossUsdc,
       platformFeeUsdc: platformFee,
       creatorNetUsdc: creatorNet,
+      gasCostAvax,
       requestHeaders: request.headers,
     })
 

@@ -57,6 +57,7 @@ export async function settleMultichainPayment({
   if (!creatorWallet) throw new Error("Creator wallet is not configured")
 
   let payoutTxHash = intent.payout_tx_hash as string | null
+  let gasCostAvax: number | null = null
   if (!payoutTxHash) {
     await supabase
       .from("bridge_payment_intents")
@@ -83,7 +84,12 @@ export async function settleMultichainPayment({
       })
       .eq("id", intent.id)
 
-    await tx.wait(1)
+    const receipt = await tx.wait(1)
+    if (receipt) {
+      gasCostAvax = Number(
+        ethers.formatEther(receipt.gasUsed * receipt.gasPrice)
+      )
+    }
   }
 
   const access = await createAccessForConfirmedPayment({
@@ -97,6 +103,7 @@ export async function settleMultichainPayment({
     creatorNetUsdc,
     requestHeaders,
     paymentMethod: "multichain",
+    gasCostAvax,
   })
 
   await supabase

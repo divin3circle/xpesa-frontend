@@ -24,6 +24,7 @@ type CreateAccessForPaymentParams = {
   amountUsdc: number
   platformFeeUsdc: number
   creatorNetUsdc: number
+  gasCostAvax?: number | null
   requestHeaders: Headers
   paymentIntentId?: string | null
   paymentMethod?: string | null
@@ -68,6 +69,7 @@ export async function createAccessForConfirmedPayment({
   requestHeaders,
   paymentIntentId,
   paymentMethod,
+  gasCostAvax,
 }: CreateAccessForPaymentParams) {
   const transactionInsert: Record<string, unknown> = {
     link_id: link.id,
@@ -84,6 +86,7 @@ export async function createAccessForConfirmedPayment({
 
   if (paymentIntentId) transactionInsert.payment_intent_id = paymentIntentId
   if (paymentMethod) transactionInsert.payment_method = paymentMethod
+  if (gasCostAvax != null) transactionInsert.gas_cost_avax = gasCostAvax
 
   const { data: insertedTransaction, error: transactionError } = await supabase
     .from("transactions")
