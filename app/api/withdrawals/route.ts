@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 
 import {
+  validateOfframpAmount,
   withdrawalRequestSchema,
   type WithdrawalChain,
 } from "@/lib/payments/withdrawal"
@@ -80,6 +81,21 @@ export async function POST(request: NextRequest) {
       amountUsdc: input.amountUsdc,
       fiatCurrency: input.fiatCurrency,
     })
+
+    // Enforce min/max BEFORE issuing anything to sign — never relay funds
+    // on-chain for a payout the provider would reject (push-model strands funds).
+    const amountError = validateOfframpAmount({
+      amountUsdc: input.amountUsdc,
+      amountFiat: quote.amountFiat,
+      fiatCurrency: input.fiatCurrency,
+    })
+    if (amountError) {
+      return NextResponse.json(
+        { error: amountError, code: "OFFRAMP_AMOUNT_REJECTED" },
+        { status: 422 }
+      )
+    }
+
     // PUSH model: the creator sends USDC to the provider's static settlement
     // address; we generate the payout reference up-front and hand it to the
     // provider's /pay call after the on-chain transfer (in the authorize route).

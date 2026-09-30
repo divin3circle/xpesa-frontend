@@ -38,6 +38,37 @@ export const withdrawalRequestSchema = z.object({
 })
 export type WithdrawalRequest = z.infer<typeof withdrawalRequestSchema>
 
+/** Provider per-currency minimum fiat amount for an offramp payout. */
+export const OFFRAMP_MIN_FIAT: Record<string, number> = { KES: 100 }
+
+/**
+ * Validate an offramp amount against the fiat minimum and an optional per-tx USD
+ * cap (env OFFRAMP_MAX_USD — e.g. Pretium's unverified $0.50 limit; raise it after
+ * KYB/KYC, or leave unset/0 for no cap). Returns an error string, or null if ok.
+ *
+ * This MUST be enforced before any on-chain transfer: the offramp is push-model
+ * (funds move to the provider, then we request the payout), so relaying an amount
+ * the provider will reject would strand the creator's USDC at the settlement
+ * address with no payout.
+ */
+export function validateOfframpAmount(input: {
+  amountUsdc: number
+  amountFiat: number
+  fiatCurrency: string
+}): string | null {
+  const min = OFFRAMP_MIN_FIAT[input.fiatCurrency] ?? 0
+  if (input.amountFiat < min) {
+    return `Withdrawals need at least ${min} ${input.fiatCurrency} (this is about ${Math.round(
+      input.amountFiat
+    )} ${input.fiatCurrency}).`
+  }
+  const maxUsd = Number(process.env.OFFRAMP_MAX_USD ?? "0")
+  if (maxUsd > 0 && input.amountUsdc > maxUsd) {
+    return `Withdrawals are currently limited to $${maxUsd} per transaction.`
+  }
+  return null
+}
+
 /** Map an internal payout rail to the provider's mobile-network (carrier) name. */
 export function withdrawalNetworkToCarrier(network: WithdrawalNetwork): string {
   switch (network) {

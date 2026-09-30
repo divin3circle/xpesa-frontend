@@ -7,6 +7,7 @@ import { getFiatProvider } from "@/lib/payments/providers"
 import { getCurrentCreatorWithWallet } from "@/lib/payments/withdrawal-server"
 import { validateSignedAuthorization } from "@/lib/payments/withdrawal-authorization"
 import {
+  validateOfframpAmount,
   withdrawalNetworkToCarrier,
   type WithdrawalChain,
   type WithdrawalNetwork,
@@ -82,6 +83,20 @@ export async function POST(
     })
     if (validationError) {
       return NextResponse.json({ error: validationError }, { status: 422 })
+    }
+
+    // Re-check bounds before moving funds on-chain (defense-in-depth; the cap
+    // may have changed since the withdrawal was created).
+    const amountError = validateOfframpAmount({
+      amountUsdc: Number(withdrawal.amount_usdc),
+      amountFiat: Number(withdrawal.amount_kes),
+      fiatCurrency: OFFRAMP_CURRENCY,
+    })
+    if (amountError) {
+      return NextResponse.json(
+        { error: amountError, code: "OFFRAMP_AMOUNT_REJECTED" },
+        { status: 422 }
+      )
     }
 
     const chain = (withdrawal.chain as WithdrawalChain) ?? "AVALANCHE"
