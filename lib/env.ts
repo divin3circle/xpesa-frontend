@@ -258,6 +258,9 @@ export const envConfig = {
   KOTANI_LOCAL_WEBHOOK_URL: process.env.KOTANI_LOCAL_WEBHOOK_URL || "",
   KOTANI_WEBHOOK_URL: getKotaniWebhookUrl(),
   KOTANI_WEBHOOK_SECRET: process.env.KOTANI_WEBHOOK_SECRET || "",
+  // Fiat provider (Pretium) webhook URL + internal reconcile secret.
+  PRETIUM_WEBHOOK_URL: process.env.PRETIUM_WEBHOOK_URL || "",
+  RECONCILE_SECRET: process.env.RECONCILE_SECRET || "",
   PLATFORM_WALLET_PRIVATE_KEY: process.env.PLATFORM_WALLET_PRIVATE_KEY || "",
   XPESA_RECEIPT_NFT_ADDRESS: process.env.XPESA_RECEIPT_NFT_ADDRESS || "",
   XPESA_RECEIPT_MINTER_PRIVATE_KEY:

@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
           phone: input.buyerPhone ?? "",
           network: input.buyerNetwork ?? "Safaricom",
         },
-        callbackUrl: process.env.PRETIUM_WEBHOOK_URL ?? "",
+        callbackUrl: envConfig.PRETIUM_WEBHOOK_URL,
       })
 
       const { data: updatedIntent, error: updateError } = await supabase
