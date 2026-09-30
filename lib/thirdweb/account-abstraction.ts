@@ -20,22 +20,28 @@ export const defaultChain = resolveDefaultChain()
 
 // --- Optional Pimlico gas sponsorship -----------------------------------------
 // By default gas is sponsored through thirdweb's own paymaster (sponsorGas: true),
-// which requires a paid thirdweb plan. When NEXT_PUBLIC_PIMLICO_ENABLED === "true"
-// and a key is present, we instead sponsor via Pimlico's pm_sponsorUserOperation
-// (pay-as-you-go). The key is NEXT_PUBLIC (thirdweb runs AA in the browser), so it
-// is exposed client-side — protect it with a Pimlico sponsorship policy.
+// which requires a paid thirdweb plan. When NEXT_PUBLIC_PIMLICO_ENABLED === "true",
+// we instead sponsor via Pimlico (pay-as-you-go, no thirdweb plan needed).
+//
+// The Pimlico key is NEVER exposed to the client: bundler + paymaster calls are
+// routed through our own backend proxy (app/api/pimlico/[chainId]/route.ts), which
+// attaches PIMLICO_API_KEY server-side. Only the on/off flag is public.
 //
 // GATED OFF BY DEFAULT: leave NEXT_PUBLIC_PIMLICO_ENABLED unset until this has been
 // verified with a real payment on Fuji. Assumes EntryPoint v0.6 (thirdweb default).
-const PIMLICO_KEY = process.env.NEXT_PUBLIC_PIMLICO_API_KEY
 const PIMLICO_ENABLED = process.env.NEXT_PUBLIC_PIMLICO_ENABLED === "true"
 
-const pimlicoRpcUrl = (chainId: number) =>
-  `https://api.pimlico.io/v2/${chainId}/rpc?apikey=${PIMLICO_KEY}`
+// Absolute URL to our proxy. Built from the browser origin (this config is only
+// used client-side); during SSR window is undefined and the relative path is fine.
+function pimlicoProxyUrl(chainId: number) {
+  const origin = typeof window !== "undefined" ? window.location.origin : ""
+  return `${origin}/api/pimlico/${chainId}`
+}
 
-// Mirrors thirdweb's getPaymasterAndData request/response, but targets Pimlico.
+// Mirrors thirdweb's getPaymasterAndData request/response, but sponsors via our
+// Pimlico proxy instead of thirdweb's default (paid) paymaster.
 function createPimlicoPaymaster(chainId: number) {
-  const url = pimlicoRpcUrl(chainId)
+  const url = pimlicoProxyUrl(chainId)
   return async (userOp: Record<string, unknown>) => {
     const hexlified = Object.fromEntries(
       Object.entries(userOp).map(([key, val]) => [
@@ -91,15 +97,13 @@ function createPimlicoPaymaster(chainId: number) {
   }
 }
 
-const usePimlico = PIMLICO_ENABLED && Boolean(PIMLICO_KEY)
-
 export const smartAccountConfig = {
   chain: defaultChain,
   sponsorGas: true,
-  ...(usePimlico
+  ...(PIMLICO_ENABLED
     ? {
         overrides: {
-          bundlerUrl: pimlicoRpcUrl(defaultChain.id),
+          bundlerUrl: pimlicoProxyUrl(defaultChain.id),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           paymaster: createPimlicoPaymaster(defaultChain.id) as any,
         },
