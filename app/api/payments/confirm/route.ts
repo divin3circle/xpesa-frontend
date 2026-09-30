@@ -5,6 +5,7 @@ import {
   parseAbi,
   decodeEventLog,
   parseUnits,
+  formatEther,
 } from "viem"
 import { avalanche, avalancheFuji, hedera, hederaTestnet } from "viem/chains"
 import { NextRequest } from "next/server"
@@ -15,6 +16,7 @@ import {
 } from "@/lib/env"
 import { USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains"
 import { createAccessForConfirmedPayment } from "@/lib/payments/access"
+import { XPESA_PLATFORM_FEE_RATE } from "@/lib/payments/constants"
 import { auditSecurityEvent } from "@/lib/security/audit"
 import {
   checkSensitiveRateLimit,
@@ -211,7 +213,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const platformFee = grossUsdc * 0.12
+  const platformFee = grossUsdc * XPESA_PLATFORM_FEE_RATE
   const creatorNet = grossUsdc - platformFee
   const creatorTransferFound = hasTransferTo({
     logs: receipt.logs,
@@ -237,6 +239,12 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  // Gas the platform sponsored for this payment (paymaster covers the fan's
+  // UserOp). Stored in AVAX; see the "12% - gas" accounting migration.
+  const gasCostAvax = Number(
+    formatEther(receipt.gasUsed * receipt.effectiveGasPrice)
+  )
+
   const { accessToken, linkType, transactionId } =
     await createAccessForConfirmedPayment({
       supabase,
@@ -247,6 +255,7 @@ export async function POST(request: NextRequest) {
       amountUsdc: grossUsdc,
       platformFeeUsdc: platformFee,
       creatorNetUsdc: creatorNet,
+      gasCostAvax,
       requestHeaders: request.headers,
     })
 

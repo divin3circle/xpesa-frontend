@@ -21,6 +21,7 @@ import Link from "next/link"
 import { HugeiconsIcon } from "@hugeicons/react"
 import { Copy01Icon } from "@hugeicons/core-free-icons"
 import { envConfig } from "@/lib/env"
+import { XPESA_PLATFORM_FEE_RATE } from "@/lib/payments/constants"
 
 export function PayButton({
   link,
@@ -101,9 +102,8 @@ export function PayButton({
     setIsPayingAction(true)
 
     try {
-      const PLATFORM_FEE = 0.12
-      const creatorAmount = amount * (1 - PLATFORM_FEE)
-      const platformAmount = amount * PLATFORM_FEE
+      const creatorAmount = amount * (1 - XPESA_PLATFORM_FEE_RATE)
+      const platformAmount = amount * XPESA_PLATFORM_FEE_RATE
 
       const usdcContract = getContract({
         client: client,

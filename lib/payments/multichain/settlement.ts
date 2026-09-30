@@ -4,6 +4,7 @@ import { envConfig } from "@/lib/env"
 import { USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains"
 import { createAccessForConfirmedPayment } from "@/lib/payments/access"
 import { getCreatorWallet, type MultichainLink } from "./link"
+import { XPESA_PLATFORM_FEE_RATE } from "@/lib/payments/constants"
 
 type SupabaseAdminClient = ReturnType<
   typeof import("@/lib/supabase/admin").createAdminClient
@@ -50,12 +51,13 @@ export async function settleMultichainPayment({
   }
 
   const amountUsdc = Number(intent.amount_usdc)
-  const platformFeeUsdc = roundUsdc(amountUsdc * 0.12)
+  const platformFeeUsdc = roundUsdc(amountUsdc * XPESA_PLATFORM_FEE_RATE)
   const creatorNetUsdc = roundUsdc(amountUsdc - platformFeeUsdc)
   const creatorWallet = getCreatorWallet(link)
   if (!creatorWallet) throw new Error("Creator wallet is not configured")
 
   let payoutTxHash = intent.payout_tx_hash as string | null
+  let gasCostAvax: number | null = null
   if (!payoutTxHash) {
     await supabase
       .from("bridge_payment_intents")
@@ -82,7 +84,12 @@ export async function settleMultichainPayment({
       })
       .eq("id", intent.id)
 
-    await tx.wait(1)
+    const receipt = await tx.wait(1)
+    if (receipt) {
+      gasCostAvax = Number(
+        ethers.formatEther(receipt.gasUsed * receipt.gasPrice)
+      )
+    }
   }
 
   const access = await createAccessForConfirmedPayment({
@@ -96,6 +103,7 @@ export async function settleMultichainPayment({
     creatorNetUsdc,
     requestHeaders,
     paymentMethod: "multichain",
+    gasCostAvax,
   })
 
   await supabase
