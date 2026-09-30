@@ -4,7 +4,11 @@ import { useState } from "react"
 import Link from "next/link"
 import { motion, useReducedMotion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { supportedNetworks, supportedTokens } from "@/lib/dashboard"
+import {
+  resolveNetworkLogo,
+  supportedNetworks,
+  supportedTokens,
+} from "@/lib/dashboard"
 import { cn } from "@/lib/utils"
 import { More01Icon } from "hugeicons-react"
 import TransactionDetailsModal from "@/components/ui/transaction-details-modal"
@@ -48,7 +52,9 @@ const tokenLogoMap = new Map(
 export function getNetworkLogo(network?: string | null) {
   if (!network) return null
   try {
-    return networkLogoMap.get(network.toLowerCase()) ?? null
+    return (
+      networkLogoMap.get(network.toLowerCase()) ?? resolveNetworkLogo(network)
+    )
   } catch {
     return null
   }
