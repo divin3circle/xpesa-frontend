@@ -8,6 +8,9 @@ import type { FiatPaymentStatus } from "@/lib/payments/fiat"
 import { getFiatStatusDescription, getFiatStatusMessage } from "./messages"
 import type { FiatCheckoutStep, FiatPaymentIntent, FiatQuote } from "./types"
 
+// Pretium's per-currency minimum fiat collection amount (mobile money).
+const MIN_FIAT_BY_CURRENCY: Record<string, number> = { KES: 100 }
+
 function isTerminalStatus(status?: FiatPaymentStatus) {
   return status === "access_issued" || status === "failed" || status === "expired"
 }
@@ -48,9 +51,19 @@ export function useFiatCheckout({
       })
       const body = await response.json()
       if (!response.ok) throw new Error(body.error || "Quote failed")
-      setQuote(body.quote)
+      const q = body.quote as FiatQuote
+      // Gate BEFORE showing the details form: block links below the provider's
+      // mobile-money minimum so the user isn't sent to fill out a doomed form.
+      const min = MIN_FIAT_BY_CURRENCY[currencyCode] ?? 0
+      if (q.amountFiat < min) {
+        toast.error(`Mobile payments need at least ${min} ${currencyCode}`, {
+          description: `This link is about ${Math.round(q.amountFiat)} ${currencyCode}. Try a higher-priced link, or pay with USDC instead.`,
+        })
+        return null
+      }
+      setQuote(q)
       setStep("details")
-      return body.quote as FiatQuote
+      return q
     } finally {
       setIsQuoting(false)
     }

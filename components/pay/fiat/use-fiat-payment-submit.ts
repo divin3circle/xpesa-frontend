@@ -35,6 +35,9 @@ export function useFiatPaymentSubmit({
     actions.setIsCreating(true)
     try {
       const quote = state.quote ?? (await actions.createQuote())
+      // createQuote returns null when the link is below the mobile-money minimum
+      // (it already showed a toast). Nothing to submit.
+      if (!quote) return
       const intent = await createFiatIntent({
         linkId: link.id,
         amountUsdc: amount,
@@ -49,7 +52,7 @@ export function useFiatPaymentSubmit({
       })
       actions.setIntent(intent)
       toast.success("Payment started", {
-        description: "Complete the payment prompt from Kotani.",
+        description: "Complete the M-Pesa prompt on your phone.",
       })
       await actions.pollIntent(intent.id)
     } catch (error) {
