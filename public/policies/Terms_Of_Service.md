@@ -140,17 +140,17 @@ XPesa sponsors gas fees for fans using embedded (email-based) wallets via smart 
 
 ## 5.4 Fiat Withdrawals 
 
-Creators may withdraw their USDC earnings to fiat (KES, UGX, etc) via our integration with Kotani Pay. Withdrawal is subject to: 
+Creators may withdraw their USDC earnings to fiat (KES, UGX, etc) via our integration with our licensed payments partner. Withdrawal is subject to: 
 
-- Kotani Pay's conversion fees (typically 1-2% of the withdrawal amount) 
+- Our payments partner's conversion fees (typically 1-2% of the withdrawal amount) 
 
 - Current USDC/KES exchange rates at time of withdrawal 
 
-- Minimum withdrawal amounts set by Kotani Pay 
+- Minimum withdrawal amounts set by our licensed payments partner 
 
-- Kotani Pay's terms of service and KYC requirements 
+- Our payments partner's terms of service and KYC requirements 
 
-XPesa is not responsible for delays, errors, or losses arising from Kotani Pay's services. Fiat withdrawals are subject to provider’s transaction limits. 
+XPesa is not responsible for delays, errors, or losses arising from our payments partner's services. Fiat withdrawals are subject to provider’s transaction limits. 
 
 XPesa Creators · XPesacreators.xyz · 4 
 
@@ -230,7 +230,7 @@ shall not exceed the total fees paid by you to XPesa in the 12 months preceding 
 
 ## 8.4 Third-Party Services 
 
-XPesa integrates with third-party services including Kotani Pay, ThirdWeb, Supabase, and Avalanche. We are not responsible for the availability, accuracy, or actions of these third-party services. Your use of these services is governed by their respective terms. 
+XPesa integrates with third-party services including our licensed payments partner, ThirdWeb, Supabase, and Avalanche. We are not responsible for the availability, accuracy, or actions of these third-party services. Your use of these services is governed by their respective terms. 
 
 ## 9. Indemnification 
 

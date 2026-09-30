@@ -66,7 +66,7 @@ export const howItWorksContent = {
         badge: "Step 3",
         title: "Collect earnings and withdraw smoothly",
         description:
-          "Your earnings settle on Avalanche as USDC, then xpesa routes your offramp via Kotani Pay so you can receive funds in M-Pesa.",
+          "Your earnings settle on Avalanche as USDC, then xpesa routes your offramp via Pretium so you can receive funds in M-Pesa.",
         buttonText: "View payout path",
         imageSrc:
           "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=1200&q=80",

@@ -25,7 +25,7 @@ export const pricingContent = {
     { text: "All four ways to sell: Document, Pack, Gate, and Tip" },
     { text: "Access expiry controls: one-time, timed, forever" },
     { text: "Basic dashboard: earnings, transactions, active links" },
-    { text: "M-Pesa offramp via Kotani Pay" },
+    { text: "M-Pesa offramp via Pretium" },
     { text: "AI link description writer (3 uses/day)" },
     { text: '"Powered by xpesa" branding on public/payment pages' },
     { text: "Transaction fee: 12%" },
