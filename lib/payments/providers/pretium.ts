@@ -75,6 +75,10 @@ export function createPretiumProvider(config?: {
       body: JSON.stringify(body),
     })
     const json = (await res.json().catch(() => ({}))) as PretiumEnvelope<T>
+    // TODO(trial): remove once Pretium response shapes are confirmed. Logs every
+    // raw response (incl. errors) so the real field names can be mapped from the
+    // Vercel runtime logs. Tagged for easy grep + removal.
+    console.log("[PRETIUM_TRIAL]", path, res.status, JSON.stringify(json))
     if (!res.ok || (json.code !== undefined && json.code >= 400)) {
       throw new Error(`Pretium ${path} failed: ${json.message ?? res.status}`)
     }

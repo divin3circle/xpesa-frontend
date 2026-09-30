@@ -14,6 +14,8 @@ export async function POST(request: NextRequest) {
   const supabase = createAdminClient()
   const provider = getFiatProvider()
   const payload = await request.json().catch(() => ({}))
+  // TODO(trial): remove once Pretium webhook shape is confirmed.
+  console.log("[PRETIUM_TRIAL] webhook", JSON.stringify(payload))
 
   const verification = provider.verifyWebhookSignature({
     payload,
