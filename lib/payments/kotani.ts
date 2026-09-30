@@ -546,6 +546,7 @@ export async function settleFiatPaymentIntent({
     .maybeSingle()
 
   let payoutTxHash = existingTransfer?.tx_hash ?? null
+  let gasCostAvax: number | null = null
 
   if (!existingTransfer) {
     const { data: transfer, error: transferError } = await supabase
@@ -596,7 +597,12 @@ export async function settleFiatPaymentIntent({
         })
         .eq("id", transfer.id)
 
-      await tx.wait(1)
+      const receipt = await tx.wait(1)
+      if (receipt) {
+        gasCostAvax = Number(
+          ethers.formatEther(receipt.gasUsed * receipt.gasPrice)
+        )
+      }
 
       await supabase
         .from("settlement_transfers")
@@ -640,6 +646,7 @@ export async function settleFiatPaymentIntent({
     requestHeaders,
     paymentIntentId,
     paymentMethod: intent.method,
+    gasCostAvax,
   })
 
   await supabase
