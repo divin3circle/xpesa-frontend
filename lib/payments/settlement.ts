@@ -240,7 +240,13 @@ async function settleOnChain({
   const access = await createAccessForConfirmedPayment({
     supabase,
     link,
-    fanWalletAddress: `fiat:${intentId}`,
+    // Internal sentinel marking a fiat-settled (walletless) purchase. The access
+    // layer (docs/packs open routes, receipt eligibility, viewer, unlock hook)
+    // keys token-only access off this exact `kotani:` prefix, and historical
+    // rows use it too — so it stays as-is for compatibility. Renaming it to a
+    // provider-neutral prefix is a coordinated follow-up for the money audit,
+    // not a hot-path change before testing.
+    fanWalletAddress: `kotani:${intentId}`,
     txHash: payoutTxHash,
     // On Base the native gas is ETH; the column is historically named *_avax but
     // stores native gas cost for whichever chain settled.
