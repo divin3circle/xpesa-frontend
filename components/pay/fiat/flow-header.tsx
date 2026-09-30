@@ -10,7 +10,7 @@ export function FlowHeader({ method }: { method: FiatPaymentMethod }) {
           {method === "mobile_money" ? "Mobile money" : "Bank transfer"}
         </p>
         <p className="text-xs text-muted-foreground">
-          Powered by Kotani Pay. Access unlocks after USDC settlement.
+          Powered by Pretium. Access unlocks after USDC settlement.
         </p>
       </div>
       {method === "mobile_money" ? (

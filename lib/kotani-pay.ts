@@ -43,7 +43,7 @@ export const KOTANI_DEFAULT_COUNTRY_CODE: KotaniCountryCode = "KE"
 export const KOTANI_DEFAULT_CURRENCY_CODE: KotaniCurrencyCode = "KES"
 export const KOTANI_DEFAULT_DIAL_CODE: KotaniDialCode = "+254"
 export const KOTANI_DEFAULT_NETWORK: KotaniNetwork = "mpesa"
-export const KOTANI_DEFAULT_PROVIDER = "Kotani Pay"
+export const KOTANI_DEFAULT_PROVIDER = "Pretium"
 export const KOTANI_CALLBACK_URL = `${envConfig.APP_URL}/api/payments/confirm`
 
 export const KOTANI_COUNTRY_CODES = ["KE", "UG", "TZ", "ZM"] as const

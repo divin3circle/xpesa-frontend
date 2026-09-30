@@ -46,7 +46,7 @@ export function FiatPayButton({
         {payButtonLabel}
       </Button>
       <p className="mt-2 text-center text-xs text-muted-foreground">
-        Powered by Kotani Pay. Access unlocks after USDC settlement.
+        Powered by Pretium. Access unlocks after USDC settlement.
       </p>
       <Dialog open={state.isDialogOpen} onOpenChange={actions.setIsDialogOpen}>
         <DialogContent className="sm:max-w-md">

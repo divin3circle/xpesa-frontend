@@ -28,7 +28,7 @@ export default function PayoutSettingsPage() {
           <CardHeader>
             <CardTitle>Payout profile</CardTitle>
             <CardDescription>
-              Used by Kotani Pay during withdrawal processing.
+              Used by Pretium during withdrawal processing.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

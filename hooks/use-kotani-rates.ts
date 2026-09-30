@@ -21,10 +21,10 @@ export function useKotaniRates(
       params.set("source", sourceCurrency)
       if (destinationCurrency) params.set("destination", destinationCurrency)
 
-      const res = await fetch(`/api/kotani/rates?${params.toString()}`)
+      const res = await fetch(`/api/payments/fiat/rate?${params.toString()}`)
       if (!res.ok) {
         const text = await res.text().catch(() => "")
-        throw new Error(`Kotani rates error: ${res.status} ${text}`)
+        throw new Error(`Rate error: ${res.status} ${text}`)
       }
       return res.json()
     },
