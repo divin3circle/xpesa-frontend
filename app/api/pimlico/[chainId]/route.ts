@@ -30,23 +30,66 @@ export async function POST(
     )
   }
 
-  const body = await request.text()
+  const rawBody = await request.text()
+  const pimlicoUrl = `https://api.pimlico.io/v2/${chainId}/rpc?apikey=${PIMLICO_API_KEY}`
+
+  // thirdweb fetches userOp gas fees via `thirdweb_getUserOperationGasPrice`, a
+  // method only thirdweb's own bundler implements. Pimlico doesn't — so without
+  // this translation the fees come back empty and the bundler rejects the userOp
+  // with "maxPriorityFeePerGas must be at least ...". Translate that one call to
+  // Pimlico's `pimlico_getUserOperationGasPrice` (slow/standard/fast tiers) and
+  // return the shape thirdweb expects: { maxFeePerGas, maxPriorityFeePerGas }.
+  let parsed: { id?: unknown; jsonrpc?: unknown; method?: string } | null = null
+  try {
+    parsed = JSON.parse(rawBody)
+  } catch {
+    parsed = null
+  }
+
+  const isGasPrice =
+    parsed && parsed.method === "thirdweb_getUserOperationGasPrice"
 
   let upstream: Response
   try {
-    upstream = await fetch(
-      `https://api.pimlico.io/v2/${chainId}/rpc?apikey=${PIMLICO_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body,
-      }
-    )
+    upstream = await fetch(pimlicoUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: isGasPrice
+        ? JSON.stringify({
+            id: parsed!.id ?? 1,
+            jsonrpc: parsed!.jsonrpc ?? "2.0",
+            method: "pimlico_getUserOperationGasPrice",
+            params: [],
+          })
+        : rawBody,
+    })
   } catch {
     return Response.json({ error: "Paymaster upstream error" }, { status: 502 })
   }
 
   const text = await upstream.text()
+
+  if (isGasPrice && upstream.ok) {
+    try {
+      const json = JSON.parse(text)
+      // Use "fast" for headroom against price moves between quote and submit.
+      const tier =
+        json?.result?.fast ?? json?.result?.standard ?? json?.result?.slow
+      if (tier?.maxFeePerGas && tier?.maxPriorityFeePerGas) {
+        return Response.json({
+          id: parsed!.id ?? 1,
+          jsonrpc: parsed!.jsonrpc ?? "2.0",
+          result: {
+            maxFeePerGas: tier.maxFeePerGas,
+            maxPriorityFeePerGas: tier.maxPriorityFeePerGas,
+          },
+        })
+      }
+    } catch {
+      // fall through to raw passthrough below
+    }
+  }
+
   return new Response(text, {
     status: upstream.status,
     headers: { "Content-Type": "application/json" },

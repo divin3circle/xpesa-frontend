@@ -31,6 +31,30 @@ type PretiumEnvelope<T = Record<string, unknown>> = {
   data?: T
 }
 
+/**
+ * Pretium's M-Pesa `shortcode` must be the 10-digit Kenyan local MSISDN
+ * (e.g. 0701838690). Normalize the various formats a user might enter:
+ *   +254701838690 / 254701838690 -> 0701838690
+ *   701838690                     -> 0701838690
+ *   0701838690                    -> 0701838690 (unchanged)
+ * TODO(multicurrency): this is Kenya/KES-specific; generalize per country when
+ * Pretium supports more fiat rails.
+ */
+function toMpesaShortcode(phone: string): string {
+  const digits = (phone ?? "").replace(/\D/g, "")
+  if (digits.startsWith("254") && digits.length === 12) {
+    return "0" + digits.slice(3)
+  }
+  if (digits.length === 9) {
+    return "0" + digits
+  }
+  if (digits.startsWith("0") && digits.length === 10) {
+    return digits
+  }
+  // Best effort: last 9 significant digits with a leading 0.
+  return "0" + digits.slice(-9)
+}
+
 function mapPretiumStatus(raw: string | null | undefined): ProviderTxState {
   switch ((raw ?? "").toUpperCase()) {
     case "PENDING":
@@ -124,7 +148,7 @@ export function createPretiumProvider(config?: {
       const json = await call<Record<string, unknown>>(
         `/v1/onramp/${input.fiatCurrency}`,
         {
-          shortcode: input.buyer.phone,
+          shortcode: toMpesaShortcode(input.buyer.phone),
           amount: input.amountFiat,
           mobile_network: input.buyer.network,
           address: input.receiverAddress,
@@ -169,7 +193,7 @@ export function createPretiumProvider(config?: {
           transaction_hash: input.transactionHash,
           chain: input.chain,
           type: "MOBILE",
-          shortcode: input.recipient.phone,
+          shortcode: toMpesaShortcode(input.recipient.phone),
           amount: input.amountFiat,
           mobile_network: input.recipient.network,
           fee: input.fee,
