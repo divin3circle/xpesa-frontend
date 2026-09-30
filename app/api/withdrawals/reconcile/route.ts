@@ -1,18 +1,16 @@
 import { NextRequest, NextResponse } from "next/server"
 
 import { createAdminClient } from "@/lib/supabase/admin"
-import {
-  getKotaniOfframpStatus,
-  mapKotaniOfframpStatus,
-} from "@/lib/payments/kotani-offramp"
+import { getFiatProvider } from "@/lib/payments/providers"
 
 /**
  * GET /api/withdrawals/reconcile — cron-triggered repair for withdrawals stuck in a non-terminal
- * state (a missed/late webhook). Polls Kotani for the true status and advances the record. This
- * is the source of truth; the webhook is an optimization. Guard with CRON_SECRET when set.
+ * state. Polls the provider's authoritative status API and advances the record. This is the
+ * source of truth for the offramp (Pretium webhooks are unsigned). Guard with CRON_SECRET.
  */
 const STUCK_AFTER_MS = 5 * 60 * 1000
 const BATCH = 50
+const OFFRAMP_CURRENCY = "KES"
 
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET
@@ -30,15 +28,20 @@ export async function GET(request: NextRequest) {
     .lt("updated_at", cutoff)
     .limit(BATCH)
 
+  const provider = getFiatProvider()
   const results: { id: string; status: string }[] = []
 
   for (const w of stuck ?? []) {
     if (!w.offramp_reference) continue
     try {
-      const s = await getKotaniOfframpStatus(w.offramp_reference)
-      const outcome = mapKotaniOfframpStatus(s.status)
-      if (outcome === "provider_processing") continue
+      const s = await provider.getTransactionStatus({
+        reference: w.offramp_reference,
+        fiatCurrency: OFFRAMP_CURRENCY,
+      })
+      // Still in flight — leave for the next cycle.
+      if (s.state !== "complete" && s.state !== "failed") continue
 
+      const outcome = s.state === "complete" ? "paid" : "failed"
       const now = new Date().toISOString()
       const update: Record<string, unknown> = { status: outcome, updated_at: now }
       if (outcome === "paid") {

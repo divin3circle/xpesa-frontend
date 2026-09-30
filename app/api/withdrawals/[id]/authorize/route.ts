@@ -1,14 +1,25 @@
 import { NextRequest, NextResponse } from "next/server"
 
+import { envConfig } from "@/lib/env"
 import { relayTransferWithAuthorization } from "@/lib/payments/relayer"
 import type { TransferAuthorization } from "@/lib/payments/eip3009"
+import { getFiatProvider } from "@/lib/payments/providers"
 import { getCurrentCreatorWithWallet } from "@/lib/payments/withdrawal-server"
 import { validateSignedAuthorization } from "@/lib/payments/withdrawal-authorization"
+import {
+  withdrawalNetworkToCarrier,
+  type WithdrawalChain,
+  type WithdrawalNetwork,
+} from "@/lib/payments/withdrawal"
+
+// Offramp is KES-only today; the provider status/pay endpoints are per-currency.
+const OFFRAMP_CURRENCY = "KES"
 
 /**
  * POST /api/withdrawals/[id]/authorize — accept the creator's signed EIP-3009 authorization,
- * validate it against the stored (trusted) fields, then relay it on-chain. Non-custodial:
- * the USDC moves creator → Kotani deposit address; the platform only pays gas.
+ * validate it against the stored (trusted) fields, relay it on-chain (creator → the provider's
+ * static settlement address; the platform only pays gas), then trigger the provider payout
+ * (PUSH) with the resulting tx hash. Non-custodial throughout.
  */
 export async function POST(
   request: NextRequest,
@@ -36,7 +47,7 @@ export async function POST(
     const { data: withdrawal, error } = await supabase
       .from("withdrawals")
       .select(
-        "id, creator_id, status, escrow_address, amount_usdc, authorization_nonce, wallet_tx_hash"
+        "id, creator_id, status, escrow_address, amount_usdc, amount_kes, authorization_nonce, wallet_tx_hash, chain, network, mpesa_number, offramp_reference"
       )
       .eq("id", id)
       .single()
@@ -73,11 +84,15 @@ export async function POST(
       return NextResponse.json({ error: validationError }, { status: 422 })
     }
 
+    const chain = (withdrawal.chain as WithdrawalChain) ?? "AVALANCHE"
     const { txHash } = await relayTransferWithAuthorization({
       authorization: body.authorization,
       signature: body.signature,
+      chain,
     })
 
+    // Record the broadcast before calling the provider, so a payout failure
+    // leaves a recoverable trail (the reconcile cron can retry the payout).
     await supabase
       .from("withdrawals")
       .update({
@@ -87,7 +102,38 @@ export async function POST(
       })
       .eq("id", id)
 
-    return NextResponse.json({ status: "onchain_sent", txHash })
+    // PUSH: tell the provider the USDC has landed at its settlement address and
+    // to disburse fiat. Reuse our pre-generated reference; adopt the provider's
+    // transaction code for status polling.
+    const provider = getFiatProvider()
+    const payout = await provider.createOfframpPayout({
+      reference: String(withdrawal.offramp_reference),
+      amountFiat: Number(withdrawal.amount_kes),
+      fiatCurrency: OFFRAMP_CURRENCY,
+      chain,
+      transactionHash: txHash,
+      recipient: {
+        phone: String(withdrawal.mpesa_number),
+        network: withdrawalNetworkToCarrier(
+          withdrawal.network as WithdrawalNetwork
+        ),
+      },
+      callbackUrl: envConfig.PRETIUM_WEBHOOK_URL,
+    })
+
+    await supabase
+      .from("withdrawals")
+      .update({
+        status: "provider_processing",
+        offramp_reference: payout.providerReference,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+
+    return NextResponse.json({
+      status: "provider_processing",
+      txHash,
+    })
   } catch (error) {
     return NextResponse.json(
       {

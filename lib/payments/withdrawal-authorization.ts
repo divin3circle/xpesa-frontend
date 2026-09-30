@@ -1,5 +1,5 @@
 import { envConfig } from "@/lib/env"
-import { USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains"
+import { getChainConfig, type PaymentChain } from "@/lib/payments/chains"
 import {
   buildAuthorization,
   buildTransferWithAuthorizationTypedData,
@@ -16,12 +16,19 @@ export function usdcBaseUnits(valueUsdc: number): string {
   return BigInt(Math.round(valueUsdc * 1_000_000)).toString()
 }
 
-/** Build a fresh signable authorization + EIP-712 typed data for a withdrawal. */
+/**
+ * Build a fresh signable authorization + EIP-712 typed data for a withdrawal.
+ * The EIP-712 domain (chainId + verifying USDC contract) is chain-specific, so a
+ * Base offramp must be signed against Base's chainId/USDC or the signature is
+ * invalid on-chain. Defaults to Avalanche for backward compatibility.
+ */
 export function buildWithdrawalTypedData(params: {
   from: string
   to: string
   valueUsdc: number
+  chain?: PaymentChain
 }) {
+  const chainConfig = getChainConfig(params.chain ?? "AVALANCHE")
   const authorization = buildAuthorization({
     from: params.from,
     to: params.to,
@@ -29,8 +36,8 @@ export function buildWithdrawalTypedData(params: {
   })
   const typedData = buildTransferWithAuthorizationTypedData({
     authorization,
-    chainId: envConfig.PAYMENT_CHAIN_ID,
-    usdcAddress: USDC_CONTRACT_ADDRESS,
+    chainId: chainConfig.chainId,
+    usdcAddress: chainConfig.usdcAddress,
     tokenName: envConfig.USDC_TOKEN_NAME,
     tokenVersion: envConfig.USDC_TOKEN_VERSION,
   })
