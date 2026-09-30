@@ -15,6 +15,7 @@ import {
 } from "@/lib/env"
 import { USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains"
 import { createAccessForConfirmedPayment } from "@/lib/payments/access"
+import { XPESA_PLATFORM_FEE_RATE } from "@/lib/payments/constants"
 import { auditSecurityEvent } from "@/lib/security/audit"
 import {
   checkSensitiveRateLimit,
@@ -211,7 +212,7 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const platformFee = grossUsdc * 0.12
+  const platformFee = grossUsdc * XPESA_PLATFORM_FEE_RATE
   const creatorNet = grossUsdc - platformFee
   const creatorTransferFound = hasTransferTo({
     logs: receipt.logs,

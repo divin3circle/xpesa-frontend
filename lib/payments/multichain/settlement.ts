@@ -4,6 +4,7 @@ import { envConfig } from "@/lib/env"
 import { USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains"
 import { createAccessForConfirmedPayment } from "@/lib/payments/access"
 import { getCreatorWallet, type MultichainLink } from "./link"
+import { XPESA_PLATFORM_FEE_RATE } from "@/lib/payments/constants"
 
 type SupabaseAdminClient = ReturnType<
   typeof import("@/lib/supabase/admin").createAdminClient
@@ -50,7 +51,7 @@ export async function settleMultichainPayment({
   }
 
   const amountUsdc = Number(intent.amount_usdc)
-  const platformFeeUsdc = roundUsdc(amountUsdc * 0.12)
+  const platformFeeUsdc = roundUsdc(amountUsdc * XPESA_PLATFORM_FEE_RATE)
   const creatorNetUsdc = roundUsdc(amountUsdc - platformFeeUsdc)
   const creatorWallet = getCreatorWallet(link)
   if (!creatorWallet) throw new Error("Creator wallet is not configured")

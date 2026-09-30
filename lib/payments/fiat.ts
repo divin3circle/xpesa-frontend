@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+import { XPESA_PLATFORM_FEE_RATE } from "./constants"
+
 export const FIAT_PAYMENT_METHODS = [
   "mobile_money",
   "bank_transfer",
@@ -19,7 +21,7 @@ export const FIAT_PAYMENT_STATUSES = [
 export type FiatPaymentMethod = (typeof FIAT_PAYMENT_METHODS)[number]
 export type FiatPaymentStatus = (typeof FIAT_PAYMENT_STATUSES)[number]
 
-export const XPESA_PLATFORM_FEE_RATE = 0.12
+export { XPESA_PLATFORM_FEE_RATE }
 
 const positiveMoney = z.coerce
   .number()
