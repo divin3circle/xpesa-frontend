@@ -145,30 +145,6 @@ export function resolveExplorerUrl(txHash: string): string {
   return `${baseUrl}${txHash}`
 }
 
-export function getKotaniBaseUrl(): string {
-  const env = process.env.KOTANI_ENV
-
-  switch (env) {
-    case "sandbox":
-      return process.env.KOTANI_SANDBOX_BASE_URL || ""
-    case "production":
-      return process.env.KOTANI_BASE_URL || ""
-    default:
-      return process.env.KOTANI_SANDBOX_BASE_URL || ""
-  }
-}
-
-export function getKotaniWebhookUrl(): string {
-  const localWebhookUrl =
-    process.env.KOTANI_LOCAL_WEBHOOK_URL ||
-    `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/kotani/webhook`
-  const prodWebhookUrl =
-    process.env.KOTANI_PROD_WEBHOOK_URL ||
-    "https://xpesacreators.xyz/api/kotani/webhook"
-
-  return isDevEnvironment(getRuntimeEnv()) ? localWebhookUrl : prodWebhookUrl
-}
-
 export const envConfig = {
   THIRDWEB_CLIENT_ID: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID || "",
   SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
@@ -243,21 +219,9 @@ export const envConfig = {
   OPENAI_MODERATION_MODEL:
     process.env.OPENAI_MODERATION_MODEL || "omni-moderation-latest",
   ADMIN_EMAILS: process.env.ADMIN_EMAILS || "",
-  KOTANI_SECRET: process.env.KOTANI_SECRET || "",
-  KOTANI_KEY: process.env.KOTANI_KEY || "",
-  KOTANI_ENV: process.env.KOTANI_ENV || "sandbox",
-  KOTANI_BASE_URL: getKotaniBaseUrl(),
-  KOTANI_COLLECTION_ENDPOINT: process.env.KOTANI_COLLECTION_ENDPOINT || "",
-  KOTANI_OFFRAMP_ENDPOINT: process.env.KOTANI_OFFRAMP_ENDPOINT || "/offramp",
-  KOTANI_OFFRAMP_RATE_ENDPOINT:
-    process.env.KOTANI_OFFRAMP_RATE_ENDPOINT || "/rates/offramp-rate",
   USDC_TOKEN_NAME: process.env.USDC_TOKEN_NAME || "USD Coin",
   USDC_TOKEN_VERSION: process.env.USDC_TOKEN_VERSION || "2",
   PAYMENT_CHAIN_ID: resolvePaymentChainId(),
-  KOTANI_PROD_WEBHOOK_URL: process.env.KOTANI_PROD_WEBHOOK_URL || "",
-  KOTANI_LOCAL_WEBHOOK_URL: process.env.KOTANI_LOCAL_WEBHOOK_URL || "",
-  KOTANI_WEBHOOK_URL: getKotaniWebhookUrl(),
-  KOTANI_WEBHOOK_SECRET: process.env.KOTANI_WEBHOOK_SECRET || "",
   // Fiat provider (Pretium) webhook URL + internal reconcile secret.
   PRETIUM_WEBHOOK_URL: process.env.PRETIUM_WEBHOOK_URL || "",
   RECONCILE_SECRET: process.env.RECONCILE_SECRET || "",

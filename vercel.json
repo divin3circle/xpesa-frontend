@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    {
+      "path": "/api/payments/fiat/reconcile",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/withdrawals/reconcile",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}
