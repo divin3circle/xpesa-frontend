@@ -19,6 +19,9 @@ import { randomUUID } from "crypto"
 const ONRAMP_CHAIN = "BASE"
 const ONRAMP_ASSET = "USDC"
 
+// Pretium enforces a per-currency minimum on the fiat collection amount.
+const MIN_ONRAMP_FIAT: Record<string, number> = { KES: 100 }
+
 export async function POST(request: NextRequest) {
   const supabase = createAdminClient()
 
@@ -85,6 +88,20 @@ export async function POST(request: NextRequest) {
       amountUsdc: input.amountUsdc,
       fiatCurrency: input.fiatCurrency,
     })
+
+    const minFiat = MIN_ONRAMP_FIAT[input.fiatCurrency] ?? 0
+    if (quote.amountFiat < minFiat) {
+      return NextResponse.json(
+        {
+          error: `Mobile payments need at least ${minFiat} ${input.fiatCurrency}. This link is about ${quote.amountFiat} ${input.fiatCurrency}.`,
+          code: "BELOW_MIN_FIAT",
+          minFiat,
+          amountFiat: quote.amountFiat,
+          fiatCurrency: input.fiatCurrency,
+        },
+        { status: 422 }
+      )
+    }
 
     const amounts = calculateFiatPaymentAmounts(input.amountUsdc)
     const providerReference = randomUUID()
