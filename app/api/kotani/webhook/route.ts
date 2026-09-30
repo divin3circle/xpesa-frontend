@@ -6,6 +6,7 @@ import {
   settleFiatPaymentIntent,
   verifyKotaniWebhookSignature,
 } from "@/lib/payments/kotani"
+import { handleOfframpWebhookEvent } from "@/lib/payments/offramp-webhook"
 import { auditSecurityEvent } from "@/lib/security/audit"
 
 const ALLOWED_KOTANI_EVENTS = new Set([
@@ -30,6 +31,14 @@ export async function POST(request: NextRequest) {
   }
 
   const event = parseKotaniWebhook(payload)
+
+  // Creator offramp (crypto -> fiat) events: matched by withdrawals.offramp_reference.
+  // Handled first; falls through to the onramp path when no withdrawal matches.
+  const offramp = await handleOfframpWebhookEvent({ supabase, event })
+  if (offramp.matched) {
+    return NextResponse.json({ ok: true, offramp: true, status: offramp.status })
+  }
+
   if (!ALLOWED_KOTANI_EVENTS.has(event.eventType)) {
     auditSecurityEvent("warn", "kotani_webhook_unexpected_event", {
       eventType: event.eventType,

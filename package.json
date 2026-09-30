@@ -10,6 +10,8 @@
     "lint": "eslint",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "NODE_OPTIONS=--max-old-space-size=4096 tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "env:prod:check": "ENV=PROD bun scripts/validate-production-env.ts"
   },
   "dependencies": {
@@ -81,6 +83,7 @@
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "tailwindcss": "4.2.4",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.1"
   }
 }

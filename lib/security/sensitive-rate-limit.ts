@@ -18,6 +18,7 @@ export type SensitiveRateLimitScope =
   | "quest_enter"
   | "quest_attempt"
   | "quest_score"
+  | "withdrawal"
   | "quest_submit"
   | "quest_progress"
   | "quest_answer_upload"

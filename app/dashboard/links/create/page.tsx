@@ -1,9 +1,7 @@
 "use client"
 
-import React, { ChangeEvent, useMemo, useState } from "react"
-import Image from "next/image"
+import { ChangeEvent, useMemo, useState } from "react"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -15,17 +13,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Edit01FreeIcons } from "@hugeicons/core-free-icons"
-import { HugeiconsIcon } from "@hugeicons/react"
-import {
-  DocumentCodeIcon,
-  Link01Icon,
-  Package01Icon,
-  TipsIcon,
-} from "hugeicons-react"
 import { useCreateLink } from "@/hooks/use-links"
 import LoadingSpinner from "@/components/ui/loading-spinner"
-import type { CreateLinkParams } from "@/hooks/use-links"
 import { createClient } from "@/lib/supabase/client"
 import {
   getUploadErrorMessage,
@@ -33,244 +22,25 @@ import {
   uploadPackAndFinalize,
 } from "@/lib/links/upload-client"
 import {
-  acceptedUploadTypes,
   classifyFileByExtension,
   validatePackSelection,
   validateSingleUpload,
-  type SupportedFileKind,
 } from "@/lib/links/file-policy"
 import type { PackFileCreateInput } from "@/lib/links/types"
 import { toast } from "sonner"
 
-type UploadedDoc = {
-  r2Key: string
-  pageCount: number | null
-  fileSizeBytes: number
-  filename: string
-  fileType?: SupportedFileKind
-}
-
-type SelectedPackFile = {
-  id: string
-  file: File
-  fileType: SupportedFileKind
-}
-
-type LinkMode = "gate" | "document" | "pack" | "tip"
-
-const modeCards: Array<{
-  mode: LinkMode
-  emoji: React.ReactNode
-  title: string
-  subtitle: string
-}> = [
-  {
-    mode: "gate",
-    emoji: <Link01Icon />,
-    title: "Gate a link",
-    subtitle: "Fan pays to unlock your a URL with premium content.",
-  },
-  {
-    mode: "document",
-    emoji: <DocumentCodeIcon />,
-    title: "Upload a file",
-    subtitle: "Single file up to 50MB with secured access.",
-  },
-  {
-    mode: "pack",
-    emoji: <Package01Icon />,
-    title: "Upload a file pack",
-    subtitle: "Up to 3 files, 150MB total.",
-  },
-  {
-    mode: "tip",
-    emoji: <TipsIcon />,
-    title: "Accept a tip",
-    subtitle: "Fan pays what they want. No content needed.",
-  },
-]
-
-function formatBytes(bytes: number) {
-  if (!bytes) return "0 KB"
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
-
-function parseOptionalNumber(value: string) {
-  const trimmedValue = value.trim()
-  if (!trimmedValue) return undefined
-
-  const parsedValue = Number(trimmedValue)
-  return Number.isFinite(parsedValue) ? parsedValue : undefined
-}
-
-const KES_PER_USDC = 129
-
-function formatKesFromUsdc(value: string) {
-  const amount = parseOptionalNumber(value)
-  if (!amount || amount <= 0) return "KES 0"
-
-  return new Intl.NumberFormat("en-KE", {
-    style: "currency",
-    currency: "KES",
-    maximumFractionDigits: 0,
-  }).format(amount * KES_PER_USDC)
-}
-
-type LinkFormValues = {
-  mode: LinkMode
-  title: string
-  description: string
-  thumbnailDataUrl: string
-  destinationUrl: string
-  gatePriceUsdc: string
-  documentPriceUsdc: string
-  packPriceUsdc: string
-  tipSuggestedAmountUsdc: string
-  tipMessage: string
-  accessExpiryType: string
-  documentUpload: UploadedDoc | null
-  selectedPackFiles: SelectedPackFile[]
-  finalizedPackSizeBytes?: number
-  finalizedPackR2Key?: string
-  finalizedPackFiles?: PackFileCreateInput[]
-}
-
-function buildCreateLinkParams({
-  mode,
-  title,
-  description,
-  thumbnailDataUrl,
-  destinationUrl,
-  gatePriceUsdc,
-  documentPriceUsdc,
-  packPriceUsdc,
-  tipSuggestedAmountUsdc,
-  tipMessage,
-  accessExpiryType,
-  documentUpload,
-  selectedPackFiles,
-  finalizedPackSizeBytes,
-  finalizedPackR2Key,
-  finalizedPackFiles,
-}: LinkFormValues): {
-  params: CreateLinkParams | null
-  errorMessage: string | null
-} {
-  const trimmedTitle = title.trim()
-  if (!trimmedTitle) {
-    return {
-      params: null,
-      errorMessage: "Please add a title before creating a link.",
-    }
-  }
-
-  const trimmedDescription = description.trim()
-  if (mode !== "tip" && !thumbnailDataUrl) {
-    return {
-      params: null,
-      errorMessage: "Please add a thumbnail before creating this link.",
-    }
-  }
-
-  switch (mode) {
-    case "tip":
-      return {
-        params: {
-          type: "tip",
-          title: trimmedTitle,
-          description: trimmedDescription,
-          thankYouMessage: tipMessage,
-          suggestedAmountUsdc: parseOptionalNumber(tipSuggestedAmountUsdc),
-        },
-        errorMessage: null,
-      }
-
-    case "gate": {
-      const trimmedDestinationUrl = destinationUrl.trim()
-      if (!trimmedDestinationUrl) {
-        return {
-          params: null,
-          errorMessage: "Please add a destination URL for the gated link.",
-        }
-      }
-
-      return {
-        params: {
-          type: "gate",
-          title: trimmedTitle,
-          description: trimmedDescription,
-          destinationUrl: trimmedDestinationUrl,
-          priceUsdc: parseOptionalNumber(gatePriceUsdc),
-          accessExpiryType,
-        },
-        errorMessage: null,
-      }
-    }
-
-    case "document": {
-      if (!documentUpload) {
-        return {
-          params: null,
-          errorMessage: "Upload a document before creating this link.",
-        }
-      }
-
-      return {
-        params: {
-          type: "document",
-          title: trimmedTitle,
-          description: trimmedDescription,
-          documentR2Key: documentUpload.r2Key,
-          documentPageCount: documentUpload.pageCount,
-          documentFileSizeBytes: documentUpload.fileSizeBytes,
-          priceUsdc: parseOptionalNumber(documentPriceUsdc),
-          accessExpiryType,
-        },
-        errorMessage: null,
-      }
-    }
-
-    case "pack": {
-      if (!selectedPackFiles.length) {
-        return {
-          params: null,
-          errorMessage:
-            "Upload at least one pack file before creating this link.",
-        }
-      }
-
-      if (!finalizedPackSizeBytes) {
-        return {
-          params: null,
-          errorMessage: "Pack upload is not finalized yet. Please try again.",
-        }
-      }
-
-      if (!finalizedPackR2Key) {
-        return {
-          params: null,
-          errorMessage: "Pack upload key is missing. Please retry upload.",
-        }
-      }
-
-      return {
-        params: {
-          type: "pack",
-          title: trimmedTitle,
-          description: trimmedDescription,
-          documentR2Key: finalizedPackR2Key,
-          packFileCount: selectedPackFiles.length,
-          packTotalSizeBytes: finalizedPackSizeBytes,
-          packFiles: finalizedPackFiles,
-          priceUsdc: parseOptionalNumber(packPriceUsdc),
-          accessExpiryType,
-        },
-        errorMessage: null,
-      }
-    }
-  }
-}
+import { DocumentFields } from "./_components/document-fields"
+import { FanPreview } from "./_components/fan-preview"
+import { GateFields } from "./_components/gate-fields"
+import { ModeCards } from "./_components/mode-cards"
+import { PackFields } from "./_components/pack-fields"
+import { TipFields } from "./_components/tip-fields"
+import { buildCreateLinkParams } from "./_components/helpers"
+import type {
+  LinkMode,
+  SelectedPackFile,
+  UploadedDoc,
+} from "./_components/types"
 
 export default function CreateLinkPage() {
   const [mode, setMode] = useState<LinkMode>("gate")
@@ -522,29 +292,7 @@ export default function CreateLinkPage() {
         </p>
       </section>
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {modeCards.map((card) => (
-          <Card
-            key={card.mode}
-            className={`cursor-pointer border transition-colors ${
-              mode === card.mode
-                ? "border-primary bg-primary/5"
-                : "border-border hover:bg-foreground/5"
-            }`}
-            onClick={() => setMode(card.mode)}
-          >
-            <CardHeader className="space-y-1">
-              <CardTitle className="flex gap-1 font-heading text-lg">
-                <span className="mr-2" aria-hidden>
-                  {card.emoji}
-                </span>
-                {card.title}
-              </CardTitle>
-              <CardDescription>{card.subtitle}</CardDescription>
-            </CardHeader>
-          </Card>
-        ))}
-      </section>
+      <ModeCards mode={mode} setMode={setMode} />
 
       <section className="grid gap-4 xl:grid-cols-5">
         <Card className="xl:col-span-3">
@@ -576,303 +324,44 @@ export default function CreateLinkPage() {
             </div>
 
             {mode === "gate" ? (
-              <>
-                <div className="space-y-2">
-                  <Label htmlFor="destination">Destination URL</Label>
-                  <Input
-                    id="destination"
-                    placeholder="https://example.com/private-resource"
-                    value={destinationUrl}
-                    onChange={(event) => setDestinationUrl(event.target.value)}
-                  />
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="price-gate">Price (USDC)</Label>
-                    <Input
-                      id="price-gate"
-                      placeholder="12.00"
-                      value={gatePriceUsdc}
-                      onChange={(event) => setGatePriceUsdc(event.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="thumbnail-gate">Thumbnail</Label>
-                    <Input
-                      id="thumbnail-gate"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleThumbnailChange}
-                    />
-                  </div>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="expiry-gate">Access expiry</Label>
-                    <select
-                      id="expiry-gate"
-                      className="h-10 w-full rounded-md border bg-background px-3 text-sm"
-                      value={accessExpiryType}
-                      onChange={(event) =>
-                        setAccessExpiryType(event.target.value)
-                      }
-                    >
-                      <option>Forever</option>
-                      <option>One-time only</option>
-                      <option>24 hours</option>
-                      <option>7 days</option>
-                      <option>30 days</option>
-                    </select>
-                  </div>
-                </div>
-              </>
+              <GateFields
+                destinationUrl={destinationUrl}
+                setDestinationUrl={setDestinationUrl}
+                gatePriceUsdc={gatePriceUsdc}
+                setGatePriceUsdc={setGatePriceUsdc}
+                accessExpiryType={accessExpiryType}
+                setAccessExpiryType={setAccessExpiryType}
+                handleThumbnailChange={handleThumbnailChange}
+              />
             ) : null}
 
             {mode === "document" ? (
-              <>
-                <div className="space-y-2">
-                  <Label>Document upload</Label>
-                    <Input
-                      type="file"
-                    accept={acceptedUploadTypes}
-                    onChange={(event) =>
-                      onDocumentFileSelect(event.target.files?.[0] ?? null)
-                    }
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    PDF, Office, CSV, image, or video. Max 50MB.
-                  </p>
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="price-document">Price (USDC)</Label>
-                    <Input
-                      id="price-document"
-                      placeholder="12.00"
-                      value={documentPriceUsdc}
-                      onChange={(event) =>
-                        setDocumentPriceUsdc(event.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="thumbnail-document">Thumbnail</Label>
-                    <Input
-                      id="thumbnail-document"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleThumbnailChange}
-                    />
-                  </div>
-                </div>
-
-                {documentUpload ? (
-                  <div className="flex items-center gap-3 rounded-xl border p-3 text-xs text-muted-foreground">
-                    <div>
-                      <p className="font-medium text-foreground">
-                        {documentUpload.filename}
-                      </p>
-                      <p>{documentUpload.pageCount} pages</p>
-                      <p>{formatBytes(documentUpload.fileSizeBytes)}</p>
-                    </div>
-                  </div>
-                ) : null}
-
-                <details className="rounded-xl border p-4">
-                  <summary className="cursor-pointer text-sm font-medium">
-                    Access Controls
-                  </summary>
-                  <div className="mt-4 grid gap-3">
-                    <label className="flex items-center justify-between text-sm">
-                      Expiry
-                      <select className="h-9 rounded-md border bg-background px-3 text-xs">
-                        <option>Forever</option>
-                        <option>One-time only</option>
-                        <option>5 minutes</option>
-                        <option>1 hour</option>
-                        <option>24 hours</option>
-                        <option>7 days</option>
-                        <option>30 days</option>
-                      </select>
-                    </label>
-                    <label className="flex items-center justify-between text-sm">
-                      Max opens
-                      <Input
-                        className="h-9 max-w-28"
-                        placeholder="Unlimited"
-                        type="number"
-                        min={1}
-                      />
-                    </label>
-                    <label className="flex items-center justify-between text-sm">
-                      IP binding
-                      <input type="checkbox" className="size-4" />
-                    </label>
-                    <label className="flex items-center justify-between text-sm text-muted-foreground">
-                      Wallet binding (always on)
-                      <input
-                        type="checkbox"
-                        checked
-                        readOnly
-                        disabled
-                        className="size-4"
-                      />
-                    </label>
-                    <label className="flex items-center justify-between text-sm">
-                      Wallet watermark
-                      <input
-                        type="checkbox"
-                        defaultChecked
-                        className="size-4"
-                      />
-                    </label>
-                    <label className="flex items-center justify-between text-sm">
-                      Block download & print
-                      <input
-                        type="checkbox"
-                        defaultChecked
-                        className="size-4"
-                      />
-                    </label>
-                  </div>
-                </details>
-              </>
+              <DocumentFields
+                onDocumentFileSelect={onDocumentFileSelect}
+                documentPriceUsdc={documentPriceUsdc}
+                setDocumentPriceUsdc={setDocumentPriceUsdc}
+                documentUpload={documentUpload}
+                handleThumbnailChange={handleThumbnailChange}
+              />
             ) : null}
 
             {mode === "pack" ? (
-              <>
-                <div className="space-y-2">
-                  <Label>Pack files</Label>
-                  <Input
-                    type="file"
-                    multiple
-                    accept={acceptedUploadTypes}
-                    onChange={(event) => onPackFilesSelect(event.target.files)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Up to 3 files, 150MB total. PDF, Office, CSV, image, and
-                    video are supported.
-                  </p>
-                  {selectedPackFiles.length > 0 ? (
-                    <div className="rounded-xl border p-3 text-xs text-muted-foreground">
-                      <p className="font-medium text-foreground">
-                        {selectedPackFiles.length} files selected
-                      </p>
-                      <ul className="mt-2 space-y-1">
-                        {selectedPackFiles.map((entry) => (
-                          <li key={entry.id}>
-                            {entry.file.name} - {formatBytes(entry.file.size)}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : null}
-                </div>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="price-pack">Price (USDC)</Label>
-                    <Input
-                      id="price-pack"
-                      placeholder="20.00"
-                      value={packPriceUsdc}
-                      onChange={(event) => setPackPriceUsdc(event.target.value)}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="thumbnail-pack">Thumbnail</Label>
-                    <Input
-                      id="thumbnail-pack"
-                      type="file"
-                      accept="image/*"
-                      onChange={handleThumbnailChange}
-                    />
-                  </div>
-                </div>
-
-                <details className="rounded-xl border p-4">
-                  <summary className="cursor-pointer text-sm font-medium">
-                    Access Controls
-                  </summary>
-                  <div className="mt-4 grid gap-3">
-                    <label className="flex items-center justify-between text-sm">
-                      Expiry
-                      <select className="h-9 rounded-md border bg-background px-3 text-xs">
-                        <option>Forever</option>
-                        <option>One-time only</option>
-                        <option>5 minutes</option>
-                        <option>1 hour</option>
-                        <option>24 hours</option>
-                        <option>7 days</option>
-                        <option>30 days</option>
-                      </select>
-                    </label>
-                    <label className="flex items-center justify-between text-sm">
-                      Max opens
-                      <Input
-                        className="h-9 max-w-28"
-                        placeholder="Unlimited"
-                        type="number"
-                        min={1}
-                      />
-                    </label>
-                    <label className="flex items-center justify-between text-sm">
-                      IP binding
-                      <input type="checkbox" className="size-4" />
-                    </label>
-                    <label className="flex items-center justify-between text-sm text-muted-foreground">
-                      Wallet binding (always on)
-                      <input
-                        type="checkbox"
-                        checked
-                        readOnly
-                        disabled
-                        className="size-4"
-                      />
-                    </label>
-                    <label className="flex items-center justify-between text-sm">
-                      Wallet watermark
-                      <input
-                        type="checkbox"
-                        defaultChecked
-                        className="size-4"
-                      />
-                    </label>
-                  </div>
-                </details>
-              </>
+              <PackFields
+                onPackFilesSelect={onPackFilesSelect}
+                selectedPackFiles={selectedPackFiles}
+                packPriceUsdc={packPriceUsdc}
+                setPackPriceUsdc={setPackPriceUsdc}
+                handleThumbnailChange={handleThumbnailChange}
+              />
             ) : null}
 
             {mode === "tip" ? (
-              <>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="tip-amount">Suggested amount (USDC)</Label>
-                    <Input
-                      id="tip-amount"
-                      placeholder="Leave empty for pay-what-you-want"
-                      type="number"
-                      value={tipSuggestedAmountUsdc}
-                      onChange={(event) =>
-                        setTipSuggestedAmountUsdc(event.target.value)
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="tip-thank-you">Thank-you message</Label>
-                    <Textarea
-                      id="tip-thank-you"
-                      maxLength={150}
-                      value={tipMessage}
-                      onChange={(event) => setTipMessage(event.target.value)}
-                    />
-                    <p className="text-right text-xs text-muted-foreground">
-                      {tipMessage.length}/150
-                    </p>
-                  </div>
-                </div>
-              </>
+              <TipFields
+                tipSuggestedAmountUsdc={tipSuggestedAmountUsdc}
+                setTipSuggestedAmountUsdc={setTipSuggestedAmountUsdc}
+                tipMessage={tipMessage}
+                setTipMessage={setTipMessage}
+              />
             ) : null}
 
             {uploadError ? (
@@ -895,70 +384,15 @@ export default function CreateLinkPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-chart-1 xl:col-span-2">
-          <CardHeader>
-            <CardTitle>Fan preview</CardTitle>
-            <CardDescription>
-              What your audience sees before payment.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="-mt-0.5">
-            <div
-              onClick={() =>
-                toast.info(
-                  "Custom video and image thumbnail upload coming soon."
-                )
-              }
-              className="group relative mb-2 cursor-pointer"
-            >
-              <Image
-                src={thumbnailDataUrl ? thumbnailDataUrl : "/icon.png"}
-                alt="Wallet"
-                width={200}
-                height={100}
-                className="w-full rounded-2xl h-52"
-              />
-              <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-background/75 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                <HugeiconsIcon
-                  icon={Edit01FreeIcons}
-                  className="size-5 text-chart-1"
-                />
-                <p className="mt-2 text-sm">Custom Thumbnail</p>
-              </div>
-            </div>
-            <div className="space-y-3 rounded-xl border p-4">
-              <Badge>{mode === "tip" ? "Support" : "Locked content"}</Badge>
-              <p className="font-medium">
-                {title.trim().length > 0 ? title : "React Native Crash Course"}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {mode === "pack"
-                  ? `${selectedPackFiles.length} files • ${packSummary.breakdown}`
-                  : mode === "document"
-                    ? `${documentUpload?.pageCount ?? 0} pages • secure in-browser access`
-                    : mode === "tip"
-                      ? "Fans can choose any amount to support your work"
-                      : "Complete practical guide with project files and implementation checklist."}
-              </p>
-              <div className="rounded-2xl bg-muted p-3 text-sm">
-                <p>
-                  Price:{" "}
-                  {mode === "tip"
-                    ? "Custom amount"
-                    : activePriceUsdc || "12.00"}{" "}
-                  USDC
-                </p>
-                <p className="text-muted-foreground">
-                  {mode === "pack"
-                    ? `${formatKesFromUsdc(activePriceUsdc)} • ${formatBytes(packSummary.totalBytes)}`
-                    : mode === "document"
-                      ? `${formatKesFromUsdc(activePriceUsdc)} • ${formatBytes(documentUpload?.fileSizeBytes ?? 0)}`
-                      : formatKesFromUsdc(activePriceUsdc)}
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <FanPreview
+          mode={mode}
+          title={title}
+          thumbnailDataUrl={thumbnailDataUrl}
+          activePriceUsdc={activePriceUsdc}
+          selectedPackFiles={selectedPackFiles}
+          packSummary={packSummary}
+          documentUpload={documentUpload}
+        />
       </section>
     </div>
   )
