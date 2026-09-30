@@ -45,3 +45,5 @@ next-env.d.ts
 .env.production.example
 contracts/docs/BACKEND_INTEGRATION.md
 contracts/docs/CONTRACT_SPEC.md
+.vercel
+.env*
