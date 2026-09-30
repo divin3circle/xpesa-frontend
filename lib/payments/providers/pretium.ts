@@ -141,13 +141,21 @@ export function createPretiumProvider(config?: {
       }
     },
 
-    async getOfframpSettlementAddress(_chain: string): Promise<string> {
-      // TODO(trial): confirm whether Pretium returns a per-order settlement
-      // address or a static per-account one. Using a configured static address.
-      if (!settlementAddress) {
-        throw new Error("PRETIUM_SETTLEMENT_ADDRESS is not configured")
+    async getOfframpSettlementAddress(chain: string): Promise<string> {
+      // Simplest + most stable UX: a static per-account settlement address per
+      // chain, configured via env (no extra round-trip, no per-order address to
+      // track, invisible to the creator). We support two chains for offramp:
+      // Avalanche + Base. TODO(trial): confirm with Pretium the address is static
+      // per account; if they return a per-order address, fetch it here instead.
+      const perChain =
+        process.env[`PRETIUM_SETTLEMENT_ADDRESS_${chain.toUpperCase()}`]
+      const address = perChain ?? settlementAddress
+      if (!address) {
+        throw new Error(
+          `No Pretium settlement address configured for chain ${chain}`
+        )
       }
-      return settlementAddress
+      return address
     },
 
     async createOfframpPayout(input): Promise<OfframpPayout> {
