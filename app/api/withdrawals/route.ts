@@ -1,22 +1,24 @@
 import { NextRequest, NextResponse } from "next/server"
 
-import { withdrawalRequestSchema } from "@/lib/payments/withdrawal"
 import {
-  getKotaniOfframpQuote,
-  requestKotaniOfframp,
-} from "@/lib/payments/kotani-offramp"
-import { createKotaniReferenceId } from "@/lib/kotani-pay"
+  withdrawalRequestSchema,
+  type WithdrawalChain,
+} from "@/lib/payments/withdrawal"
+import { getFiatProvider } from "@/lib/payments/providers"
 import {
   checkSensitiveRateLimit,
   rateLimitResponse,
 } from "@/lib/security/sensitive-rate-limit"
 import { getCurrentCreatorWithWallet } from "@/lib/payments/withdrawal-server"
 import { buildWithdrawalTypedData } from "@/lib/payments/withdrawal-authorization"
+import { randomUUID } from "crypto"
 
 /**
  * POST /api/withdrawals — initiate a non-custodial creator offramp.
- * Quote → Kotani offramp (deposit address) → persist → return EIP-3009 typed data to sign.
- * Idempotent on `idempotencyKey`: one withdrawal record + one Kotani request per key.
+ * Quote → provider settlement address (static) → persist → return EIP-3009 typed
+ * data to sign. The creator later signs; we relay the transfer on-chain and then
+ * call the provider's payout API with the tx hash (PUSH model).
+ * Idempotent on `idempotencyKey`: one withdrawal record per key.
  */
 export async function POST(request: NextRequest) {
   const creator = await getCurrentCreatorWithWallet()
@@ -35,9 +37,11 @@ export async function POST(request: NextRequest) {
     })
     if (!rl.allowed) return rateLimitResponse(rl.retryAfterSeconds)
 
+    const provider = getFiatProvider()
+
     const { data: existing } = await supabase
       .from("withdrawals")
-      .select("id, status, escrow_address, amount_usdc, amount_kes, rate")
+      .select("id, status, escrow_address, amount_usdc, amount_kes, rate, chain")
       .eq("idempotency_key", input.idempotencyKey)
       .eq("creator_id", creatorId)
       .maybeSingle()
@@ -54,6 +58,7 @@ export async function POST(request: NextRequest) {
         from: walletAddress,
         to: String(existing.escrow_address),
         valueUsdc: Number(existing.amount_usdc),
+        chain: (existing.chain as WithdrawalChain) ?? "AVALANCHE",
       })
       await supabase
         .from("withdrawals")
@@ -71,24 +76,23 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    const quote = await getKotaniOfframpQuote({
+    const quote = await provider.getOfframpQuote({
       amountUsdc: input.amountUsdc,
       fiatCurrency: input.fiatCurrency,
     })
-    const referenceId = createKotaniReferenceId()
-    const offramp = await requestKotaniOfframp({
-      referenceId,
-      amountUsdc: input.amountUsdc,
-      fiatCurrency: input.fiatCurrency,
-      mpesaNumber: input.mpesaNumber,
-      accountName: input.accountName ?? "",
-      network: input.network,
-    })
+    // PUSH model: the creator sends USDC to the provider's static settlement
+    // address; we generate the payout reference up-front and hand it to the
+    // provider's /pay call after the on-chain transfer (in the authorize route).
+    const settlementAddress = await provider.getOfframpSettlementAddress(
+      input.chain
+    )
+    const offrampReference = randomUUID()
 
     const { authorization, typedData } = buildWithdrawalTypedData({
       from: walletAddress,
-      to: offramp.depositAddress,
+      to: settlementAddress,
       valueUsdc: input.amountUsdc,
+      chain: input.chain,
     })
 
     const { data: withdrawal, error } = await supabase
@@ -101,8 +105,9 @@ export async function POST(request: NextRequest) {
         mpesa_number: input.mpesaNumber,
         network: input.network,
         account_name: input.accountName ?? null,
-        offramp_reference: offramp.providerReference,
-        escrow_address: offramp.depositAddress,
+        offramp_reference: offrampReference,
+        escrow_address: settlementAddress,
+        chain: input.chain,
         authorization_nonce: authorization.nonce,
         idempotency_key: input.idempotencyKey,
         status: "requested",
@@ -119,7 +124,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       withdrawalId: withdrawal.id,
-      depositAddress: offramp.depositAddress,
+      depositAddress: settlementAddress,
       amountKes: quote.amountFiat,
       rate: quote.rate,
       typedData,

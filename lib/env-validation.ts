@@ -24,13 +24,6 @@ const productionRequiredEnvKeys = [
   "XPESA_QUEST_NFT_CHAIN_ID",
   "ADMIN_EMAILS",
   "OPENAI_API_KEY",
-  "KOTANI_ENV",
-  "KOTANI_BASE_URL",
-  "KOTANI_KEY",
-  "KOTANI_SECRET",
-  "KOTANI_COLLECTION_ENDPOINT",
-  "KOTANI_PROD_WEBHOOK_URL",
-  "KOTANI_WEBHOOK_SECRET",
 ] as const
 
 export function getMissingProductionEnvKeys() {

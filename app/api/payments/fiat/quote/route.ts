@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
 
 import { fiatQuoteRequestSchema } from "@/lib/payments/fiat"
-import { getKotaniFiatQuote } from "@/lib/payments/kotani"
+import { getFiatProvider } from "@/lib/payments/providers"
 
 export async function POST(request: NextRequest) {
   try {
     const input = fiatQuoteRequestSchema.parse(await request.json())
-    const quote = await getKotaniFiatQuote(input)
-    return NextResponse.json({ quote })
+    const quote = await getFiatProvider().getOnrampQuote(input)
+    return NextResponse.json({
+      quote: { ...quote, fiatCurrency: input.fiatCurrency },
+    })
   } catch (error) {
     return NextResponse.json(
       {

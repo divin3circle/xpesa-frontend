@@ -1,7 +1,7 @@
 import { ethers } from "ethers"
 
 import { envConfig } from "@/lib/env"
-import { USDC_CONTRACT_ADDRESS } from "@/lib/thirdweb/chains"
+import { getChainConfig, type PaymentChain } from "@/lib/payments/chains"
 import type { TransferAuthorization } from "@/lib/payments/eip3009"
 
 /**
@@ -17,13 +17,15 @@ const EIP3009_ABI = [
 export async function relayTransferWithAuthorization(params: {
   authorization: TransferAuthorization
   signature: string
+  chain?: PaymentChain
 }): Promise<{ txHash: string }> {
   if (!envConfig.PLATFORM_WALLET_PRIVATE_KEY) {
     throw new Error("Relayer signer is not configured")
   }
-  const provider = new ethers.JsonRpcProvider(envConfig.RPC_URL)
+  const chainConfig = getChainConfig(params.chain ?? "AVALANCHE")
+  const provider = new ethers.JsonRpcProvider(chainConfig.rpcUrl)
   const wallet = new ethers.Wallet(envConfig.PLATFORM_WALLET_PRIVATE_KEY, provider)
-  const usdc = new ethers.Contract(USDC_CONTRACT_ADDRESS, EIP3009_ABI, wallet)
+  const usdc = new ethers.Contract(chainConfig.usdcAddress, EIP3009_ABI, wallet)
   const a = params.authorization
   const tx = await usdc.transferWithAuthorization(
     a.from,

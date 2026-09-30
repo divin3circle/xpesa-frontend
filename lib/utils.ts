@@ -7,7 +7,6 @@ import { envConfig } from "@/lib/env"
 export {
   envConfig,
   getActivePaymentChain,
-  getKotaniBaseUrl,
   getPaymentNetworkLabel,
   isAvalanchePaymentChain,
   resolveExplorerUrl,
