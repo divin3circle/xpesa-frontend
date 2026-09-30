@@ -6,12 +6,18 @@ import {
   calculateFiatPaymentAmounts,
   fiatPaymentIntentRequestSchema,
 } from "@/lib/payments/fiat"
-import { requestKotaniCollection } from "@/lib/payments/kotani"
-import { createKotaniReferenceId } from "@/lib/kotani-pay"
+import { getFiatProvider } from "@/lib/payments/providers"
 import {
   checkSensitiveRateLimit,
   rateLimitResponse,
 } from "@/lib/security/sensitive-rate-limit"
+import { randomUUID } from "crypto"
+
+// Pretium onramp delivers stablecoin on Base or Celo (not Avalanche yet); we
+// settle fans' fiat purchases as USDC on Base. The offramp is what lets a
+// creator later choose Base or Avalanche.
+const ONRAMP_CHAIN = "BASE"
+const ONRAMP_ASSET = "USDC"
 
 export async function POST(request: NextRequest) {
   const supabase = createAdminClient()
@@ -61,8 +67,27 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const provider = getFiatProvider()
+
+    // Mobile money needs a phone to push the STK prompt to — never let it through
+    // without one (previously this was optional and reached the provider empty).
+    if (input.method === "mobile_money" && !input.buyerPhone) {
+      return NextResponse.json(
+        { error: "A mobile-money phone number is required" },
+        { status: 422 }
+      )
+    }
+
+    // Recompute the fiat amount from a fresh server-side quote. NEVER trust the
+    // client-supplied input.amountFiat — the client only controls how much USDC
+    // it wants; the KES it must pay is ours to compute from the live rate.
+    const quote = await provider.getOnrampQuote({
+      amountUsdc: input.amountUsdc,
+      fiatCurrency: input.fiatCurrency,
+    })
+
     const amounts = calculateFiatPaymentAmounts(input.amountUsdc)
-    const providerReference = createKotaniReferenceId()
+    const providerReference = randomUUID()
 
     const { data: intent, error: intentError } = await supabase
       .from("payment_intents")
@@ -70,9 +95,9 @@ export async function POST(request: NextRequest) {
         link_id: input.linkId,
         creator_id: link.creator_id,
         method: input.method,
-        provider: "kotani",
+        provider: provider.id,
         status: "created",
-        amount_fiat: input.amountFiat,
+        amount_fiat: quote.amountFiat,
         fiat_currency: input.fiatCurrency,
         quoted_usdc: amounts.amountUsdc,
         platform_fee_usdc: amounts.platformFeeUsdc,
@@ -97,10 +122,18 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      const collection = await requestKotaniCollection({
-        intentId: intent.id,
-        input,
-        referenceId: providerReference,
+      const collection = await provider.createOnrampOrder({
+        reference: providerReference,
+        amountFiat: quote.amountFiat,
+        fiatCurrency: input.fiatCurrency,
+        receiverAddress: envConfig.PLATFORM_WALLET_ADDRESS,
+        chain: ONRAMP_CHAIN,
+        asset: ONRAMP_ASSET,
+        buyer: {
+          phone: input.buyerPhone ?? "",
+          network: input.buyerNetwork ?? "Safaricom",
+        },
+        callbackUrl: process.env.PRETIUM_WEBHOOK_URL ?? "",
       })
 
       const { data: updatedIntent, error: updateError } = await supabase
@@ -128,9 +161,9 @@ export async function POST(request: NextRequest) {
         .from("payment_intents")
         .update({
           status: "failed",
-          failure_code: "KOTANI_COLLECTION_FAILED",
+          failure_code: "ONRAMP_COLLECTION_FAILED",
           failure_message:
-            error instanceof Error ? error.message : "Kotani collection failed",
+            error instanceof Error ? error.message : "Onramp collection failed",
           updated_at: new Date().toISOString(),
         })
         .eq("id", intent.id)
@@ -138,10 +171,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            error instanceof Error ? error.message : "Kotani collection failed",
-          missingConfiguration: !envConfig.KOTANI_COLLECTION_ENDPOINT,
+            error instanceof Error ? error.message : "Onramp collection failed",
         },
-        { status: envConfig.KOTANI_COLLECTION_ENDPOINT ? 502 : 503 }
+        { status: 502 }
       )
     }
   } catch (error) {
