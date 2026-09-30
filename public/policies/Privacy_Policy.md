@@ -64,7 +64,7 @@ altered by XPesa or by you. By making or receiving a payment on XPesa, you ackno
 
 - ThirdWeb: wallet connection and smart account data for payment processing 
 
-- Kotani Pay: M-Pesa transaction confirmation data when you withdraw earnings 
+- Our licensed payments partner: M-Pesa transaction confirmation data when you withdraw earnings 
 
 - Supabase: our database and authentication provider who processes data on our behalf 
 
@@ -80,7 +80,7 @@ We use information we collect for the following purposes:
 
 - To verify your identity and prevent fraud 
 
-- To facilitate M-Pesa withdrawals via Kotani Pay 
+- To facilitate M-Pesa withdrawals via our licensed payments partner 
 
 - To display your public creator profile at XPesacreators.xyz/[handle] 
 
@@ -122,7 +122,7 @@ We share data with the following third-party service providers who process data 
 
 - ThirdWeb (US): wallet connection and smart account infrastructure 
 
-- Kotani Pay (Kenya): M-Pesa offramp and currency conversion 
+- Our licensed payments partner (Kenya): M-Pesa offramp and currency conversion 
 
 - Upstash (US): Redis caching for session and access token management 
 
